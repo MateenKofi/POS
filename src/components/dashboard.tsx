@@ -86,7 +86,7 @@ export function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {["Coffee Beans", "Milk Cartons", "Sugar Packets", "Paper Cups"].map((item, i) => (
+              {["Coffee Beans", "Milk Cartons", "Sugar Packets", "Paper Cups"].map((item) => (
                 <div
                   key={item}
                   className="flex items-center justify-between py-2 border-b border-slate-100 last:border-0"

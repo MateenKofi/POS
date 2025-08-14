@@ -1,7 +1,6 @@
-
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import  Login  from "@/components/login"
+import Login from "@/components/login"
 import { Sidebar } from "@/components/sidebar"
 import { ProductManagement } from "@/components/product-management"
 import { SalesInterface } from "@/components/sales-interface"
@@ -11,30 +10,39 @@ import { StaffManagement } from "@/components/staff-management"
 import { Dashboard } from "@/components/dashboard"
 import { Reports } from "@/components/reports"
 
-const queryClient = new QueryClient()
-
-interface User {
+export interface User {
   username: string
   role: "manager" | "cashier"
 }
 
-const App = () => {
-  const [user, setUser] = useState<User | null>(null)
-  const [activeTab, setActiveTab] = useState("")
+const queryClient = new QueryClient()
 
-  const handleLogin = (userData: User) => {
-    setUser(userData)
-    // Set default tab based on role
-    setActiveTab(userData.role === "manager" ? "dashboard" : "sales")
+const App = () => {
+  const [activeTab, setActiveTab] = useState("")
+  const [user, setUser] = useState<User | null>(null)
+
+  // Load user from localStorage on mount
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user")
+    if (storedUser) {
+      const parsedUser: User = JSON.parse(storedUser)
+      setUser(parsedUser)
+      setActiveTab(parsedUser.role === "manager" ? "dashboard" : "sales")
+    }
+  }, [])
+
+  // Save logged-in user
+  const handleLogin = (loggedInUser: User) => {
+    localStorage.setItem("user", JSON.stringify(loggedInUser))
+    setUser(loggedInUser)
+    setActiveTab(loggedInUser.role === "manager" ? "dashboard" : "sales")
   }
 
+  // Logout user
   const handleLogout = () => {
+    localStorage.removeItem("user")
     setUser(null)
     setActiveTab("")
-  }
-
-  if (!user) {
-    return <Login onLogin={handleLogin} />
   }
 
   const renderContent = () => {
@@ -54,8 +62,12 @@ const App = () => {
       case "staff":
         return <StaffManagement />
       default:
-        return user.role === "manager" ? <Dashboard /> : <SalesInterface />
+        return user?.role === "manager" ? <Dashboard /> : <SalesInterface />
     }
+  }
+
+  if (!user) {
+    return <Login onLogin={handleLogin} />
   }
 
   return (
