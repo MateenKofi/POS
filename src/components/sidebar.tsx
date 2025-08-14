@@ -1,0 +1,69 @@
+"use client"
+
+import { LayoutDashboard, ShoppingCart, Package, History, Truck, Users, BarChart3, LogOut } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
+
+interface SidebarProps {
+  activeTab: string
+  onTabChange: (tab: string) => void
+  userRole: "manager" | "cashier"
+  username: string
+  onLogout: () => void
+}
+
+export function Sidebar({ activeTab, onTabChange, userRole, onLogout }: SidebarProps) {
+  const allMenuItems = [
+    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, roles: ["manager"] },
+    { id: "sales", label: "Sales", icon: ShoppingCart, roles: ["cashier"] },
+    { id: "products", label: "Products", icon: Package, roles: ["manager"] },
+    { id: "history", label: "Sales History", icon: History, roles: ["manager", "cashier"] },
+    { id: "reports", label: "Reports", icon: BarChart3, roles: ["manager"] },
+    { id: "suppliers", label: "Suppliers", icon: Truck, roles: ["manager"] },
+    { id: "staff", label: "Staff", icon: Users, roles: ["manager"] },
+  ]
+
+  const menuItems = allMenuItems.filter((item) => item.roles.includes(userRole))
+
+  return (
+    <div className="w-64 bg-white border-r border-slate-200 flex flex-col">
+      <div className="p-6 border-b border-slate-200">
+        <h1 className="text-xl  text-slate-800 capitalize font-bold">POS System</h1>
+        <p className="text-sm text-slate-600 font-bold">Role: {userRole}</p>
+      </div>
+
+      <nav className="flex-1 p-4 space-y-2">
+        {menuItems.map((item) => {
+          const Icon = item.icon
+          return (
+            <Button
+              key={item.id}
+              variant={activeTab === item.id ? "default" : "ghost"}
+              className={cn(
+                "w-full justify-start gap-3 h-11",
+                activeTab === item.id
+                  ? "bg-blue-600 text-white hover:bg-blue-700"
+                  : "text-slate-700 hover:bg-slate-100",
+              )}
+              onClick={() => onTabChange(item.id)}
+            >
+              <Icon className="h-5 w-5" />
+              {item.label}
+            </Button>
+          )
+        })}
+      </nav>
+
+      <div className="p-4 border-t border-slate-200">
+        <Button
+          variant="ghost"
+          className="w-full justify-start gap-3 h-11 text-red-600 hover:text-red-700 hover:bg-red-50"
+          onClick={onLogout}
+        >
+          <LogOut className="h-5 w-5" />
+          Logout
+        </Button>
+      </div>
+    </div>
+  )
+}
