@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import { useAuth } from "@/contexts/AuthContext"
 import Login from "@/components/login"
 import { Sidebar } from "@/components/sidebar"
 import { ProductManagement } from "@/components/product-management"
@@ -9,39 +9,22 @@ import { SupplierManagement } from "@/components/supplier-management"
 import { StaffManagement } from "@/components/staff-management"
 import { Dashboard } from "@/components/dashboard"
 import { Reports } from "@/components/reports"
-
-export interface User {
-  username: string
-  role: "manager" | "cashier"
-}
-
-const queryClient = new QueryClient()
+import { Loader2 } from "lucide-react"
 
 const App = () => {
   const [activeTab, setActiveTab] = useState("")
-  const [user, setUser] = useState<User | null>(null)
+  const { user, isLoading, logout } = useAuth()
 
-  // Load user from localStorage on mount
+  // Set initial tab based on user role
   useEffect(() => {
-    const storedUser = localStorage.getItem("user")
-    if (storedUser) {
-      const parsedUser: User = JSON.parse(storedUser)
-      setUser(parsedUser)
-      setActiveTab(parsedUser.role === "manager" ? "dashboard" : "sales")
+    if (user) {
+      setActiveTab(user.role === "manager" || user.role === "admin" ? "dashboard" : "sales")
     }
-  }, [])
-
-  // Save logged-in user
-  const handleLogin = (loggedInUser: User) => {
-    localStorage.setItem("user", JSON.stringify(loggedInUser))
-    setUser(loggedInUser)
-    setActiveTab(loggedInUser.role === "manager" ? "dashboard" : "sales")
-  }
+  }, [user])
 
   // Logout user
   const handleLogout = () => {
-    localStorage.removeItem("user")
-    setUser(null)
+    logout()
     setActiveTab("")
   }
 
@@ -62,27 +45,36 @@ const App = () => {
       case "staff":
         return <StaffManagement />
       default:
-        return user?.role === "manager" ? <Dashboard /> : <SalesInterface />
+        return user?.role === "manager" || user?.role === "admin" ? <Dashboard /> : <SalesInterface />
     }
   }
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="flex items-center gap-2">
+          <Loader2 className="h-6 w-6 animate-spin" />
+          <span>Loading...</span>
+        </div>
+      </div>
+    )
+  }
+
   if (!user) {
-    return <Login onLogin={handleLogin} />
+    return <Login />
   }
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <div className="flex h-screen bg-slate-50">
-        <Sidebar
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
-          userRole={user.role}
-          username={user.username}
-          onLogout={handleLogout}
-        />
-        <main className="flex-1 overflow-auto">{renderContent()}</main>
-      </div>
-    </QueryClientProvider>
+    <div className="flex h-screen bg-slate-50">
+      <Sidebar
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        userRole={user.role}
+        username={user.username}
+        onLogout={handleLogout}
+      />
+      <main className="flex-1 overflow-auto">{renderContent()}</main>
+    </div>
   )
 }
 

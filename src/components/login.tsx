@@ -7,27 +7,18 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { User, Lock, Eye, EyeOff } from "lucide-react"
-
-interface LoginProps {
-  onLogin: (user: { username: string; role: "manager" | "cashier" }) => void
-}
+import { User, Lock, Eye, EyeOff, Loader2 } from "lucide-react"
+import { useAuth } from "@/contexts/AuthContext"
 
 interface LoginFormData {
   username: string
   password: string
 }
 
-// Mock users for demonstration
-const mockUsers = [
-  { username: "manager", password: "manager123", role: "manager" as const },
-  { username: "cashier", password: "cashier123", role: "cashier" as const },
-]
-
-const Login = ({ onLogin }: LoginProps) => {
+const Login = () => {
   const [error, setError] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
+  const { login, isLoading } = useAuth()
 
   const {
     register,
@@ -36,21 +27,16 @@ const Login = ({ onLogin }: LoginProps) => {
   } = useForm<LoginFormData>()
 
   const handleLogin = async (data: LoginFormData) => {
-    setIsLoading(true)
     setError("")
-
-    setTimeout(() => {
-      const user = mockUsers.find(
-        (u) => u.username === data.username && u.password === data.password
-      )
-
-      if (user) {
-        onLogin({ username: user.username, role: user.role })
-      } else {
+    
+    try {
+      const success = await login(data.username, data.password)
+      if (!success) {
         setError("Invalid username or password")
       }
-      setIsLoading(false)
-    }, 1000)
+    } catch (err) {
+      setError("Login failed. Please try again.")
+    }
   }
 
   return (
@@ -118,20 +104,23 @@ const Login = ({ onLogin }: LoginProps) => {
               className="w-full bg-blue-600 hover:bg-blue-700"
               disabled={isLoading}
             >
-              {isLoading ? "Signing in..." : "Sign In"}
+              {isLoading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  Signing in...
+                </>
+              ) : (
+                "Sign In"
+              )}
             </Button>
           </form>
 
-          {/* Demo Account Info */}
+          {/* API Info */}
           <div className="mt-6 p-4 bg-slate-100 rounded-lg">
-            <p className="text-sm font-medium text-slate-700 mb-2">Demo Accounts:</p>
+            <p className="text-sm font-medium text-slate-700 mb-2">API Connection:</p>
             <div className="space-y-1 text-sm text-slate-600">
-              <p>
-                <strong>Manager:</strong> manager / manager123
-              </p>
-              <p>
-                <strong>Cashier:</strong> cashier / cashier123
-              </p>
+              <p>Make sure your backend API is running at:</p>
+              <p className="font-mono text-xs">http://localhost:3007</p>
             </div>
           </div>
         </CardContent>
