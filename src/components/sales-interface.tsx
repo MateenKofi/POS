@@ -243,7 +243,7 @@ export function SalesInterface() {
                       </Badge>
                     </div>
                     <p className="text-sm text-slate-600 mb-2">{product.description}</p>
-                    <p className="text-lg font-semibold text-blue-600">${parseFloat(product.price).toFixed(2)}</p>
+                    <p className="text-lg font-semibold text-blue-600">GH₵{parseFloat(product.price).toFixed(2)}</p>
                   </div>
                 ))}
               </div>
@@ -266,7 +266,7 @@ export function SalesInterface() {
                     <div key={item.product_id} className="flex items-center justify-between py-2 border-b border-slate-100">
                       <div className="flex-1">
                         <h4 className="font-medium text-slate-800 text-sm">{item.name}</h4>
-                        <p className="text-slate-600 text-sm">${parseFloat(item.price).toFixed(2)} each</p>
+                        <p className="text-slate-600 text-sm">GH₵{parseFloat(item.price).toFixed(2)} each</p>
                       </div>
                       <div className="flex items-center gap-2">
                         <Button
@@ -303,16 +303,16 @@ export function SalesInterface() {
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
                       <span className="text-slate-600">Subtotal:</span>
-                      <span className="text-slate-800">${subtotal.toFixed(2)}</span>
+                      <span className="text-slate-800">GH₵{subtotal.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-slate-600">Tax (8%):</span>
-                      <span className="text-slate-800">${tax.toFixed(2)}</span>
+                      <span className="text-slate-800">GH₵{tax.toFixed(2)}</span>
                     </div>
                     <Separator />
                     <div className="flex justify-between text-lg font-semibold">
                       <span className="text-slate-800">Total:</span>
-                      <span className="text-slate-800">${total.toFixed(2)}</span>
+                      <span className="text-slate-800">GH₵{total.toFixed(2)}</span>
                     </div>
                   </div>
 
@@ -376,7 +376,7 @@ export function SalesInterface() {
                   onChange={(e) => handleCashAmountChange(e.target.value)}
                 />
                 {paymentDetails.change > 0 && (
-                  <p className="text-sm text-green-600 mt-1">Change: ${paymentDetails.change.toFixed(2)}</p>
+                  <p className="text-sm text-green-600 mt-1">Change: GH₵{paymentDetails.change.toFixed(2)}</p>
                 )}
                 {paymentDetails.amount > 0 && paymentDetails.amount < total && (
                   <p className="text-sm text-red-600 mt-1">Insufficient amount</p>
@@ -398,18 +398,18 @@ export function SalesInterface() {
             <div className="bg-slate-50 p-3 rounded-lg">
               <div className="flex justify-between text-sm mb-1">
                 <span>Total Amount:</span>
-                <span className="font-semibold">${total.toFixed(2)}</span>
+                <span className="font-semibold">GH₵{total.toFixed(2)}</span>
               </div>
               {paymentDetails.method === 1 && paymentDetails.amount > 0 && (
                 <>
                   <div className="flex justify-between text-sm mb-1">
                     <span>Cash Received:</span>
-                    <span>${paymentDetails.amount.toFixed(2)}</span>
+                    <span>GH₵{paymentDetails.amount.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-sm font-semibold">
                     <span>Change:</span>
                     <span className={paymentDetails.change >= 0 ? "text-green-600" : "text-red-600"}>
-                      ${paymentDetails.change.toFixed(2)}
+                      GH₵{paymentDetails.change.toFixed(2)}
                     </span>
                   </div>
                 </>
@@ -466,7 +466,7 @@ export function SalesInterface() {
                   {completedSale.items.map((item: CartItem) => (
                     <div key={item.product_id} className="flex justify-between">
                       <span>{item.name} x{item.quantity}</span>
-                      <span>${(parseFloat(item.price) * item.quantity).toFixed(2)}</span>
+                      <span>GH₵{(parseFloat(item.price) * item.quantity).toFixed(2)}</span>
                     </div>
                   ))}
                 </div>
@@ -476,15 +476,15 @@ export function SalesInterface() {
                 <div className="space-y-1 text-sm">
                   <div className="flex justify-between">
                     <span>Subtotal:</span>
-                    <span>${completedSale.subtotal.toFixed(2)}</span>
+                    <span>GH₵{completedSale.subtotal.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Tax (8%):</span>
-                    <span>${completedSale.tax.toFixed(2)}</span>
+                    <span>GH₵{completedSale.tax.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between font-semibold">
                     <span>Total:</span>
-                    <span>${completedSale.total.toFixed(2)}</span>
+                    <span>GH₵{completedSale.total.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Payment Method:</span>
@@ -493,7 +493,7 @@ export function SalesInterface() {
                   {completedSale.amountPaid > completedSale.total && (
                     <div className="flex justify-between">
                       <span>Change:</span>
-                      <span className="text-green-600">${completedSale.change.toFixed(2)}</span>
+                      <span className="text-green-600">GH₵{completedSale.change.toFixed(2)}</span>
                     </div>
                   )}
                 </div>

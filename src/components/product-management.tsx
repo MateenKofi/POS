@@ -165,7 +165,7 @@ export function ProductManagement() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="price">Price ($) *</Label>
+                  <Label htmlFor="price">Price (GH₵) *</Label>
                   <Input
                     id="price"
                     type="number"
@@ -318,13 +318,13 @@ export function ProductManagement() {
               <div>
                 <span className="font-medium text-gray-700">Total Stock Value:</span>
                 <span className="ml-2 text-gray-600">
-                  ${displayProducts.reduce((sum, p) => sum + (parseFloat(p.price) * p.stock_quantity), 0).toFixed(2)}
+                  GH₵{displayProducts.reduce((sum, p) => sum + (parseFloat(p.price) * p.stock_quantity), 0).toFixed(2)}
                 </span>
               </div>
               <div>
                 <span className="font-medium text-gray-700">Total Supply Value:</span>
                 <span className="ml-2 text-gray-600">
-                  ${(() => {
+                  GH₵{(() => {
                     const totalSupplyValue = displayProducts.reduce((sum, p) => {
                       if (p.suppliers && p.suppliers.length > 0) {
                         const avgSupplyPrice = p.suppliers.reduce((s, supplier) => s + parseFloat(supplier.supply_price), 0) / p.suppliers.length
@@ -362,7 +362,7 @@ export function ProductManagement() {
               <div>
                 <span className="font-medium text-gray-700">Total Potential Profit:</span>
                 <span className="ml-2 text-green-600">
-                  ${(() => {
+                  GH₵{(() => {
                     const totalProfit = displayProducts.reduce((sum, p) => {
                       if (p.suppliers && p.suppliers.length > 0) {
                         const retailPrice = parseFloat(p.price)
@@ -442,7 +442,7 @@ export function ProductManagement() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="edit-price">Price ($) *</Label>
+                  <Label htmlFor="edit-price">Price (GH₵) *</Label>
                   <Input
                     id="edit-price"
                     type="number"
@@ -525,7 +525,7 @@ export function ProductManagement() {
                           </div>
                           <div>
                             <span className="text-sm font-medium text-gray-700">Supply Price:</span>
-                            <p className="text-sm text-gray-900">${supplier.supply_price}</p>
+                            <p className="text-sm text-gray-900">GH₵{supplier.supply_price}</p>
                           </div>
                           <div className="col-span-2">
                             <div className="flex items-center justify-between">
@@ -605,7 +605,7 @@ function ProductRow({
       <TableCell className="text-gray-600 max-w-xs truncate">
         {product.description}
       </TableCell>
-      <TableCell className="font-semibold">${parseFloat(product.price).toFixed(2)}</TableCell>
+      <TableCell className="font-semibold">GH₵{parseFloat(product.price).toFixed(2)}</TableCell>
       <TableCell>
         <span className={`font-medium ${product.stock_quantity < 20 ? "text-red-600" : "text-green-600"}`}>
           {product.stock_quantity} units
@@ -627,9 +627,9 @@ function ProductRow({
                       <Badge variant="outline" className="text-xs">
                         {supplier.name}
                       </Badge>
-                      <span className="text-xs text-gray-500">
-                        ${supplier.supply_price}
-                      </span>
+                                          <span className="text-xs text-gray-500">
+                      GH₵{supplier.supply_price}
+                    </span>
                       <Badge variant="secondary" className="text-xs">
                         {profitMargin}% margin
                       </Badge>

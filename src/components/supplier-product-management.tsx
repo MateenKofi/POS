@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Plus, Search, Edit, Trash2, Loader2, Building2, Package, DollarSign } from "lucide-react"
+import { Plus, Search, Edit, Trash2, Loader2, Building2, Package, BadgeCent } from "lucide-react"
 import { useCreateSupplierProduct, useUpdateSupplierProduct, useDeleteSupplierProduct, useSuppliers, useProducts, useAllSupplierProducts } from "@/hooks/useApi"
 import type { SupplierProductWithDetails, CreateSupplierProductRequest } from "@/lib/api"
 import { toast } from "sonner"
@@ -149,8 +149,9 @@ export function SupplierProductManagement() {
                 <Select
                   value={newSupplierProduct.supplier_id.toString()}
                   onValueChange={(value) => setNewSupplierProduct({ ...newSupplierProduct, supplier_id: parseInt(value) })}
+
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="w-full text-gray-900">
                     <SelectValue placeholder="Select a supplier" />
                   </SelectTrigger>
                   <SelectContent>
@@ -168,7 +169,7 @@ export function SupplierProductManagement() {
                   value={newSupplierProduct.product_id.toString()}
                   onValueChange={(value) => setNewSupplierProduct({ ...newSupplierProduct, product_id: parseInt(value) })}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select a product" />
                   </SelectTrigger>
                   <SelectContent>
@@ -291,12 +292,12 @@ export function SupplierProductManagement() {
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-1">
-                          <DollarSign className="h-4 w-4 text-gray-400" />
-                          <span className="font-semibold">${supplyPrice.toFixed(2)}</span>
+                          <BadgeCent className="h-4 w-4 text-gray-400" />
+                          <span className="font-semibold">GH {supplyPrice.toFixed(2)}</span>
                         </div>
                       </TableCell>
                       <TableCell>
-                        <span className="font-semibold text-green-600">${retailPrice.toFixed(2)}</span>
+                        <span className="font-semibold text-green-600">GH {retailPrice.toFixed(2)}</span>
                       </TableCell>
                       <TableCell>
                         <span className="font-semibold text-gray-600">
@@ -305,7 +306,7 @@ export function SupplierProductManagement() {
                       </TableCell>
                       <TableCell>
                         <span className={`font-medium ${profitMargin >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                          ${profitMargin.toFixed(2)} ({profitMarginPercent}%)
+                          GH {profitMargin.toFixed(2)} ({profitMarginPercent}%)
                         </span>
                       </TableCell>
                       <TableCell className="text-right">

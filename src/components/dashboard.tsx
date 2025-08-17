@@ -62,11 +62,13 @@ export function Dashboard() {
   console.log('Recent Sales Data:', recentSales)
   console.log('Extracted Sales:', sales)
 
-  // Format currency
+  // Format currency to Ghanaian Cedi
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-GH', {
       style: 'currency',
-      currency: 'USD'
+      currency: 'GHS',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
     }).format(amount)
   }
 
@@ -350,11 +352,13 @@ export function Dashboard() {
                       </span>
                       <div>
                         <p className="font-medium text-slate-800">{product.name}</p>
-                        <p className="text-sm text-slate-600">{product.totalSold || 0} sold</p>
+                        <p className="text-sm text-slate-600">{product.total_sold
+ || 0} sold</p>
                       </div>
                     </div>
                     <p className="font-semibold text-slate-800">
-                      {formatCurrency(product.revenue || 0)}
+                      {formatCurrency(product.total_revenue
+ || 0)}
                     </p>
                   </div>
                 ))}
