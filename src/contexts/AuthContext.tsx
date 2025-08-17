@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react'
 import { api, endpoints, type User, type ApiResponse } from '@/lib/api'
 
 interface AuthContextType {
@@ -40,7 +40,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, [])
 
-  const fetchUserProfile = async (authToken: string) => {
+  const fetchUserProfile = async (_authToken: string) => {
     try {
       const response = await api.get<ApiResponse<User>>(endpoints.auth.profile)
       setUser(response.data)

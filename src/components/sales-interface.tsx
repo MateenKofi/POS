@@ -1,14 +1,14 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Search, Plus, Minus, Trash2, CreditCard, DollarSign, Receipt, X, Loader2 } from "lucide-react"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Search, Plus, Minus, Trash2, CreditCard, DollarSign, Receipt, Loader2 } from "lucide-react"
 import { useProducts, useCreateSale, PAYMENT_METHODS, type PaymentMethodId } from "@/hooks/useApi"
 import { type Product as ApiProduct, type CreateSaleRequest } from "@/lib/api"
 

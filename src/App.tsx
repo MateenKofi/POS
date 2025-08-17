@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react"
 import { useAuth } from "@/contexts/AuthContext"
+import { Toaster } from "sonner"
 import Login from "@/components/login"
 import { Sidebar } from "@/components/sidebar"
 import { ProductManagement } from "@/components/product-management"
 import { SalesInterface } from "@/components/sales-interface"
 import { SalesHistory } from "@/components/sales-history"
 import { SupplierManagement } from "@/components/supplier-management"
+import { SupplierProductManagement } from "@/components/supplier-product-management"
 import { StaffManagement } from "@/components/staff-management"
 import { Dashboard } from "@/components/dashboard"
 import { Reports } from "@/components/reports"
@@ -42,6 +44,8 @@ const App = () => {
         return <Reports />
       case "suppliers":
         return <SupplierManagement />
+      case "supplier-products":
+        return <SupplierProductManagement />
       case "staff":
         return <StaffManagement />
       default:
@@ -74,6 +78,7 @@ const App = () => {
         onLogout={handleLogout}
       />
       <main className="flex-1 overflow-auto">{renderContent()}</main>
+      <Toaster position="top-right" richColors />
     </div>
   )
 }

@@ -81,11 +81,23 @@ export const endpoints = {
     create: '/suppliers',
     update: (id: string) => `/suppliers/${id}`,
     delete: (id: string) => `/suppliers/${id}`,
+    search: (query: string) => `/suppliers/search?q=${encodeURIComponent(query)}`,
+    getProducts: (supplierId: string) => `/suppliers/${supplierId}/products`, // GET endpoint for supplier products
     addProduct: (supplierId: string) => `/suppliers/${supplierId}/products`,
     removeProduct: (supplierId: string, productId: string) => 
       `/suppliers/${supplierId}/products/${productId}`,
     updatePrice: (supplierId: string, productId: string) => 
       `/suppliers/${supplierId}/products/${productId}/price`,
+    products: (supplierId: string) => `/suppliers/${supplierId}/products`,
+  },
+  supplierProducts: {
+    all: '/suppliers/products', // This might need to be adjusted based on your backend
+    byId: (id: string) => `/suppliers/products/${id}`,
+    create: '/suppliers/products', // This might need to be adjusted based on your backend
+    update: (id: string) => `/suppliers/products/${id}`,
+    delete: (id: string) => `/suppliers/products/${id}`,
+    bySupplier: (supplierId: string) => `/suppliers/${supplierId}/products`,
+    byProduct: (productId: string) => `/suppliers/products/product/${productId}`,
   },
   dashboard: {
     stats: '/dashboard/stats',
@@ -107,7 +119,30 @@ export interface Product {
   description: string
   price: string
   stock_quantity: number
+  category?: string
+  barcode?: string
+  supplier?: string
+  suppliers?: SupplierInfo[]
 }
+
+export interface SupplierInfo {
+  supplier_id: number
+  name: string
+  contact_info: string
+  supply_price: string
+}
+
+export interface CreateProductRequest {
+  name: string
+  description: string
+  price: string
+  stock_quantity: number
+  category?: string
+  barcode?: string
+  supplier?: string
+}
+
+export interface UpdateProductRequest extends Partial<CreateProductRequest> {}
 
 export interface SaleItem {
   product_id: number
@@ -127,6 +162,10 @@ export interface Sale {
   payment_method_id: number
   total_amount: string
   items: SaleItem[]
+  // Additional fields from dashboard API response
+  first_name?: string
+  last_name?: string
+  method_name?: string
 }
 
 export interface PaymentMethod {
@@ -143,4 +182,40 @@ export interface User {
   username: string
   role: 'salesperson' | 'manager' | 'admin'
   contact_info: string
+}
+
+export interface Supplier {
+  supplier_id: number
+  name: string
+  contact_info: string
+}
+
+export interface CreateSupplierRequest {
+  name: string
+  contact_info: string
+}
+
+export interface UpdateSupplierRequest extends Partial<CreateSupplierRequest> {}
+
+export interface SupplierProduct {
+  supplier_product_id: number
+  supplier_id: number
+  product_id: number
+  supply_price: string
+}
+
+export interface CreateSupplierProductRequest {
+  supplier_id: number
+  product_id: number
+  supply_price: string
+}
+
+export interface UpdateSupplierProductRequest extends Partial<CreateSupplierProductRequest> {}
+
+export interface SupplierProductWithDetails extends SupplierProduct {
+  supplier_name: string
+  product_name: string
+  product_description: string
+  retail_price: string
+  stock_quantity: number
 }

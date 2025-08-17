@@ -7,20 +7,21 @@ import { cn } from "@/lib/utils"
 interface SidebarProps {
   activeTab: string
   onTabChange: (tab: string) => void
-  userRole: "manager" | "cashier"
+  userRole: "salesperson" | "manager" | "admin"
   username: string
   onLogout: () => void
 }
 
 export function Sidebar({ activeTab, onTabChange, userRole, onLogout }: SidebarProps) {
   const allMenuItems = [
-    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, roles: ["manager"] },
-    { id: "sales", label: "Sales", icon: ShoppingCart, roles: ["cashier"] },
-    { id: "products", label: "Products", icon: Package, roles: ["manager"] },
-    { id: "history", label: "Sales History", icon: History, roles: ["manager", "cashier"] },
-    { id: "reports", label: "Reports", icon: BarChart3, roles: ["manager"] },
-    { id: "suppliers", label: "Suppliers", icon: Truck, roles: ["manager"] },
-    { id: "staff", label: "Staff", icon: Users, roles: ["manager"] },
+    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, roles: ["manager", "admin"] },
+    { id: "sales", label: "Sales", icon: ShoppingCart, roles: ["salesperson", "manager", "admin"] },
+    { id: "products", label: "Products", icon: Package, roles: ["manager", "admin"] },
+    { id: "history", label: "Sales History", icon: History, roles: ["salesperson", "manager", "admin"] },
+    { id: "reports", label: "Reports", icon: BarChart3, roles: ["manager", "admin"] },
+    { id: "suppliers", label: "Suppliers", icon: Truck, roles: ["manager", "admin"] },
+    { id: "supplier-products", label: "Supplier Products", icon: Package, roles: ["manager", "admin"] },
+    { id: "staff", label: "Staff", icon: Users, roles: ["manager", "admin"] },
   ]
 
   const menuItems = allMenuItems.filter((item) => item.roles.includes(userRole))

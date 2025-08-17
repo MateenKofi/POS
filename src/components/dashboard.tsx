@@ -8,7 +8,11 @@ export function Dashboard() {
   // API hooks for dashboard data
   const { data: dashboardStatistics, isLoading: isStatsLoading, error: statsError } = useDashboardStats()
   const { data: inventoryReport, isLoading: isInventoryLoading } = useInventoryReport(10)
-  const { data: recentSales, isLoading: isSalesLoading } = useSales(1, 5)
+  const { data: recentSales, isLoading: isSalesLoading, error: salesError } = useSales(1, 5)
+
+  // Debug logging
+  console.log('Dashboard Component Rendered')
+  console.log('useSales hook result:', { recentSales, isSalesLoading, salesError })
 
   // Loading state
   if (isStatsLoading || isInventoryLoading || isSalesLoading) {
@@ -27,6 +31,10 @@ export function Dashboard() {
       </div>
     )
   }
+
+  // Debug information
+  console.log('Dashboard Loading States:', { isStatsLoading, isInventoryLoading, isSalesLoading })
+  console.log('Dashboard Data:', { dashboardStatistics, inventoryReport, recentSales })
 
   // Error state
   if (statsError) {
@@ -50,7 +58,9 @@ export function Dashboard() {
   // Extract data from API responses
   const stats = dashboardStatistics?.overview || {}
   const lowStockProducts = inventoryReport?.lowStockProducts || []
-  const sales = Array.isArray(recentSales) ? recentSales : []
+  const sales = recentSales?.sales || []
+  console.log('Recent Sales Data:', recentSales)
+  console.log('Extracted Sales:', sales)
 
   // Format currency
   const formatCurrency = (amount: number) => {
@@ -140,22 +150,76 @@ export function Dashboard() {
               <div className="text-center py-8 text-slate-500">
                 <ShoppingCart className="h-8 w-8 mx-auto mb-2 text-slate-300" />
                 <p>No recent transactions</p>
+                {/* Debug information */}
+                <div className="mt-4 p-3 bg-gray-100 rounded text-xs text-left">
+                  <p className="font-medium mb-2">Debug Info:</p>
+                  <p>recentSales: {JSON.stringify(recentSales, null, 2)}</p>
+                  <p>sales array length: {sales.length}</p>
+                  <p>isSalesLoading: {isSalesLoading.toString()}</p>
+                  <p>salesError: {salesError ? JSON.stringify(salesError) : 'None'}</p>
+                  <p>API URL: {`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3007'}/api/sales?page=1&limit=5`}</p>
+                  
+                  {/* Test API Call Button */}
+                  <div className="mt-3">
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={async () => {
+                        try {
+                          const response = await fetch('http://localhost:3007/api/sales?page=1&limit=5')
+                          const data = await response.json()
+                          console.log('Manual API Test Result:', data)
+                          alert(`API Test Result: ${JSON.stringify(data, null, 2)}`)
+                        } catch (error) {
+                          console.error('Manual API Test Error:', error)
+                          alert(`API Test Error: ${error}`)
+                        }
+                      }}
+                    >
+                      Test API Call
+                    </Button>
+                  </div>
+                </div>
               </div>
             ) : (
               <div className="space-y-4">
                 {sales.map((sale) => (
-                  <div key={sale.sale_id} className="flex items-center justify-between py-2 border-b border-slate-100 last:border-0">
-                    <div>
-                      <p className="font-medium text-slate-800">Transaction #{sale.sale_id}</p>
-                      <p className="text-sm text-slate-600">
-                        {sale.items?.length || 0} items • {new Date(sale.sale_date).toLocaleDateString()}
-                      </p>
+                  <div key={sale.sale_id} className="flex items-center justify-between py-3 border-b border-slate-100 last:border-0">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <p className="font-medium text-slate-800">Transaction #{sale.sale_id}</p>
+                        <Badge variant="outline" className="text-xs">
+                          {sale.method_name || (sale.payment_method_id === 1 ? 'Cash' : sale.payment_method_id === 2 ? 'Card' : 'Mobile Money')}
+                        </Badge>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-sm text-slate-600">
+                          {sale.first_name && sale.last_name ? (
+                            <span>By {sale.first_name} {sale.last_name}</span>
+                          ) : (
+                            <span>Salesperson #{sale.salesperson_id}</span>
+                          )}
+                        </p>
+                        <p className="text-xs text-slate-500">
+                          {new Date(sale.sale_date).toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </p>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <p className="font-semibold text-slate-800">{formatCurrency(parseFloat(sale.total_amount))}</p>
-                      <Badge variant="secondary" className="text-xs">
-                        {sale.payment_method_id === 1 ? 'Cash' : sale.payment_method_id === 2 ? 'Card' : 'Mobile Money'}
-                      </Badge>
+                    <div className="text-right ml-4">
+                      <p className="font-semibold text-slate-800 text-lg">
+                        {formatCurrency(parseFloat(sale.total_amount))}
+                      </p>
+                      {sale.items && sale.items.length > 0 && (
+                        <p className="text-xs text-slate-500">
+                          {sale.items.length} item{sale.items.length !== 1 ? 's' : ''}
+                        </p>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -196,6 +260,77 @@ export function Dashboard() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Sales Summary Section */}
+      {sales.length > 0 && (
+        <div className="mt-6">
+          <Card className="border-slate-200">
+            <CardHeader>
+              <CardTitle className="text-slate-800">Sales Summary</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="text-center p-4 bg-blue-50 rounded-lg">
+                  <p className="text-2xl font-bold text-blue-600">
+                    {sales.length}
+                  </p>
+                  <p className="text-sm text-blue-800">Total Sales</p>
+                </div>
+                <div className="text-center p-4 bg-green-50 rounded-lg">
+                  <p className="text-2xl font-bold text-green-600">
+                    {formatCurrency(sales.reduce((sum, sale) => sum + parseFloat(sale.total_amount), 0))}
+                  </p>
+                  <p className="text-sm text-green-800">Total Revenue</p>
+                </div>
+                <div className="text-center p-4 bg-purple-50 rounded-lg">
+                  <p className="text-2xl font-bold text-purple-600">
+                    {formatCurrency(sales.reduce((sum, sale) => sum + parseFloat(sale.total_amount), 0) / sales.length)}
+                  </p>
+                  <p className="text-sm text-purple-800">Average Sale</p>
+                </div>
+                <div className="text-center p-4 bg-orange-50 rounded-lg">
+                  <p className="text-2xl font-bold text-orange-600">
+                    {(() => {
+                      const uniqueSalespeople = new Set(sales.map(sale => sale.salesperson_id))
+                      return uniqueSalespeople.size
+                    })()}
+                  </p>
+                  <p className="text-sm text-orange-800">Salespeople</p>
+                </div>
+              </div>
+              
+              {/* Payment Method Breakdown */}
+              <div className="mt-6">
+                <h4 className="text-sm font-medium text-slate-700 mb-3">Payment Method Breakdown</h4>
+                <div className="space-y-2">
+                  {(() => {
+                    const paymentMethods = sales.reduce((acc, sale) => {
+                      const method = sale.method_name || (sale.payment_method_id === 1 ? 'Cash' : sale.payment_method_id === 2 ? 'Card' : 'Mobile Money')
+                      acc[method] = (acc[method] || 0) + 1
+                      return acc
+                    }, {} as Record<string, number>)
+                    
+                    return Object.entries(paymentMethods).map(([method, count]) => (
+                      <div key={method} className="flex items-center justify-between">
+                        <span className="text-sm text-slate-600">{method}</span>
+                        <div className="flex items-center gap-2">
+                          <div className="w-20 bg-slate-200 rounded-full h-2">
+                            <div 
+                              className="bg-blue-600 h-2 rounded-full" 
+                              style={{ width: `${(count / sales.length) * 100}%` }}
+                            ></div>
+                          </div>
+                          <span className="text-sm font-medium text-slate-800">{count}</span>
+                        </div>
+                      </div>
+                    ))
+                  })()}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       {/* Additional Dashboard Sections */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
