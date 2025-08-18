@@ -75,6 +75,17 @@ export const endpoints = {
       `/sales/date-range?start_date=${startDate}&end_date=${endDate}`,
     bySalesperson: (salespersonId: string) => `/sales/salesperson/${salespersonId}`,
   },
+  staff: {
+    all: '/salespersons',
+    byId: (id: string) => `/salespersons/${id}`,
+    create: '/salespersons',
+    update: (id: string) => `/salespersons/${id}`,
+    delete: (id: string) => `/salespersons/${id}`,
+    search: (query: string) => `/salespersons/search?q=${encodeURIComponent(query)}`,
+    toggleStatus: (id: string) => `/salespersons/${id}/toggle-status`,
+    updateRole: (id: string) => `/salespersons/${id}/role`,
+    updatePassword: (id: string) => `/salespersons/${id}/password`,
+  },
   suppliers: {
     all: '/suppliers',
     byId: (id: string) => `/suppliers/${id}`,
@@ -182,6 +193,10 @@ export interface User {
   username: string
   role: 'salesperson' | 'manager' | 'admin'
   contact_info: string
+  status?: 'active' | 'inactive'
+  hire_date?: string
+  hourly_rate?: number
+  hours_worked?: number
 }
 
 export interface Supplier {
@@ -218,4 +233,44 @@ export interface SupplierProductWithDetails extends SupplierProduct {
   product_description: string
   retail_price: string
   stock_quantity: number
+}
+
+export interface Staff {
+  salesperson_id: number
+  first_name: string
+  last_name: string
+  email: string
+  username: string
+  contact_info: string
+  role: 'salesperson' | 'manager' | 'admin'
+  status: 'active' | 'inactive'
+  hire_date: string
+  hourly_rate: number
+  hours_worked: number
+}
+
+export interface CreateStaffRequest {
+  first_name: string
+  last_name: string
+  email: string
+  username: string
+  password: string
+  contact_info: string
+  role: 'salesperson' | 'manager' | 'admin'
+  hourly_rate: number
+}
+
+export interface UpdateStaffRequest extends Partial<CreateStaffRequest> {
+  status?: 'active' | 'inactive'
+  hire_date?: string
+  hours_worked?: number
+}
+
+export interface UpdateStaffPasswordRequest {
+  current_password: string
+  new_password: string
+}
+
+export interface UpdateStaffRoleRequest {
+  role: 'salesperson' | 'manager' | 'admin'
 }

@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient, useQueries } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
-import { api, endpoints, type ApiResponse, type Product, type CreateProductRequest, type UpdateProductRequest, type CreateSaleRequest, type Sale, type Supplier, type CreateSupplierRequest, type UpdateSupplierRequest, type SupplierProduct, type CreateSupplierProductRequest, type UpdateSupplierProductRequest, type SupplierProductWithDetails } from '@/lib/api'
+import { api, endpoints, type ApiResponse, type Product, type CreateProductRequest, type UpdateProductRequest, type CreateSaleRequest, type Sale, type Supplier, type CreateSupplierRequest, type UpdateSupplierRequest, type SupplierProduct, type CreateSupplierProductRequest, type UpdateSupplierProductRequest, type SupplierProductWithDetails, type Staff, type CreateStaffRequest, type UpdateStaffRequest, type UpdateStaffRoleRequest, type UpdateStaffPasswordRequest } from '@/lib/api'
 
 // Products hooks
 export const useProducts = (page = 1, limit = 10) => {
@@ -257,6 +257,126 @@ export const useDeleteSupplier = () => {
   })
 }
 
+// Staff hooks
+export const useStaff = (page = 1, limit = 10) => {
+  return useQuery({
+    queryKey: ['staff', page, limit],
+    queryFn: async () => {
+      const response = await api.get<ApiResponse<Staff[]>>(
+        `${endpoints.staff.all}?page=${page}&limit=${limit}`
+      )
+      return response.data
+    },
+  })
+}
+
+export const useStaffMember = (id: string) => {
+  return useQuery({
+    queryKey: ['staff', id],
+    queryFn: async () => {
+      const response = await api.get<ApiResponse<Staff>>(endpoints.staff.byId(id))
+      return response.data
+    },
+    enabled: !!id,
+  })
+}
+
+export const useSearchStaff = (query: string) => {
+  return useQuery({
+    queryKey: ['staff', 'search', query],
+    queryFn: async () => {
+      const response = await api.get<ApiResponse<Staff[]>>(endpoints.staff.search(query))
+      return response.data
+    },
+    enabled: !!query && query.length > 2,
+  })
+}
+
+export const useCreateStaff = () => {
+  const queryClient = useQueryClient()
+  
+  return useMutation({
+    mutationFn: async (data: CreateStaffRequest) => {
+      const response = await api.post<ApiResponse<Staff>>(endpoints.staff.create, data)
+      return response.data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['staff'] })
+    },
+  })
+}
+
+export const useUpdateStaff = () => {
+  const queryClient = useQueryClient()
+  
+  return useMutation({
+    mutationFn: async ({ id, data }: { id: string; data: UpdateStaffRequest }) => {
+      const response = await api.put<ApiResponse<Staff>>(endpoints.staff.update(id), data)
+      return response.data
+    },
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ['staff'] })
+      queryClient.invalidateQueries({ queryKey: ['staff', id] })
+    },
+  })
+}
+
+export const useDeleteStaff = () => {
+  const queryClient = useQueryClient()
+  
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const response = await api.delete<ApiResponse<void>>(endpoints.staff.delete(id))
+      return response.data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['staff'] })
+    },
+  })
+}
+
+export const useToggleStaffStatus = () => {
+  const queryClient = useQueryClient()
+  
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const response = await api.patch<ApiResponse<Staff>>(endpoints.staff.toggleStatus(id))
+      return response.data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['staff'] })
+    },
+  })
+}
+
+export const useUpdateStaffRole = () => {
+  const queryClient = useQueryClient()
+  
+  return useMutation({
+    mutationFn: async ({ id, data }: { id: string; data: UpdateStaffRoleRequest }) => {
+      const response = await api.patch<ApiResponse<Staff>>(endpoints.staff.updateRole(id), data)
+      return response.data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['staff'] })
+    },
+  })
+}
+
+export const useUpdateStaffPassword = () => {
+  const queryClient = useQueryClient()
+  
+  return useMutation({
+    mutationFn: async ({ id, data }: { id: string; data: UpdateStaffPasswordRequest }) => {
+      const response = await api.patch<ApiResponse<void>>(endpoints.staff.updatePassword(id), data)
+      return response.data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['staff'] })
+    },
+  })
+}
+
 // SupplierProduct hooks
 export const useSupplierProducts = (page = 1, limit = 10) => {
   return useQuery({
@@ -483,6 +603,21 @@ export const useSupplierProductForm = () => {
       supplier_id: 0,
       product_id: 0,
       supply_price: '',
+    },
+  })
+}
+
+export const useStaffForm = () => {
+  return useForm<CreateStaffRequest>({
+    defaultValues: {
+      first_name: '',
+      last_name: '',
+      email: '',
+      username: '',
+      password: '',
+      contact_info: '',
+      role: 'salesperson',
+      hourly_rate: 15.0,
     },
   })
 }
