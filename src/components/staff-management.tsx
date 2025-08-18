@@ -60,7 +60,6 @@ export function StaffManagement() {
   const createStaffMutation = useCreateStaff()
   const updateStaffMutation = useUpdateStaff()
   const deleteStaffMutation = useDeleteStaff()
-  const toggleStatusMutation = useToggleStaffStatus()
   const updateRoleMutation = useUpdateStaffRole()
   const updatePasswordMutation = useUpdateStaffPassword()
 
@@ -153,9 +152,6 @@ export function StaffManagement() {
     }
   }
 
-  const toggleStaffStatus = (id: number) => {
-    toggleStatusMutation.mutate(id.toString())
-  }
 
   const openEditDialog = (staff: Staff) => {
     setEditingStaff(staff)
@@ -183,15 +179,17 @@ export function StaffManagement() {
   }
 
   const filteredStaff = useMemo(() => {
-    if (!staffData) return []
-    return staffData.filter(
+    const staffList = Array.isArray(staffData?.salespersons) ? staffData.salespersons : [];
+    return staffList.filter(
       (member) =>
         member.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         member.last_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         member.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
         member.role.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-  }, [staffData, searchTerm])
+    );
+  }, [staffData, searchTerm]);
+
+
 
   const getRoleBadgeColor = (role: string) => {
     switch (role) {
@@ -394,40 +392,14 @@ export function StaffManagement() {
                   <Badge className={`${getRoleBadgeColor(member.role)} text-white`}>
                     {getRoleDisplayName(member.role)}
                   </Badge>
-                  <Badge
-                    variant={member.status === "active" ? "default" : "secondary"}
-                    className={member.status === "active" ? "bg-green-600 text-white" : ""}
-                  >
-                    {member.status}
-                  </Badge>
+        
                 </div>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
                   <p className="text-sm text-slate-600">Contact: {member.contact_info}</p>
-                  <p className="text-sm text-slate-600">
-                    Hire Date: {member.hire_date ? new Date(member.hire_date).toLocaleDateString() : "-"}
-                  </p>
-                  <div className="flex items-center gap-2 text-sm">
-                    <Clock className="h-4 w-4 text-slate-400" />
-                    <span className="text-slate-600">{member.hours_worked ?? 0}h this month</span>
-                  </div>
-                  <div className="pt-2 border-t border-slate-100 flex justify-between items-center">
-                    <span className="text-sm text-slate-600">Hourly Rate:</span>
-                    <span className="font-semibold text-slate-800">
-                      ${member.hourly_rate?.toFixed(2) ?? "-"}
-                    </span>
-                  </div>
                   <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="flex-1 bg-transparent"
-                      onClick={() => toggleStaffStatus(member.salesperson_id)}
-                      disabled={toggleStatusMutation.isPending}
-                    >
-                      {member.status === "active" ? "Deactivate" : "Activate"}
-                    </Button>
+      
                     <Button
                       variant="outline"
                       size="sm"
