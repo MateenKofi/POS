@@ -1,6 +1,108 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* Responsive utilities */
+@layer utilities {
+  .line-clamp-1 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+  }
+  
+  .line-clamp-2 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+  
+  .line-clamp-3 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+  }
+  
+  /* Mobile-first responsive breakpoints */
+  .container-responsive {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  @media (min-width: 640px) {
+    .container-responsive {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .container-responsive {
+      padding-left: 2rem;
+      padding-right: 2rem;
+    }
+  }
+  
+  /* Responsive text sizing */
+  .text-responsive-xs {
+    font-size: 0.75rem;
+    line-height: 1rem;
+  }
+  
+  .text-responsive-sm {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
+  
+  .text-responsive-base {
+    font-size: 1rem;
+    line-height: 1.5rem;
+  }
+  
+  .text-responsive-lg {
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+  }
+  
+  .text-responsive-xl {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+  }
+  
+  .text-responsive-2xl {
+    font-size: 1.5rem;
+    line-height: 2rem;
+  }
+  
+  .text-responsive-3xl {
+    font-size: 1.875rem;
+    line-height: 2.25rem;
+  }
+  
+  @media (min-width: 640px) {
+    .text-responsive-xs { font-size: 0.75rem; }
+    .text-responsive-sm { font-size: 0.875rem; }
+    .text-responsive-base { font-size: 1rem; }
+    .text-responsive-lg { font-size: 1.125rem; }
+    .text-responsive-xl { font-size: 1.25rem; }
+    .text-responsive-2xl { font-size: 1.5rem; }
+    .text-responsive-3xl { font-size: 1.875rem; }
+  }
+  
+  @media (min-width: 768px) {
+    .text-responsive-2xl { font-size: 1.875rem; }
+    .text-responsive-3xl { font-size: 2.25rem; }
+  }
+  
+  @media (min-width: 1024px) {
+    .text-responsive-3xl { font-size: 3rem; }
+  }
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {

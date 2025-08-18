@@ -7,8 +7,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Plus, Search, Edit, Trash2, Loader2, Mail, Building2, Package, DollarSign } from "lucide-react"
-import { useSuppliers, useCreateSupplier, useUpdateSupplier, useDeleteSupplier, useSearchSuppliers, useSupplierProductsBySupplier } from "@/hooks/useApi"
+import { Plus, Search, Edit, Trash2, Loader2, Mail, Building2, Package, DollarSign, BadgeCent } from "lucide-react"
+import { useSuppliers, useCreateSupplier, useUpdateSupplier, useDeleteSupplier, useSupplierProductsBySupplier } from "@/hooks/useApi"
 import type { Supplier, CreateSupplierRequest } from "@/lib/api"
 import { toast } from "sonner"
 
@@ -24,14 +24,23 @@ export function SupplierManagement() {
 
   // API hooks
   const { data: suppliers, isLoading, error } = useSuppliers()
-  const searchQuery = useSearchSuppliers(searchTerm)
   const createSupplier = useCreateSupplier()
   const updateSupplier = useUpdateSupplier()
   const deleteSupplier = useDeleteSupplier()
 
-  // Use search results if search term exists and is long enough, otherwise use all suppliers
-  const displaySuppliers = searchTerm && searchTerm.length > 2 ? searchQuery.data : suppliers
-  const isSearching = searchTerm && searchTerm.length > 2 && searchQuery.isLoading
+  // Frontend search implementation - filter suppliers locally
+  const filteredSuppliers = suppliers?.filter((supplier: Supplier) => {
+    if (!searchTerm) return true
+    
+    const searchLower = searchTerm.toLowerCase()
+    return (
+      supplier.name.toLowerCase().includes(searchLower) ||
+      supplier.contact_info.toLowerCase().includes(searchLower) ||
+      supplier.supplier_id.toString().includes(searchTerm)
+    )
+  }) || []
+
+  const isSearching = false // No longer needed since search is frontend-only
 
   const handleAddSupplier = async () => {
     if (!newSupplier.name || !newSupplier.contact_info) {
@@ -107,47 +116,49 @@ export function SupplierManagement() {
   }
 
   return (
-    <div className="p-6">
-      <div className="flex items-center justify-between mb-8">
+    <div className="p-3 sm:p-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 sm:mb-8 gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-slate-800 mb-2">Supplier Management</h1>
-          <p className="text-slate-600">Manage your business relationships and supply chain</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-800 mb-2">Supplier Management</h1>
+          <p className="text-sm sm:text-base text-slate-600">Manage your supplier relationships and contacts</p>
         </div>
 
         <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
           <DialogTrigger asChild>
-            <Button className="bg-blue-600 hover:bg-blue-700 text-white gap-2">
+            <Button className="bg-blue-600 hover:bg-blue-700 text-white gap-2 w-full sm:w-auto text-sm sm:text-base py-2 sm:py-3">
               <Plus className="h-4 w-4" />
               Add Supplier
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-md">
+          <DialogContent className="w-[95vw] max-w-md mx-auto">
             <DialogHeader>
-              <DialogTitle>Add New Supplier</DialogTitle>
+              <DialogTitle className="text-lg sm:text-xl">Add New Supplier</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
               <div>
-                <Label htmlFor="supplier-name">Company Name *</Label>
+                <Label htmlFor="name">Supplier Name *</Label>
                 <Input
-                  id="supplier-name"
+                  id="name"
                   value={newSupplier.name}
                   onChange={(e) => setNewSupplier({ ...newSupplier, name: e.target.value })}
-                  placeholder="Enter company name"
+                  placeholder="Enter supplier name"
+                  className="text-sm sm:text-base"
                 />
               </div>
               <div>
-                <Label htmlFor="contact-info">Contact Information *</Label>
+                <Label htmlFor="contact_info">Contact Information *</Label>
                 <Input
-                  id="contact-info"
+                  id="contact_info"
                   value={newSupplier.contact_info}
                   onChange={(e) => setNewSupplier({ ...newSupplier, contact_info: e.target.value })}
-                  placeholder="Enter email, phone, or contact details"
+                  placeholder="Enter contact information"
+                  className="text-sm sm:text-base"
                 />
               </div>
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <Button 
                   onClick={handleAddSupplier} 
-                  className="flex-1 bg-blue-600 hover:bg-blue-700"
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-sm sm:text-base py-2 sm:py-3"
                   disabled={createSupplier.isPending}
                 >
                   {createSupplier.isPending ? (
@@ -165,6 +176,7 @@ export function SupplierManagement() {
                     setIsAddDialogOpen(false)
                     resetForm()
                   }}
+                  className="text-sm sm:text-base py-2 sm:py-3"
                 >
                   Cancel
                 </Button>
@@ -181,55 +193,57 @@ export function SupplierManagement() {
             placeholder="Search suppliers by name or contact info..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
+            className="pl-10 text-sm sm:text-base"
           />
         </div>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>
+          <CardTitle className="text-lg sm:text-xl">
             Suppliers 
             {isLoading || isSearching ? (
               <span className="text-sm font-normal text-gray-500 ml-2">Loading...</span>
             ) : (
               <span className="text-sm font-normal text-gray-500 ml-2">
-                ({displaySuppliers?.length || 0} suppliers)
+                ({filteredSuppliers?.length || 0} suppliers)
               </span>
             )}
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          {isLoading || isSearching ? (
+        <CardContent className="p-0 sm:p-6">
+          {isLoading ? (
             <div className="flex items-center justify-center py-8">
               <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
               <span className="ml-2 text-gray-600">
-                {isSearching ? "Searching suppliers..." : "Loading suppliers..."}
+                Loading suppliers...
               </span>
             </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Company Name</TableHead>
-                  <TableHead>Contact Information</TableHead>
-                  <TableHead>Products Supplied</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {displaySuppliers?.map((supplier) => (
-                  <SupplierRow key={supplier.supplier_id} supplier={supplier} onEdit={openEditDialog} onDelete={handleDeleteSupplier} />
-                ))}
-                {displaySuppliers?.length === 0 && (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
                   <TableRow>
-                    <TableCell colSpan={4} className="text-center py-8 text-gray-500">
-                      {searchTerm ? "No suppliers found matching your search." : "No suppliers available."}
-                    </TableCell>
+                    <TableHead className="text-xs sm:text-sm">Supplier Name</TableHead>
+                    <TableHead className="text-xs sm:text-sm hidden sm:table-cell">Contact Info</TableHead>
+                    <TableHead className="text-xs sm:text-sm">Products</TableHead>
+                    <TableHead className="text-right text-xs sm:text-sm">Actions</TableHead>
                   </TableRow>
-                )}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {filteredSuppliers?.map((supplier) => (
+                    <SupplierRow key={supplier.supplier_id} supplier={supplier} onEdit={openEditDialog} onDelete={handleDeleteSupplier} />
+                  ))}
+                  {filteredSuppliers?.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={4} className="text-center py-8 text-gray-500 text-sm sm:text-base">
+                        {searchTerm ? "No suppliers found matching your search." : "No suppliers available."}
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
           )}
         </CardContent>
       </Card>
@@ -362,7 +376,7 @@ function SupplierRow({
 
       {/* View Products Dialog */}
       <Dialog open={isViewProductsOpen} onOpenChange={setIsViewProductsOpen}>
-        <DialogContent className="max-w-4xl">
+        <DialogContent className="min-w-4xl">
           <DialogHeader>
             <DialogTitle>
               <div className="flex items-center gap-2">
@@ -420,12 +434,12 @@ function SupplierRow({
                           </TableCell>
                           <TableCell>
                             <div className="flex items-center gap-1">
-                              <DollarSign className="h-4 w-4 text-gray-400" />
-                              <span className="font-semibold">${supplyPrice.toFixed(2)}</span>
-                </div>
+                              <BadgeCent className="h-4 w-4 text-gray-400" />
+                              <span className="font-semibold">GHS {supplyPrice.toFixed(2)}</span>
+                            </div>
                           </TableCell>
                           <TableCell>
-                            <span className="font-semibold text-green-600">${retailPrice.toFixed(2)}</span>
+                            <span className="font-semibold text-green-600">GHS {retailPrice.toFixed(2)}</span>
                           </TableCell>
                           <TableCell>
                             <span className={`font-medium ${sp.stock_quantity < 20 ? "text-red-600" : "text-green-600"}`}>
@@ -434,7 +448,7 @@ function SupplierRow({
                           </TableCell>
                           <TableCell>
                             <span className={`font-medium ${profitMargin >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                              ${profitMargin.toFixed(2)} ({profitMarginPercent}%)
+                              GHS {profitMargin.toFixed(2)} ({profitMarginPercent}%)
                             </span>
                           </TableCell>
                         </TableRow>

@@ -6,7 +6,6 @@ import {
   useCreateStaff, 
   useUpdateStaff, 
   useDeleteStaff, 
-  useToggleStaffStatus, 
   useUpdateStaffRole,
   useUpdateStaffPassword
 } from "@/hooks/useApi"
@@ -19,7 +18,70 @@ import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
-import { Plus, Search, Edit, Trash2, User, Clock, Eye, EyeOff } from "lucide-react"
+import { Plus, Search, Eye, EyeOff, Edit2, Trash2 } from "lucide-react"
+import { Loader2 } from "lucide-react"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+
+// StaffRow component
+function StaffRow({ 
+  staff, 
+  onEdit, 
+  onDelete, 
+  onRoleUpdate, 
+  onPasswordUpdate 
+}: { 
+  staff: Staff
+  onEdit: (staff: Staff) => void
+  onDelete: (id: number) => void
+  onRoleUpdate: (id: number, role: "salesperson" | "manager" | "admin") => void
+  onPasswordUpdate: (staff: Staff) => void
+}) {
+  return (
+    <TableRow>
+      <TableCell className="font-medium">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+            <span className="text-blue-600 font-semibold text-sm">
+              {staff.first_name.charAt(0)}{staff.last_name.charAt(0)}
+            </span>
+          </div>
+          <div>
+            <p className="font-medium">{staff.first_name} {staff.last_name}</p>
+            <p className="text-sm text-gray-500">{staff.email}</p>
+          </div>
+        </div>
+      </TableCell>
+      <TableCell className="hidden sm:table-cell">
+        <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-200">
+          {staff.role}
+        </Badge>
+      </TableCell>
+      <TableCell className="hidden lg:table-cell text-sm text-gray-600">
+        {staff.contact_info || 'N/A'}
+      </TableCell>
+      <TableCell className="text-right">
+        <div className="flex justify-end gap-1">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="h-8 w-8 p-0"
+            onClick={() => onEdit(staff)}
+          >
+            <Edit2 className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
+            onClick={() => onDelete(staff.salesperson_id)}
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
+      </TableCell>
+    </TableRow>
+  )
+}
 
 export function StaffManagement() {
   const [searchTerm, setSearchTerm] = useState("")
@@ -161,7 +223,7 @@ export function StaffManagement() {
       email: staff.email,
       contact_info: staff.contact_info,
       role: staff.role,
-      hourly_rate: staff.hourly_rate,
+      hourly_rate: staff.hourly_rate || 15.0,
     })
     setIsEditDialogOpen(true)
   }
@@ -181,7 +243,7 @@ export function StaffManagement() {
   const filteredStaff = useMemo(() => {
     const staffList = Array.isArray(staffData?.salespersons) ? staffData.salespersons : [];
     return staffList.filter(
-      (member) =>
+      (member: Staff) =>
         member.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         member.last_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         member.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -218,221 +280,226 @@ export function StaffManagement() {
   }
 
   return (
-    <div className="p-6">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+    <div className="p-3 sm:p-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 sm:mb-8 gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-slate-800 mb-2">Staff Management</h1>
-          <p className="text-slate-600">Manage your team members and their roles</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-800 mb-2">Staff Management</h1>
+          <p className="text-sm sm:text-base text-slate-600">Manage your team members and their roles</p>
         </div>
 
-        {/* Add Staff Dialog */}
         <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
           <DialogTrigger asChild>
-            <Button className="bg-blue-600 hover:bg-blue-700 text-white gap-2">
+            <Button className="bg-blue-600 hover:bg-blue-700 text-white gap-2 w-full sm:w-auto text-sm sm:text-base py-2 sm:py-3">
               <Plus className="h-4 w-4" />
               Add Staff Member
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-md">
+          <DialogContent className="w-[95vw] max-w-md mx-auto">
             <DialogHeader>
-              <DialogTitle>Add New Staff Member</DialogTitle>
+              <DialogTitle className="text-lg sm:text-xl">Add New Staff Member</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
-              <div className="flex gap-2">
-                <div className="w-1/2">
-                  <Label htmlFor="staff-first-name">First Name</Label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="first_name">First Name *</Label>
                   <Input
-                    id="staff-first-name"
+                    id="first_name"
                     value={newStaff.first_name}
                     onChange={(e) => setNewStaff({ ...newStaff, first_name: e.target.value })}
                     placeholder="Enter first name"
+                    className="text-sm sm:text-base"
                   />
                 </div>
-                <div className="w-1/2">
-                  <Label htmlFor="staff-last-name">Last Name</Label>
+                <div>
+                  <Label htmlFor="last_name">Last Name *</Label>
                   <Input
-                    id="staff-last-name"
+                    id="last_name"
                     value={newStaff.last_name}
                     onChange={(e) => setNewStaff({ ...newStaff, last_name: e.target.value })}
                     placeholder="Enter last name"
+                    className="text-sm sm:text-base"
                   />
                 </div>
               </div>
-              <div>
-                <Label htmlFor="staff-email">Email</Label>
-                <Input
-                  id="staff-email"
-                  type="email"
-                  value={newStaff.email}
-                  onChange={(e) => setNewStaff({ ...newStaff, email: e.target.value })}
-                  placeholder="Enter email address"
-                />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="email">Email *</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={newStaff.email}
+                    onChange={(e) => setNewStaff({ ...newStaff, email: e.target.value })}
+                    placeholder="Enter email"
+                    className="text-sm sm:text-base"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="username">Username *</Label>
+                  <Input
+                    id="username"
+                    value={newStaff.username}
+                    onChange={(e) => setNewStaff({ ...newStaff, username: e.target.value })}
+                    placeholder="Enter username"
+                    className="text-sm sm:text-base"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="password">Password *</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    value={newStaff.password}
+                    onChange={(e) => setNewStaff({ ...newStaff, password: e.target.value })}
+                    placeholder="Enter password"
+                    className="text-sm sm:text-base"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="role">Role *</Label>
+                  <Select value={newStaff.role} onValueChange={(value: "salesperson" | "manager" | "admin") => setNewStaff({ ...newStaff, role: value })}>
+                    <SelectTrigger className="text-sm sm:text-base">
+                      <SelectValue placeholder="Select role" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="salesperson">Salesperson</SelectItem>
+                      <SelectItem value="manager">Manager</SelectItem>
+                      <SelectItem value="admin">Admin</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
               <div>
-                <Label htmlFor="staff-username">Username</Label>
+                <Label htmlFor="contact_info">Contact Info</Label>
                 <Input
-                  id="staff-username"
-                  value={newStaff.username}
-                  onChange={(e) => setNewStaff({ ...newStaff, username: e.target.value })}
-                  placeholder="Enter username"
-                />
-              </div>
-              <div>
-                <Label htmlFor="staff-password">Password</Label>
-                <Input
-                  id="staff-password"
-                  type="password"
-                  value={newStaff.password}
-                  onChange={(e) => setNewStaff({ ...newStaff, password: e.target.value })}
-                  placeholder="Enter password"
-                />
-              </div>
-              <div>
-                <Label htmlFor="staff-contact">Contact Info</Label>
-                <Input
-                  id="staff-contact"
+                  id="contact_info"
                   value={newStaff.contact_info}
                   onChange={(e) => setNewStaff({ ...newStaff, contact_info: e.target.value })}
-                  placeholder="Enter phone or contact info"
+                  placeholder="Enter contact information"
+                  className="text-sm sm:text-base"
                 />
               </div>
               <div>
-                <Label htmlFor="staff-role">Role</Label>
-                <Select value={newStaff.role} onValueChange={(value: "salesperson" | "manager" | "admin") => setNewStaff({ ...newStaff, role: value })}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a role" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="salesperson">Salesperson</SelectItem>
-                    <SelectItem value="manager">Manager</SelectItem>
-                    <SelectItem value="admin">Admin</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label htmlFor="hourly-rate">Hourly Rate ($)</Label>
+                <Label htmlFor="hourly_rate">Hourly Rate (GH₵)</Label>
                 <Input
-                  id="hourly-rate"
+                  id="hourly_rate"
                   type="number"
                   step="0.01"
                   value={newStaff.hourly_rate}
-                  onChange={(e) => setNewStaff({ ...newStaff, hourly_rate: parseFloat(e.target.value) || 15.0 })}
+                  onChange={(e) => setNewStaff({ ...newStaff, hourly_rate: parseFloat(e.target.value) || 0 })}
                   placeholder="15.00"
+                  className="text-sm sm:text-base"
                 />
               </div>
-              <Button
-                onClick={handleAddStaff}
-                className="w-full bg-blue-600 hover:bg-blue-700"
-                disabled={createStaffMutation.isPending}
-              >
-                {createStaffMutation.isPending ? "Adding..." : "Add Staff Member"}
-              </Button>
+              <div className="flex flex-col sm:flex-row gap-2">
+                <Button 
+                  onClick={handleAddStaff} 
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-sm sm:text-base py-2 sm:py-3"
+                  disabled={createStaffMutation.isPending}
+                >
+                  {createStaffMutation.isPending ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      Creating...
+                    </>
+                  ) : (
+                    "Add Staff Member"
+                  )}
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    setIsAddDialogOpen(false)
+                    setNewStaff({
+                      first_name: "",
+                      last_name: "",
+                      email: "",
+                      username: "",
+                      password: "",
+                      contact_info: "",
+                      role: "salesperson",
+                      hourly_rate: 15.0,
+                    })
+                  }}
+                  className="text-sm sm:text-base py-2 sm:py-3"
+                >
+                  Cancel
+                </Button>
+              </div>
             </div>
           </DialogContent>
         </Dialog>
       </div>
 
-      {/* Search Input */}
       <div className="mb-6">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
           <Input
-            placeholder="Search staff members..."
+            placeholder="Search staff by name, email, or role..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
+            className="pl-10 text-sm sm:text-base"
           />
         </div>
       </div>
 
-      {/* Staff List */}
-      {isLoading ? (
-        <div className="text-center text-slate-500 py-10">Loading staff...</div>
-      ) : error ? (
-        <div className="text-center text-red-500 py-10">Failed to load staff</div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredStaff.map((member) => (
-            <Card key={member.salesperson_id} className="border-slate-200 hover:shadow-md transition-shadow">
-              <CardHeader className="pb-3">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-slate-200 rounded-full flex items-center justify-center">
-                      <User className="h-5 w-5 text-slate-600" />
-                    </div>
-                    <div>
-                      <CardTitle className="text-lg text-slate-800">
-                        {member.first_name} {member.last_name}
-                      </CardTitle>
-                      <p className="text-sm text-slate-600">{member.email}</p>
-                    </div>
-                  </div>
-                  <div className="flex gap-1">
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="h-8 w-8 p-0"
-                      onClick={() => openEditDialog(member)}
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
-                      onClick={() => handleDeleteStaff(member.salesperson_id)}
-                      disabled={deleteStaffMutation.isPending}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-                <div className="flex gap-2 mt-2">
-                  <Badge className={`${getRoleBadgeColor(member.role)} text-white`}>
-                    {getRoleDisplayName(member.role)}
-                  </Badge>
-        
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <p className="text-sm text-slate-600">Contact: {member.contact_info}</p>
-                  <div className="flex gap-2">
-      
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="flex-1 bg-transparent"
-                      onClick={() => openPasswordDialog(member)}
-                    >
-                      Change Password
-                    </Button>
-                  </div>
-                  <div className="flex gap-2">
-                    <Select 
-                      value={member.role} 
-                      onValueChange={(value: "salesperson" | "manager" | "admin") => 
-                        handleRoleUpdate(member.salesperson_id, value)
-                      }
-                      disabled={updateRoleMutation.isPending}
-                    >
-                      <SelectTrigger className="flex-1">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="salesperson">Salesperson</SelectItem>
-                        <SelectItem value="manager">Manager</SelectItem>
-                        <SelectItem value="admin">Admin</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg sm:text-xl">
+            Staff Members 
+            {isLoading ? (
+              <span className="text-sm font-normal text-gray-500 ml-2">Loading...</span>
+            ) : (
+              <span className="text-sm font-normal text-gray-500 ml-2">
+                ({filteredStaff?.length || 0} staff members)
+              </span>
+            )}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-0 sm:p-6">
+          {isLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+              <span className="ml-2 text-gray-600">
+                Loading staff members...
+              </span>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="text-xs sm:text-sm">Name</TableHead>
+                    <TableHead className="text-xs sm:text-sm hidden sm:table-cell">Role</TableHead>
+                    <TableHead className="text-xs sm:text-sm hidden lg:table-cell">Contact</TableHead>
+                    <TableHead className="text-right text-xs sm:text-sm">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredStaff?.map((staff) => (
+                    <StaffRow 
+                      key={staff.salesperson_id} 
+                      staff={staff} 
+                      onEdit={openEditDialog} 
+                      onDelete={handleDeleteStaff}
+                      onRoleUpdate={handleRoleUpdate}
+                      onPasswordUpdate={openPasswordDialog}
+                    />
+                  ))}
+                  {filteredStaff?.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={4} className="text-center py-8 text-gray-500 text-sm sm:text-base">
+                        {searchTerm ? "No staff members found matching your search." : "No staff members available."}
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Edit Staff Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
@@ -499,7 +566,7 @@ export function StaffManagement() {
                 id="edit-hourly-rate"
                 type="number"
                 step="0.01"
-                value={editStaff.hourly_rate}
+                value={editStaff.hourly_rate || ''}
                 onChange={(e) => setEditStaff({ ...editStaff, hourly_rate: parseFloat(e.target.value) || 15.0 })}
                 placeholder="15.00"
               />

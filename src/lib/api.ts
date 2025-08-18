@@ -243,10 +243,10 @@ export interface Staff {
   username: string
   contact_info: string
   role: 'salesperson' | 'manager' | 'admin'
-  status: 'active' | 'inactive'
-  hire_date: string
-  hourly_rate: number
-  hours_worked: number
+  status?: 'active' | 'inactive'
+  hire_date?: string
+  hourly_rate?: number
+  hours_worked?: number
 }
 
 export interface CreateStaffRequest {
@@ -273,4 +273,23 @@ export interface UpdateStaffPasswordRequest {
 
 export interface UpdateStaffRoleRequest {
   role: 'salesperson' | 'manager' | 'admin'
+}
+
+// Dashboard types
+export interface DashboardStats {
+  overview: {
+    todayRevenue: number
+    totalProducts: number
+    todaySales: number
+  }
+  topProducts: Array<{
+    product_id: number
+    name: string
+    total_sold: number
+    total_revenue: number
+  }>
+}
+
+export interface InventoryReport {
+  lowStockProducts: Product[]
 }

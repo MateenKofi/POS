@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -23,6 +23,21 @@ interface PaymentDetails {
   reference?: string
 }
 
+interface CompletedSale {
+  id: number
+  items: CartItem[]
+  subtotal: number
+  tax: number
+  total: number
+  paymentMethod: string
+  amountPaid: number
+  change: number
+  reference?: string
+  timestamp: string
+  status: string
+  apiResponse: unknown
+}
+
 export function SalesInterface() {
   const [cart, setCart] = useState<CartItem[]>([])
   const [searchTerm, setSearchTerm] = useState("")
@@ -34,7 +49,7 @@ export function SalesInterface() {
     reference: ""
   })
   const [showReceipt, setShowReceipt] = useState(false)
-  const [completedSale, setCompletedSale] = useState<any>(null)
+  const [completedSale, setCompletedSale] = useState<CompletedSale | null>(null)
 
   // API hooks
   const { data: productsData, isLoading: isProductsLoading, error: productsError, refetch: refetchProducts } = useProducts(1, 100)
@@ -43,11 +58,24 @@ export function SalesInterface() {
   // Get available products from API
   const availableProducts = productsData || []
   
-  // Filter products based on search term
+  // Frontend search implementation - filter products based on search term
   const filteredProducts = availableProducts.filter((product: ApiProduct) =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    product.description.toLowerCase().includes(searchTerm.toLowerCase())
+    product.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    product.product_id.toString().includes(searchTerm)
   )
+
+  // Refetch products after payment completion to get updated stock levels
+  useEffect(() => {
+    if (completedSale && showReceipt) {
+      // Small delay to ensure backend has processed the sale
+      const timer = setTimeout(() => {
+        refetchProducts()
+      }, 1000)
+      
+      return () => clearTimeout(timer)
+    }
+  }, [completedSale, showReceipt, refetchProducts])
 
   // Handle API errors
   const handleRetry = () => {
@@ -154,7 +182,9 @@ export function SalesInterface() {
       setShowPaymentDialog(false)
       setShowReceipt(true)
       
+      if (process.env.NODE_ENV === 'development') {
       console.log("Sale completed via API:", result)
+    }
     } catch (error) {
       console.error("Error creating sale:", error)
       alert("Failed to process payment. Please try again.")
@@ -206,44 +236,44 @@ export function SalesInterface() {
   }
 
   return (
-    <div className="p-6">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-slate-800 mb-2">Sales Terminal</h1>
-        <p className="text-slate-600">Streamline your checkout process</p>
+    <div className="p-3 sm:p-6">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold text-slate-800 mb-2">Sales Terminal</h1>
+        <p className="text-sm sm:text-base text-slate-600">Streamline your checkout process</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6">
         {/* Product Selection */}
-        <div className="lg:col-span-2">
+        <div className="xl:col-span-2">
           <Card className="border-slate-200">
-            <CardHeader>
-              <CardTitle className="text-slate-800">Select Products</CardTitle>
+            <CardHeader className="pb-4">
+              <CardTitle className="text-lg sm:text-xl text-slate-800">Select Products</CardTitle>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
                 <Input
                   placeholder="Search products..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
+                  className="pl-10 text-sm sm:text-base"
                 />
               </div>
             </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <CardContent className="pt-0">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-2 gap-3 sm:gap-4">
                 {filteredProducts.map((product: ApiProduct) => (
                   <div
                     key={product.product_id}
-                    className="p-4 border border-slate-200 rounded-lg hover:bg-slate-50 cursor-pointer transition-colors"
+                    className="p-3 sm:p-4 border border-slate-200 rounded-lg hover:bg-slate-50 cursor-pointer transition-colors"
                     onClick={() => addToCart(product)}
                   >
                     <div className="flex justify-between items-start mb-2">
-                      <h3 className="font-medium text-slate-800">{product.name}</h3>
-                      <Badge variant="secondary" className="text-xs">
+                      <h3 className="font-medium text-slate-800 text-sm sm:text-base line-clamp-2">{product.name}</h3>
+                      <Badge variant="secondary" className="text-xs flex-shrink-0 ml-2">
                         Stock: {product.stock_quantity}
                       </Badge>
                     </div>
-                    <p className="text-sm text-slate-600 mb-2">{product.description}</p>
-                    <p className="text-lg font-semibold text-blue-600">GH₵{parseFloat(product.price).toFixed(2)}</p>
+                    <p className="text-xs sm:text-sm text-slate-600 mb-2 line-clamp-2">{product.description}</p>
+                    <p className="text-base sm:text-lg font-semibold text-blue-600">GH₵{parseFloat(product.price).toFixed(2)}</p>
                   </div>
                 ))}
               </div>
@@ -252,47 +282,47 @@ export function SalesInterface() {
         </div>
 
         {/* Shopping Cart */}
-        <div>
-          <Card className="border-slate-200">
-            <CardHeader>
-              <CardTitle className="text-slate-800">Current Sale</CardTitle>
+        <div className="order-first xl:order-last">
+          <Card className="border-slate-200 sticky top-4">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-lg sm:text-xl text-slate-800">Current Sale</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-0">
               {cart.length === 0 ? (
-                <p className="text-slate-500 text-center py-8">No items in cart</p>
+                <p className="text-slate-500 text-center py-6 sm:py-8 text-sm sm:text-base">No items in cart</p>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-3 sm:space-y-4">
                   {cart.map((item) => (
                     <div key={item.product_id} className="flex items-center justify-between py-2 border-b border-slate-100">
-                      <div className="flex-1">
-                        <h4 className="font-medium text-slate-800 text-sm">{item.name}</h4>
-                        <p className="text-slate-600 text-sm">GH₵{parseFloat(item.price).toFixed(2)} each</p>
+                      <div className="flex-1 min-w-0 mr-2">
+                        <h4 className="font-medium text-slate-800 text-xs sm:text-sm line-clamp-1">{item.name}</h4>
+                        <p className="text-slate-600 text-xs sm:text-sm">GH₵{parseFloat(item.price).toFixed(2)} each</p>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
                         <Button
                           variant="outline"
                           size="sm"
-                          className="h-8 w-8 p-0 bg-transparent"
+                          className="h-6 w-6 sm:h-8 sm:w-8 p-0 bg-transparent"
                           onClick={() => updateQuantity(item.product_id, -1)}
                         >
-                          <Minus className="h-3 w-3" />
+                          <Minus className="h-2 w-2 sm:h-3 sm:w-3" />
                         </Button>
-                        <span className="w-8 text-center text-sm font-medium">{item.quantity}</span>
+                        <span className="w-6 sm:w-8 text-center text-xs sm:text-sm font-medium">{item.quantity}</span>
                         <Button
                           variant="outline"
                           size="sm"
-                          className="h-8 w-8 p-0 bg-transparent"
+                          className="h-6 w-6 sm:h-8 sm:w-8 p-0 bg-transparent"
                           onClick={() => updateQuantity(item.product_id, 1)}
                         >
-                          <Plus className="h-3 w-3" />
+                          <Plus className="h-2 w-2 sm:h-3 sm:w-3" />
                         </Button>
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
+                          className="h-6 w-6 sm:h-8 sm:w-8 p-0 text-red-600 hover:text-red-700"
                           onClick={() => removeFromCart(item.product_id)}
                         >
-                          <Trash2 className="h-3 w-3" />
+                          <Trash2 className="h-2 w-2 sm:h-3 sm:w-3" />
                         </Button>
                       </div>
                     </div>
@@ -301,16 +331,16 @@ export function SalesInterface() {
                   <Separator />
 
                   <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
+                    <div className="flex justify-between text-xs sm:text-sm">
                       <span className="text-slate-600">Subtotal:</span>
                       <span className="text-slate-800">GH₵{subtotal.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-sm">
+                    <div className="flex justify-between text-xs sm:text-sm">
                       <span className="text-slate-600">Tax (8%):</span>
                       <span className="text-slate-800">GH₵{tax.toFixed(2)}</span>
                     </div>
                     <Separator />
-                    <div className="flex justify-between text-lg font-semibold">
+                    <div className="flex justify-between text-sm sm:text-lg font-semibold">
                       <span className="text-slate-800">Total:</span>
                       <span className="text-slate-800">GH₵{total.toFixed(2)}</span>
                     </div>
@@ -318,7 +348,7 @@ export function SalesInterface() {
 
                   <Button 
                     onClick={openPaymentDialog} 
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white gap-2 mt-4"
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white gap-2 mt-4 text-sm sm:text-base py-2 sm:py-3"
                     disabled={createSaleMutation.isPending}
                   >
                     {createSaleMutation.isPending ? (
@@ -337,9 +367,9 @@ export function SalesInterface() {
 
       {/* Payment Dialog */}
       <Dialog open={showPaymentDialog} onOpenChange={setShowPaymentDialog}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="w-[95vw] max-w-md mx-auto">
           <DialogHeader>
-            <DialogTitle>Payment Details</DialogTitle>
+            <DialogTitle className="text-lg sm:text-xl">Payment Details</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div>
@@ -446,9 +476,9 @@ export function SalesInterface() {
 
       {/* Receipt Dialog */}
       <Dialog open={showReceipt} onOpenChange={setShowReceipt}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="w-[95vw] max-w-md mx-auto">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
+            <DialogTitle className="flex items-center gap-2 text-lg sm:text-xl">
               <Receipt className="h-5 w-4" />
               Sale Receipt
             </DialogTitle>

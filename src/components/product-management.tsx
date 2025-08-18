@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Plus, Search, Edit, Trash2, Loader2, Package, Truck, Info, Copy } from "lucide-react"
-import { useProducts, useCreateProduct, useUpdateProduct, useDeleteProduct, useSearchProducts } from "@/hooks/useApi"
+import { useProducts, useCreateProduct, useUpdateProduct, useDeleteProduct } from "@/hooks/useApi"
 import type { Product, CreateProductRequest } from "@/lib/api"
 import { toast } from "sonner"
 
@@ -29,14 +29,25 @@ export function ProductManagement() {
 
   // API hooks
   const { data: products, isLoading, error } = useProducts()
-  const searchQuery = useSearchProducts(searchTerm)
   const createProduct = useCreateProduct()
   const updateProduct = useUpdateProduct()
   const deleteProduct = useDeleteProduct()
 
-  // Use search results if search term exists and is long enough, otherwise use all products
-  const displayProducts = searchTerm && searchTerm.length > 2 ? searchQuery.data : products
-  const isSearching = searchTerm && searchTerm.length > 2 && searchQuery.isLoading
+  // Frontend search implementation - filter products locally
+  const filteredProducts = products?.filter((product: Product) => {
+    if (!searchTerm) return true
+    
+    const searchLower = searchTerm.toLowerCase()
+    return (
+      product.name.toLowerCase().includes(searchLower) ||
+      product.description.toLowerCase().includes(searchLower) ||
+      product.product_id.toString().includes(searchTerm) ||
+      product.price.includes(searchTerm) ||
+      product.stock_quantity.toString().includes(searchTerm)
+    )
+  }) || []
+
+  const isSearching = false // No longer needed since search is frontend-only
 
   const handleAddProduct = async () => {
     if (!newProduct.name || !newProduct.description || !newProduct.price) {
@@ -98,7 +109,7 @@ export function ProductManagement() {
     try {
       await navigator.clipboard.writeText(text)
       toast.success("Contact information copied to clipboard!")
-    } catch (err) {
+    } catch {
       toast.error("Failed to copy to clipboard")
     }
   }
@@ -120,29 +131,26 @@ export function ProductManagement() {
     )
   }
 
-  // Show search error if it exists
-  if (searchTerm && searchTerm.length > 2 && searchQuery.error) {
-    toast.error("Search failed. Please try again.")
-  }
+  // No search error handling needed since search is frontend-only
 
   return (
-    <div className="p-6">
-      <div className="flex items-center justify-between mb-8">
+    <div className="p-3 sm:p-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 sm:mb-8 gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-slate-800 mb-2">Product Management</h1>
-          <p className="text-slate-600">Manage your inventory and product catalog</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-800 mb-2">Product Management</h1>
+          <p className="text-sm sm:text-base text-slate-600">Manage your inventory and product catalog</p>
         </div>
 
         <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
           <DialogTrigger asChild>
-            <Button className="bg-blue-600 hover:bg-blue-700 text-white gap-2">
+            <Button className="bg-blue-600 hover:bg-blue-700 text-white gap-2 w-full sm:w-auto text-sm sm:text-base py-2 sm:py-3">
               <Plus className="h-4 w-4" />
               Add Product
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-md">
+          <DialogContent className="w-[95vw] max-w-md mx-auto">
             <DialogHeader>
-              <DialogTitle>Add New Product</DialogTitle>
+              <DialogTitle className="text-lg sm:text-xl">Add New Product</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
               <div>
@@ -152,6 +160,7 @@ export function ProductManagement() {
                   value={newProduct.name}
                   onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
                   placeholder="Enter product name"
+                  className="text-sm sm:text-base"
                 />
               </div>
               <div>
@@ -161,9 +170,10 @@ export function ProductManagement() {
                   value={newProduct.description}
                   onChange={(e) => setNewProduct({ ...newProduct, description: e.target.value })}
                   placeholder="Enter product description"
+                  className="text-sm sm:text-base"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="price">Price (GH₵) *</Label>
                   <Input
@@ -173,6 +183,7 @@ export function ProductManagement() {
                     value={newProduct.price}
                     onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })}
                     placeholder="0.00"
+                    className="text-sm sm:text-base"
                   />
                 </div>
                 <div>
@@ -183,13 +194,14 @@ export function ProductManagement() {
                     value={newProduct.stock_quantity}
                     onChange={(e) => setNewProduct({ ...newProduct, stock_quantity: parseInt(e.target.value) || 0 })}
                     placeholder="0"
+                    className="text-sm sm:text-base"
                   />
                 </div>
               </div>
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <Button 
                   onClick={handleAddProduct} 
-                  className="flex-1 bg-blue-600 hover:bg-blue-700"
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-sm sm:text-base py-2 sm:py-3"
                   disabled={createProduct.isPending}
                 >
                   {createProduct.isPending ? (
@@ -207,6 +219,7 @@ export function ProductManagement() {
                     setIsAddDialogOpen(false)
                     resetForm()
                   }}
+                  className="text-sm sm:text-base py-2 sm:py-3"
                 >
                   Cancel
                 </Button>
@@ -223,82 +236,83 @@ export function ProductManagement() {
             placeholder="Search products by name or description..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
+            className="pl-10 text-sm sm:text-base"
           />
         </div>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>
+          <CardTitle className="text-lg sm:text-xl">
             Products 
             {isLoading || isSearching ? (
               <span className="text-sm font-normal text-gray-500 ml-2">Loading...</span>
             ) : (
               <span className="text-sm font-normal text-gray-500 ml-2">
-                ({displayProducts?.length || 0} products)
+                ({filteredProducts?.length || 0} products)
               </span>
             )}
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          {isLoading || isSearching ? (
+        <CardContent className="p-0 sm:p-6">
+          {isLoading ? (
             <div className="flex items-center justify-center py-8">
               <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
               <span className="ml-2 text-gray-600">
-                {isSearching ? "Searching products..." : "Loading products..."}
+                Loading products...
               </span>
             </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Product Name</TableHead>
-                  <TableHead>Description</TableHead>
-                  <TableHead>Price</TableHead>
-                  <TableHead>Stock</TableHead>
-                  <TableHead>Suppliers</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {displayProducts?.map((product) => (
-                  <ProductRow 
-                    key={product.product_id} 
-                    product={product} 
-                    onEdit={openEditDialog} 
-                    onDelete={handleDeleteProduct} 
-                    onSupplierDetails={openSupplierDetails}
-                    deleteProduct={deleteProduct} 
-                  />
-                ))}
-                {displayProducts?.length === 0 && (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center py-8 text-gray-500">
-                      {searchTerm ? "No products found matching your search." : "No products available."}
-                    </TableCell>
+                    <TableHead className="text-xs sm:text-sm">Product Name</TableHead>
+                    <TableHead className="text-xs sm:text-sm hidden sm:table-cell">Description</TableHead>
+                    <TableHead className="text-xs sm:text-sm">Price</TableHead>
+                    <TableHead className="text-xs sm:text-sm">Stock</TableHead>
+                    <TableHead className="text-xs sm:text-sm hidden lg:table-cell">Suppliers</TableHead>
+                    <TableHead className="text-right text-xs sm:text-sm">Actions</TableHead>
                   </TableRow>
-                )}
-              </TableBody>
-            </Table>
-            
+                </TableHeader>
+                <TableBody>
+                  {filteredProducts?.map((product) => (
+                    <ProductRow 
+                      key={product.product_id} 
+                      product={product} 
+                      onEdit={openEditDialog} 
+                      onDelete={handleDeleteProduct} 
+                      onSupplierDetails={openSupplierDetails}
+                      deleteProduct={deleteProduct} 
+                    />
+                  ))}
+                  {filteredProducts?.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center py-8 text-gray-500 text-sm sm:text-base">
+                        {searchTerm ? "No products found matching your search." : "No products available."}
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
           )}
         </CardContent>
       </Card>
       
       {/* Summary Information */}
-      {displayProducts && displayProducts.length > 0 && (
+      {filteredProducts && filteredProducts.length > 0 && (
         <Card className="mt-4">
           <CardContent className="p-4">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
               <div>
                 <span className="font-medium text-gray-700">Total Products:</span>
-                <span className="ml-2 text-gray-600">{displayProducts.length}</span>
+                <span className="ml-2 text-gray-600">{filteredProducts.length}</span>
               </div>
               <div>
                 <span className="font-medium text-gray-700">Products with Suppliers:</span>
                 <span className="ml-2 text-gray-600">
-                  {displayProducts.filter(p => p.suppliers && p.suppliers.length > 0).length}
+                  {filteredProducts.filter(p => p.suppliers && p.suppliers.length > 0).length}
                 </span>
               </div>
               <div>
@@ -306,7 +320,7 @@ export function ProductManagement() {
                 <span className="ml-2 text-gray-600">
                   {(() => {
                     const uniqueSuppliers = new Set()
-                    displayProducts.forEach(p => {
+                    filteredProducts.forEach(p => {
                       if (p.suppliers) {
                         p.suppliers.forEach(s => uniqueSuppliers.add(s.supplier_id))
                       }
@@ -318,14 +332,14 @@ export function ProductManagement() {
               <div>
                 <span className="font-medium text-gray-700">Total Stock Value:</span>
                 <span className="ml-2 text-gray-600">
-                  GH₵{displayProducts.reduce((sum, p) => sum + (parseFloat(p.price) * p.stock_quantity), 0).toFixed(2)}
+                  GH₵{filteredProducts.reduce((sum, p) => sum + (parseFloat(p.price) * p.stock_quantity), 0).toFixed(2)}
                 </span>
               </div>
               <div>
                 <span className="font-medium text-gray-700">Total Supply Value:</span>
                 <span className="ml-2 text-gray-600">
                   GH₵{(() => {
-                    const totalSupplyValue = displayProducts.reduce((sum, p) => {
+                    const totalSupplyValue = filteredProducts.reduce((sum, p) => {
                       if (p.suppliers && p.suppliers.length > 0) {
                         const avgSupplyPrice = p.suppliers.reduce((s, supplier) => s + parseFloat(supplier.supply_price), 0) / p.suppliers.length
                         return sum + (avgSupplyPrice * p.stock_quantity)
@@ -339,14 +353,14 @@ export function ProductManagement() {
               <div>
                 <span className="font-medium text-gray-700">Low Stock Items:</span>
                 <span className="ml-2 text-red-600">
-                  {displayProducts.filter(p => p.stock_quantity < 20).length}
+                  {filteredProducts.filter(p => p.stock_quantity < 20).length}
                 </span>
               </div>
               <div>
                 <span className="font-medium text-gray-700">Avg. Profit Margin:</span>
                 <span className="ml-2 text-green-600">
                   {(() => {
-                    const productsWithSuppliers = displayProducts.filter(p => p.suppliers && p.suppliers.length > 0)
+                    const productsWithSuppliers = filteredProducts.filter(p => p.suppliers && p.suppliers.length > 0)
                     if (productsWithSuppliers.length === 0) return 'N/A'
                     
                     const totalMargin = productsWithSuppliers.reduce((sum, p) => {
@@ -363,7 +377,7 @@ export function ProductManagement() {
                 <span className="font-medium text-gray-700">Total Potential Profit:</span>
                 <span className="ml-2 text-green-600">
                   GH₵{(() => {
-                    const totalProfit = displayProducts.reduce((sum, p) => {
+                    const totalProfit = filteredProducts.reduce((sum, p) => {
                       if (p.suppliers && p.suppliers.length > 0) {
                         const retailPrice = parseFloat(p.price)
                         const avgSupplyPrice = p.suppliers.reduce((s, supplier) => s + parseFloat(supplier.supply_price), 0) / p.suppliers.length
@@ -379,7 +393,7 @@ export function ProductManagement() {
                 <span className="font-medium text-gray-700">Best Margin:</span>
                 <span className="ml-2 text-green-600">
                   {(() => {
-                    const productsWithSuppliers = displayProducts.filter(p => p.suppliers && p.suppliers.length > 0)
+                    const productsWithSuppliers = filteredProducts.filter(p => p.suppliers && p.suppliers.length > 0)
                     if (productsWithSuppliers.length === 0) return 'N/A'
                     
                     const margins = productsWithSuppliers.map(p => {
@@ -396,7 +410,7 @@ export function ProductManagement() {
                 <span className="font-medium text-gray-700">Worst Margin:</span>
                 <span className="ml-2 text-red-600">
                   {(() => {
-                    const productsWithSuppliers = displayProducts.filter(p => p.suppliers && p.suppliers.length > 0)
+                    const productsWithSuppliers = filteredProducts.filter(p => p.suppliers && p.suppliers.length > 0)
                     if (productsWithSuppliers.length === 0) return 'N/A'
                     
                     const margins = productsWithSuppliers.map(p => {
@@ -592,7 +606,7 @@ function ProductRow({
   onEdit: (product: Product) => void
   onDelete: (id: number) => void
   onSupplierDetails: (product: Product) => void
-  deleteProduct: any
+  deleteProduct: ReturnType<typeof useDeleteProduct>
 }) {
   return (
     <TableRow>
@@ -602,7 +616,7 @@ function ProductRow({
           {product.name}
         </div>
       </TableCell>
-      <TableCell className="text-gray-600 max-w-xs truncate">
+      <TableCell className="text-gray-600 max-w-xs truncate hidden sm:table-cell">
         {product.description}
       </TableCell>
       <TableCell className="font-semibold">GH₵{parseFloat(product.price).toFixed(2)}</TableCell>
@@ -611,13 +625,13 @@ function ProductRow({
           {product.stock_quantity} units
         </span>
       </TableCell>
-      <TableCell>
+      <TableCell className="hidden lg:table-cell">
         <div className="flex items-center gap-2">
           <Truck className="h-4 w-4 text-blue-600" />
           <div className="text-slate-600">
             {product.suppliers && product.suppliers.length > 0 ? (
               <div className="space-y-1">
-                {product.suppliers.map((supplier, index) => {
+                {product.suppliers.map((supplier) => {
                   const retailPrice = parseFloat(product.price)
                   const supplyPrice = parseFloat(supplier.supply_price)
                   const profitMargin = ((retailPrice - supplyPrice) / retailPrice * 100).toFixed(1)

@@ -6,16 +6,23 @@ import {
   TrendingUp,
   Loader2,
   AlertCircle,
+  Users,
+  Truck,
 } from "lucide-react";
 import {
   useDashboardStats,
   useInventoryReport,
   useSales,
 } from "@/hooks/useApi";
+import type { Product } from "@/lib/api";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
-export function Dashboard() {
+interface DashboardProps {
+  onNavigate?: (tab: string) => void;
+}
+
+export function Dashboard({ onNavigate }: DashboardProps) {
   // API hooks for dashboard data
   const {
     data: dashboardStatistics,
@@ -30,13 +37,15 @@ export function Dashboard() {
     error: salesError,
   } = useSales(1, 5);
 
-  // Debug logging
-  console.log("Dashboard Component Rendered");
-  console.log("useSales hook result:", {
-    recentSales,
-    isSalesLoading,
-    salesError,
-  });
+  // Debug logging (development only)
+  if (process.env.NODE_ENV === 'development') {
+    console.log("Dashboard Component Rendered");
+    console.log("useSales hook result:", {
+      recentSales,
+      isSalesLoading,
+      salesError,
+    });
+  }
 
   // Loading state
   if (isStatsLoading || isInventoryLoading || isSalesLoading) {
@@ -58,17 +67,19 @@ export function Dashboard() {
     );
   }
 
-  // Debug information
-  console.log("Dashboard Loading States:", {
-    isStatsLoading,
-    isInventoryLoading,
-    isSalesLoading,
-  });
-  console.log("Dashboard Data:", {
-    dashboardStatistics,
-    inventoryReport,
-    recentSales,
-  });
+  // Debug information (development only)
+  if (process.env.NODE_ENV === 'development') {
+    console.log("Dashboard Loading States:", {
+      isStatsLoading,
+      isInventoryLoading,
+      isSalesLoading,
+    });
+    console.log("Dashboard Data:", {
+      dashboardStatistics,
+      inventoryReport,
+      recentSales,
+    });
+  }
 
   // Error state
   if (statsError) {
@@ -90,11 +101,18 @@ export function Dashboard() {
   }
 
   // Extract data from API responses
-  const stats = dashboardStatistics?.overview || {};
+  const stats = dashboardStatistics?.overview || {
+    todayRevenue: 0,
+    totalProducts: 0,
+    todaySales: 0
+  };
   const lowStockProducts = inventoryReport?.lowStockProducts || [];
   const sales = recentSales?.sales || [];
-  console.log("Recent Sales Data:", recentSales);
-  console.log("Extracted Sales:", sales);
+  
+  if (process.env.NODE_ENV === 'development') {
+    console.log("Recent Sales Data:", recentSales);
+    console.log("Extracted Sales:", sales);
+  }
 
   // Format currency to Ghanaian Cedi
   const formatCurrency = (amount: number) => {
@@ -156,31 +174,49 @@ export function Dashboard() {
     },
   ];
 
+  // Quick action handlers
+  const handleQuickAction = (action: string) => {
+    if (onNavigate) {
+      onNavigate(action);
+    } else {
+      // Fallback: try to dispatch a custom event
+      const event = new CustomEvent('navigateToTab', { detail: action });
+      window.dispatchEvent(event);
+    }
+  };
+
   return (
-    <div className="p-6">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-slate-800 mb-2">
+    <div className="p-3 sm:p-6">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold text-slate-800 mb-2">
           Your Sales at a Glance
         </h1>
-        <p className="text-slate-600">
+        <p className="text-sm sm:text-base text-slate-600">
           Monitor your business performance in real-time
         </p>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {dashboardStats.map((stat) => {
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
+        {dashboardStats.map((stat, index) => {
           const Icon = stat.icon;
+          const quickActions = [
+            { action: "sales", label: "View Sales" },
+            { action: "products", label: "View Products" },
+            { action: "sales", label: "View Sales" },
+            { action: "reports", label: "View Reports" }
+          ];
+          
           return (
-            <Card key={stat.title} className="border-slate-200">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-slate-600">
+            <Card key={stat.title} className="border-slate-200 hover:shadow-md transition-shadow">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 sm:px-6">
+                <CardTitle className="text-xs sm:text-sm font-medium text-slate-600">
                   {stat.title}
                 </CardTitle>
                 <Icon className="h-4 w-4 text-slate-400" />
               </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-slate-800">
+              <CardContent className="px-4 sm:px-6 pt-0">
+                <div className="text-xl sm:text-2xl font-bold text-slate-800">
                   {stat.value}
                 </div>
                 <p
@@ -192,6 +228,16 @@ export function Dashboard() {
                 >
                   {stat.change} from yesterday
                 </p>
+                {quickActions[index] && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="mt-2 h-6 px-2 text-xs text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                    onClick={() => handleQuickAction(quickActions[index].action)}
+                  >
+                    {quickActions[index].label} →
+                  </Button>
+                )}
               </CardContent>
             </Card>
           );
@@ -202,10 +248,18 @@ export function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Recent Transactions */}
         <Card className="border-slate-200">
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-slate-800">
               Recent Transactions
             </CardTitle>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+              onClick={() => handleQuickAction("sales")}
+            >
+              View All →
+            </Button>
           </CardHeader>
           <CardContent>
             {sales.length === 0 ? (
@@ -321,8 +375,18 @@ export function Dashboard() {
 
         {/* Low Stock Alerts */}
         <Card className="border-slate-200">
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-slate-800">Low Stock Alerts</CardTitle>
+            {lowStockProducts.length > 0 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                onClick={() => handleQuickAction("products")}
+              >
+                Manage Stock →
+              </Button>
+            )}
           </CardHeader>
           <CardContent>
             {lowStockProducts.length === 0 ? (
@@ -332,10 +396,11 @@ export function Dashboard() {
               </div>
             ) : (
               <div className="space-y-4">
-                {lowStockProducts.map((product: any) => (
+                {lowStockProducts.map((product: Product) => (
                   <div
                     key={product.product_id}
-                    className="flex items-center justify-between py-2 border-b border-slate-100 last:border-0"
+                    className="flex items-center justify-between py-2 border-b border-slate-100 last:border-0 hover:bg-slate-50 rounded px-2 transition-colors cursor-pointer"
+                    onClick={() => handleQuickAction("products")}
                   >
                     <div>
                       <p className="font-medium text-slate-800">
@@ -358,8 +423,16 @@ export function Dashboard() {
       {sales.length > 0 && (
         <div className="mt-6">
           <Card className="border-slate-200">
-            <CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle className="text-slate-800">Sales Summary</CardTitle>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                onClick={() => handleQuickAction("reports")}
+              >
+                View Reports →
+              </Button>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -460,16 +533,24 @@ export function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
         {/* Top Products */}
         <Card className="border-slate-200 lg:col-span-2">
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-slate-800">Top Products</CardTitle>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+              onClick={() => handleQuickAction("products")}
+            >
+              View All →
+            </Button>
           </CardHeader>
           <CardContent>
-            {dashboardStatistics.topProducts &&
+            {dashboardStatistics?.topProducts &&
             dashboardStatistics.topProducts.length > 0 ? (
               <div className="space-y-4">
                 {dashboardStatistics.topProducts
                   .slice(0, 5)
-                  .map((product: any, index: number) => (
+                  .map((product, index: number) => (
                     <div
                       key={product.product_id}
                       className="flex items-center justify-between py-2 border-b border-slate-100 last:border-0"
@@ -509,17 +590,37 @@ export function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              <Button className="w-full justify-start" variant="outline">
-                <Package className="h-4 w-4 mr-2" />
-                Add Product
-              </Button>
-              <Button className="w-full justify-start" variant="outline">
+              <Button
+                className="w-full justify-start"
+                variant="outline"
+                onClick={() => handleQuickAction("sales")}
+              >
                 <ShoppingCart className="h-4 w-4 mr-2" />
                 New Sale
               </Button>
-              <Button className="w-full justify-start" variant="outline">
-                <TrendingUp className="h-4 w-4 mr-2" />
-                View Reports
+              <Button
+                className="w-full justify-start"
+                variant="outline"
+                onClick={() => handleQuickAction("products")}
+              >
+                <Package className="h-4 w-4 mr-2" />
+                Manage Products
+              </Button>
+              <Button
+                className="w-full justify-start"
+                variant="outline"
+                onClick={() => handleQuickAction("suppliers")}
+              >
+                <Truck className="h-4 w-4 mr-2" />
+                Manage Suppliers
+              </Button>
+              <Button
+                className="w-full justify-start"
+                variant="outline"
+                onClick={() => handleQuickAction("staff")}
+              >
+                <Users className="h-4 w-4 mr-2" />
+                Manage Staff
               </Button>
             </div>
           </CardContent>

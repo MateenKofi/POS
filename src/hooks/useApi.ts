@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient, useQueries } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
-import { api, endpoints, type ApiResponse, type Product, type CreateProductRequest, type UpdateProductRequest, type CreateSaleRequest, type Sale, type Supplier, type CreateSupplierRequest, type UpdateSupplierRequest, type SupplierProduct, type CreateSupplierProductRequest, type UpdateSupplierProductRequest, type SupplierProductWithDetails, type Staff, type CreateStaffRequest, type UpdateStaffRequest, type UpdateStaffRoleRequest, type UpdateStaffPasswordRequest } from '@/lib/api'
+import { api, endpoints, type ApiResponse, type Product, type CreateProductRequest, type UpdateProductRequest, type CreateSaleRequest, type Sale, type Supplier, type CreateSupplierRequest, type UpdateSupplierRequest, type SupplierProduct, type CreateSupplierProductRequest, type UpdateSupplierProductRequest, type SupplierProductWithDetails, type Staff, type CreateStaffRequest, type UpdateStaffRequest, type UpdateStaffRoleRequest, type UpdateStaffPasswordRequest, type DashboardStats, type InventoryReport } from '@/lib/api'
 
 // Products hooks
 export const useProducts = (page = 1, limit = 10) => {
@@ -26,16 +26,7 @@ export const useProduct = (id: string) => {
   })
 }
 
-export const useSearchProducts = (query: string) => {
-  return useQuery({
-    queryKey: ['products', 'search', query],
-    queryFn: async () => {
-      const response = await api.get<ApiResponse<Product[]>>(endpoints.products.search(query))
-      return response.data
-    },
-    enabled: !!query && query.length > 2,
-  })
-}
+// Removed useSearchProducts - now using frontend search
 
 export const useCreateProduct = () => {
   const queryClient = useQueryClient()
@@ -146,7 +137,7 @@ export const useDashboardStats = () => {
   return useQuery({
     queryKey: ['dashboard', 'stats'],
     queryFn: async () => {
-      const response = await api.get<ApiResponse<any>>(endpoints.dashboard.stats)
+      const response = await api.get<ApiResponse<DashboardStats>>(endpoints.dashboard.stats)
       return response.data
     },
   })
@@ -156,7 +147,7 @@ export const useInventoryReport = (lowStockThreshold = 10) => {
   return useQuery({
     queryKey: ['dashboard', 'inventory-report', lowStockThreshold],
     queryFn: async () => {
-      const response = await api.get<ApiResponse<any>>(
+      const response = await api.get<ApiResponse<InventoryReport>>(
         `${endpoints.dashboard.inventoryReport}?low_stock_threshold=${lowStockThreshold}`
       )
       return response.data
@@ -201,18 +192,7 @@ export const useSupplier = (id: string) => {
   })
 }
 
-export const useSearchSuppliers = (query: string) => {
-  return useQuery({
-    queryKey: ['suppliers', 'search', query],
-    queryFn: async () => {
-      const response = await api.get<ApiResponse<Supplier[]>>(
-        endpoints.suppliers.search(query)
-      )
-      return response.data
-    },
-    enabled: !!query && query.length > 2,
-  })
-}
+// Removed useSearchSuppliers - now using frontend search
 
 export const useCreateSupplier = () => {
   const queryClient = useQueryClient()
@@ -262,9 +242,15 @@ export const useStaff = (page = 1, limit = 10) => {
   return useQuery({
     queryKey: ['staff', page, limit],
     queryFn: async () => {
-      const response = await api.get<ApiResponse<Staff[]>>(
-        `${endpoints.staff.all}?page=${page}&limit=${limit}`
-      )
+      const response = await api.get<ApiResponse<{
+        salespersons: Staff[]
+        pagination: {
+          page: number
+          limit: number
+          total: number
+          pages: number
+        }
+      }>>(`${endpoints.staff.all}?page=${page}&limit=${limit}`)
       return response.data
     },
   })
@@ -281,16 +267,7 @@ export const useStaffMember = (id: string) => {
   })
 }
 
-export const useSearchStaff = (query: string) => {
-  return useQuery({
-    queryKey: ['staff', 'search', query],
-    queryFn: async () => {
-      const response = await api.get<ApiResponse<Staff[]>>(endpoints.staff.search(query))
-      return response.data
-    },
-    enabled: !!query && query.length > 2,
-  })
-}
+// Removed useSearchStaff - now using frontend search
 
 export const useCreateStaff = () => {
   const queryClient = useQueryClient()
