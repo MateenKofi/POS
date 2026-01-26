@@ -13,6 +13,8 @@ import { Dashboard } from "@/components/dashboard"
 import { Reports } from "@/components/reports"
 import { Loader2, Menu } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Invoices } from "@/components/invoices"
+import { Transactions } from "@/components/transactions"
 
 const App = () => {
   const [activeTab, setActiveTab] = useState("")
@@ -59,6 +61,10 @@ const App = () => {
         return <Dashboard onNavigate={setActiveTab} />
       case "sales":
         return <SalesInterface />
+      case "invoices":
+        return <Invoices />
+      case "transactions":
+        return <Transactions />
       case "products":
         return <ProductManagement />
       case "reports":
@@ -131,6 +137,8 @@ const App = () => {
             <h1 className="text-lg font-semibold text-slate-800 capitalize">
               {activeTab === 'dashboard' ? 'Dashboard' :
                activeTab === 'sales' ? 'Sales' :
+               activeTab === 'invoices' ? 'Invoices' :
+               activeTab === 'transactions' ? 'Transactions' :
                activeTab === 'products' ? 'Products' :
                activeTab === 'suppliers' ? 'Suppliers' :
                activeTab === 'supplier-products' ? 'Supplier Products' :

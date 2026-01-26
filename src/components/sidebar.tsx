@@ -10,6 +10,8 @@ import {
   // BarChart3,
   LogOut,
   X,
+  Receipt,
+  History,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -33,6 +35,18 @@ export function Sidebar({
       id: "dashboard",
       label: "Dashboard",
       icon: LayoutDashboard,
+      roles: ["manager", "admin"],
+    },
+    {
+      id: "invoices",
+      label: "Invoices",
+      icon: Receipt,
+      roles: ["salesperson", "manager", "admin"],
+    },
+    {
+      id: "transactions",
+      label: "Transactions",
+      icon: History,
       roles: ["manager", "admin"],
     },
     {
