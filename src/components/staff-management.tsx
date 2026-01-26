@@ -6,7 +6,6 @@ import {
   useCreateStaff, 
   useUpdateStaff, 
   useDeleteStaff, 
-  useUpdateStaffRole,
   useUpdateStaffPassword
 } from "@/hooks/useApi"
 import { type Staff, type CreateStaffRequest, type UpdateStaffRequest } from "@/lib/api"
@@ -26,15 +25,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 function StaffRow({ 
   staff, 
   onEdit, 
-  onDelete, 
-  onRoleUpdate, 
-  onPasswordUpdate 
+  onDelete 
 }: { 
   staff: Staff
   onEdit: (staff: Staff) => void
   onDelete: (id: number) => void
-  onRoleUpdate: (id: number, role: "salesperson" | "manager" | "admin") => void
-  onPasswordUpdate: (staff: Staff) => void
 }) {
   return (
     <TableRow>
@@ -118,11 +113,11 @@ export function StaffManagement() {
   })
 
   // API hooks
-  const { data: staffData, isLoading, error } = useStaff()
+  const { data: staffData, isLoading } = useStaff()
   const createStaffMutation = useCreateStaff()
   const updateStaffMutation = useUpdateStaff()
   const deleteStaffMutation = useDeleteStaff()
-  const updateRoleMutation = useUpdateStaffRole()
+  
   const updatePasswordMutation = useUpdateStaffPassword()
 
   const handleAddStaff = () => {
@@ -228,17 +223,7 @@ export function StaffManagement() {
     setIsEditDialogOpen(true)
   }
 
-  const handleRoleUpdate = (staffId: number, newRole: "salesperson" | "manager" | "admin") => {
-    updateRoleMutation.mutate({
-      id: staffId.toString(),
-      data: { role: newRole }
-    })
-  }
-
-  const openPasswordDialog = (staff: Staff) => {
-    setEditingStaff(staff)
-    setIsPasswordDialogOpen(true)
-  }
+  
 
   const filteredStaff = useMemo(() => {
     const staffList = Array.isArray(staffData?.salespersons) ? staffData.salespersons : [];
@@ -251,33 +236,7 @@ export function StaffManagement() {
     );
   }, [staffData, searchTerm]);
 
-
-
-  const getRoleBadgeColor = (role: string) => {
-    switch (role) {
-      case "manager":
-        return "bg-blue-600"
-      case "salesperson":
-        return "bg-slate-600"
-      case "admin":
-        return "bg-pink-600"
-      default:
-        return "bg-slate-600"
-    }
-  }
-
-  const getRoleDisplayName = (role: string) => {
-    switch (role) {
-      case "manager":
-        return "Manager"
-      case "salesperson":
-        return "Salesperson"
-      case "admin":
-        return "Admin"
-      default:
-        return role.charAt(0).toUpperCase() + role.slice(1)
-    }
-  }
+ 
 
   return (
     <div className="p-3 sm:p-6">
@@ -483,8 +442,6 @@ export function StaffManagement() {
                       staff={staff} 
                       onEdit={openEditDialog} 
                       onDelete={handleDeleteStaff}
-                      onRoleUpdate={handleRoleUpdate}
-                      onPasswordUpdate={openPasswordDialog}
                     />
                   ))}
                   {filteredStaff?.length === 0 && (

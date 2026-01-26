@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Plus, Search, Edit, Trash2, Loader2, Mail, Building2, Package, DollarSign, BadgeCent } from "lucide-react"
+import { Plus, Search, Edit, Trash2, Loader2, Mail, Building2, Package, BadgeCent } from "lucide-react"
 import { useSuppliers, useCreateSupplier, useUpdateSupplier, useDeleteSupplier, useSupplierProductsBySupplier } from "@/hooks/useApi"
 import type { Supplier, CreateSupplierRequest } from "@/lib/api"
 import { toast } from "sonner"
@@ -108,11 +108,6 @@ export function SupplierManagement() {
         </div>
       </div>
     )
-  }
-
-  // Show search error if it exists
-  if (searchTerm && searchTerm.length > 2 && searchQuery.error) {
-    toast.error("Search failed. Please try again.")
   }
 
   return (
