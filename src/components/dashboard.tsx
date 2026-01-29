@@ -13,6 +13,7 @@ import {
   useDashboardStats,
   useInventoryReport,
   useSales,
+  useProducts,
 } from "@/hooks/useApi";
 import type { Product } from "@/lib/api";
 import { Badge } from "@/components/ui/badge";
@@ -36,6 +37,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
     isLoading: isSalesLoading,
     error: salesError,
   } = useSales(1, 5);
+  const { data: productsData } = useProducts(1, 1000);
 
   // Debug logging (development only)
   if (process.env.NODE_ENV === 'development') {
@@ -108,7 +110,25 @@ export function Dashboard({ onNavigate }: DashboardProps) {
   };
   const lowStockProducts = inventoryReport?.lowStockProducts || [];
   const sales = recentSales?.sales || [];
-  
+
+  // Calculate today's profit from sales
+  const todayProfit = sales.reduce((sum, sale) => {
+    const profit = parseFloat(sale.profit_amount || '0')
+    return sum + profit
+  }, 0)
+
+  // Get all products for expiry check
+  const allProductsForExpiry = productsData && Array.isArray(productsData) && productsData.length > 0
+    ? [...productsData]
+    : []
+
+  // Calculate expiring products
+  const expiringProducts = allProductsForExpiry.filter(p => {
+    if (!p.expiry_date) return false
+    const daysUntilExpiry = Math.ceil((new Date(p.expiry_date).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
+    return daysUntilExpiry <= 30 && daysUntilExpiry >= 0
+  })
+
   if (process.env.NODE_ENV === 'development') {
     console.log("Recent Sales Data:", recentSales);
     console.log("Extracted Sales:", sales);
@@ -133,12 +153,22 @@ export function Dashboard({ onNavigate }: DashboardProps) {
 
   const dashboardStats = [
     {
-      title: "Today's Sales",
+      title: "Today's Revenue",
       value: formatCurrency(stats.todayRevenue || 0),
       icon: DollarSign,
       change: calculateChange(
         stats.todayRevenue || 0,
         (stats.todayRevenue || 0) * 0.9
+      ),
+      changeType: "positive" as const,
+    },
+    {
+      title: "Today's Profit",
+      value: formatCurrency(todayProfit),
+      icon: TrendingUp,
+      change: calculateChange(
+        todayProfit,
+        todayProfit * 0.95
       ),
       changeType: "positive" as const,
     },
@@ -160,16 +190,6 @@ export function Dashboard({ onNavigate }: DashboardProps) {
         stats.todaySales || 0,
         (stats.todaySales || 0) * 0.92
       ),
-      changeType: "positive" as const,
-    },
-    {
-      title: "Average Sale",
-      value:
-        stats.todaySales && stats.todayRevenue
-          ? formatCurrency(stats.todayRevenue / stats.todaySales)
-          : formatCurrency(0),
-      icon: TrendingUp,
-      change: "+5.4%",
       changeType: "positive" as const,
     },
   ];
@@ -338,7 +358,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
                               By {sale.first_name} {sale.last_name}
                             </span>
                           ) : (
-                            <span>Salesperson #{sale.salesperson_id}</span>
+                            <span>Salesperson #{sale.cashier_id}</span>
                           )}
                         </p>
                         <p className="text-xs text-slate-500">
@@ -407,12 +427,61 @@ export function Dashboard({ onNavigate }: DashboardProps) {
                         {product.name}
                       </p>
                       <p className="text-sm text-red-600">
-                        Only {product.stock_quantity} left
+                        Only {product.stock_quantity} {product.unit_type === 'bag' ? 'bags' : 'kg'} left
                       </p>
                     </div>
                     <div className="w-2 h-2 bg-red-500 rounded-full"></div>
                   </div>
                 ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Expiring Soon Alert */}
+        <Card className="border-orange-200">
+          <CardHeader>
+            <CardTitle className="text-orange-800">Expiring Soon</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {expiringProducts.length === 0 ? (
+              <div className="text-center py-8 text-slate-500">
+                <Package className="h-8 w-8 mx-auto mb-2 text-slate-300" />
+                <p>No products expiring soon</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {expiringProducts.map((product) => {
+                  const daysUntilExpiry = Math.ceil((new Date(product.expiry_date!).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
+                  const isExpired = daysUntilExpiry < 0
+                  return (
+                    <div
+                      key={product.product_id}
+                      className={`flex items-center justify-between p-3 rounded-lg border ${
+                        isExpired ? 'bg-red-50 border-red-200' : 'bg-orange-50 border-orange-200'
+                      }`}
+                    >
+                      <div>
+                        <p className="font-medium text-slate-800">{product.name}</p>
+                        <p className="text-sm text-slate-600">
+                          {product.batch_number && <span>Batch: {product.batch_number}</span>}
+                          <span className="mx-2">•</span>
+                          {product.stock_quantity} {product.unit_type === 'bag' ? 'bags' : 'kg'}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className={`text-sm font-medium ${
+                          isExpired ? 'text-red-600' : 'text-orange-600'
+                        }`}>
+                          {isExpired ? 'Expired' : `${daysUntilExpiry} days`}
+                        </p>
+                        <p className="text-xs text-slate-600">
+                          {new Date(product.expiry_date!).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </div>
+                  )
+                })}
               </div>
             )}
           </CardContent>
@@ -468,7 +537,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
                   <p className="text-2xl font-bold text-orange-600">
                     {(() => {
                       const uniqueSalespeople = new Set(
-                        sales.map((sale) => sale.salesperson_id)
+                        sales.map((sale) => sale.cashier_id)
                       );
                       return uniqueSalespeople.size;
                     })()}

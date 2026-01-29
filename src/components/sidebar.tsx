@@ -12,6 +12,8 @@ import {
   X,
   Receipt,
   History,
+  RefreshCw,
+  FileText,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -19,7 +21,7 @@ import { cn } from "@/lib/utils";
 interface SidebarProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
-  userRole: "salesperson" | "manager" | "admin";
+  userRole: "cashier" | "manager" | "admin";
   username: string;
   onLogout: () => void;
 }
@@ -41,7 +43,7 @@ export function Sidebar({
       id: "invoices",
       label: "Invoices",
       icon: Receipt,
-      roles: ["salesperson", "manager", "admin"],
+      roles: ["cashier", "manager", "admin"],
     },
     {
       id: "transactions",
@@ -53,7 +55,7 @@ export function Sidebar({
       id: "sales",
       label: "Sales",
       icon: ShoppingCart,
-      roles: ["salesperson", "manager", "admin"],
+      roles: ["cashier", "manager", "admin"],
     },
     {
       id: "products",
@@ -75,6 +77,18 @@ export function Sidebar({
       roles: ["manager", "admin"],
     },
     { id: "staff", label: "Staff", icon: Users, roles: ["manager", "admin"] },
+    {
+      id: "stock-movements",
+      label: "Stock Movements",
+      icon: RefreshCw,
+      roles: ["manager", "admin"],
+    },
+    {
+      id: "daily-closure",
+      label: "Daily Closure",
+      icon: FileText,
+      roles: ["manager", "admin"],
+    },
   ];
 
   const menuItems = allMenuItems.filter((item) =>

@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Modal } from "@/components/modal"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Plus, Search, Edit, Trash2, Loader2, Mail, Building2, Package, BadgeCent } from "lucide-react"
 import { useSuppliers, useCreateSupplier, useUpdateSupplier, useDeleteSupplier, useSupplierProductsBySupplier } from "@/hooks/useApi"
@@ -118,17 +118,21 @@ export function SupplierManagement() {
           <p className="text-sm sm:text-base text-slate-600">Manage your supplier relationships and contacts</p>
         </div>
 
-        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="bg-blue-600 hover:bg-blue-700 text-white gap-2 w-full sm:w-auto text-sm sm:text-base py-2 sm:py-3">
-              <Plus className="h-4 w-4" />
-              Add Supplier
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="w-[95vw] max-w-md mx-auto">
-            <DialogHeader>
-              <DialogTitle className="text-lg sm:text-xl">Add New Supplier</DialogTitle>
-            </DialogHeader>
+        <Button
+          onClick={() => setIsAddDialogOpen(true)}
+          className="bg-blue-600 hover:bg-blue-700 text-white gap-2 w-full sm:w-auto text-sm sm:text-base py-2 sm:py-3"
+        >
+          <Plus className="h-4 w-4" />
+          Add Supplier
+        </Button>
+
+      {isAddDialogOpen && (
+        <Modal
+          isOpen={isAddDialogOpen}
+          onClose={() => setIsAddDialogOpen(false)}
+          title="Add New Supplier"
+          size="md"
+        >
             <div className="space-y-4">
               <div>
                 <Label htmlFor="name">Supplier Name *</Label>
@@ -177,8 +181,8 @@ export function SupplierManagement() {
                 </Button>
               </div>
             </div>
-          </DialogContent>
-        </Dialog>
+          </Modal>
+        )}
       </div>
 
       <div className="mb-6">
@@ -243,12 +247,14 @@ export function SupplierManagement() {
         </CardContent>
       </Card>
 
-      {/* Edit Supplier Dialog */}
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Edit Supplier</DialogTitle>
-          </DialogHeader>
+      {/* Edit Supplier Modal */}
+      {isEditDialogOpen && (
+        <Modal
+          isOpen={isEditDialogOpen}
+          onClose={() => setIsEditDialogOpen(false)}
+          title="Edit Supplier"
+          size="md"
+        >
           {editingSupplier && (
             <div className="space-y-4">
               <div>
@@ -296,8 +302,8 @@ export function SupplierManagement() {
               </div>
             </div>
           )}
-        </DialogContent>
-      </Dialog>
+        </Modal>
+      )}
     </div>
   )
 }
@@ -369,17 +375,19 @@ function SupplierRow({
         </TableCell>
       </TableRow>
 
-      {/* View Products Dialog */}
-      <Dialog open={isViewProductsOpen} onOpenChange={setIsViewProductsOpen}>
-        <DialogContent className="min-w-4xl">
-          <DialogHeader>
-            <DialogTitle>
-              <div className="flex items-center gap-2">
-                <Building2 className="h-5 w-5 text-blue-600" />
-                Products Supplied by {supplier.name}
-              </div>
-            </DialogTitle>
-          </DialogHeader>
+      {/* View Products Modal */}
+      {isViewProductsOpen && (
+        <Modal
+          isOpen={isViewProductsOpen}
+          onClose={() => setIsViewProductsOpen(false)}
+          title={
+            <div className="flex items-center gap-2">
+              <Building2 className="h-5 w-5 text-blue-600" />
+              Products Supplied by {supplier.name}
+            </div>
+          }
+          size="full"
+        >
           
           <div className="space-y-4">
             <div className="flex items-center justify-between">
@@ -460,8 +468,8 @@ function SupplierRow({
       </div>
             )}
     </div>
-        </DialogContent>
-      </Dialog>
+        </Modal>
+      )}
     </>
   )
 }

@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Modal } from "@/components/modal"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Plus, Search, Edit, Trash2, Loader2, Building2, Package, BadgeCent } from "lucide-react"
@@ -132,17 +132,21 @@ export function SupplierProductManagement() {
           <p className="text-slate-600">Manage which suppliers provide which products and their supply prices</p>
         </div>
 
-        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="bg-blue-600 hover:bg-blue-700 text-white gap-2">
-              <Plus className="h-4 w-4" />
-              Add Supplier Product
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle>Add New Supplier Product Relationship</DialogTitle>
-            </DialogHeader>
+        <Button
+          onClick={() => setIsAddDialogOpen(true)}
+          className="bg-blue-600 hover:bg-blue-700 text-white gap-2"
+        >
+          <Plus className="h-4 w-4" />
+          Add Supplier Product
+        </Button>
+
+      {isAddDialogOpen && (
+        <Modal
+          isOpen={isAddDialogOpen}
+          onClose={() => setIsAddDialogOpen(false)}
+          title="Add New Supplier Product Relationship"
+          size="md"
+        >
             <div className="space-y-4">
               <div>
                 <Label htmlFor="supplier">Supplier *</Label>
@@ -218,8 +222,8 @@ export function SupplierProductManagement() {
                 </Button>
               </div>
             </div>
-          </DialogContent>
-        </Dialog>
+          </Modal>
+        )}
       </div>
 
       <div className="mb-6">
@@ -350,12 +354,14 @@ export function SupplierProductManagement() {
         </CardContent>
       </Card>
 
-      {/* Edit Supplier Product Dialog */}
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Edit Supply Price</DialogTitle>
-          </DialogHeader>
+      {/* Edit Supplier Product Modal */}
+      {isEditDialogOpen && (
+        <Modal
+          isOpen={isEditDialogOpen}
+          onClose={() => setIsEditDialogOpen(false)}
+          title="Edit Supply Price"
+          size="md"
+        >
           {editingSupplierProduct && (
             <div className="space-y-4">
               <div>
@@ -414,8 +420,8 @@ export function SupplierProductManagement() {
               </div>
             </div>
           )}
-        </DialogContent>
-      </Dialog>
+        </Modal>
+      )}
     </div>
   )
 }

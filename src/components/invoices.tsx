@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Modal } from "@/components/modal"
 import { Separator } from "@/components/ui/separator"
 import { Loader2, Search, Eye, Mail, Printer } from "lucide-react"
 import { useSales } from "@/hooks/useApi"
@@ -158,16 +158,16 @@ export function Invoices() {
         </CardContent>
       </Card>
 
-      <Dialog open={!!selected} onOpenChange={(o) => { if (!o) setSelected(null) }}>
-        <DialogContent className="w-[95vw] max-w-md mx-auto">
-          <DialogHeader>
-            <DialogTitle className="text-lg sm:text-xl">Invoice Preview</DialogTitle>
-          </DialogHeader>
-          {selected && (
-            <InvoicePreview sale={selected} />
-          )}
-        </DialogContent>
-      </Dialog>
+      {selected && (
+        <Modal
+          isOpen={!!selected}
+          onClose={() => setSelected(null)}
+          title="Invoice Preview"
+          size="md"
+        >
+          <InvoicePreview sale={selected} />
+        </Modal>
+      )}
     </div>
   )
 }

@@ -15,6 +15,8 @@ import { Loader2, Menu } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Invoices } from "@/components/invoices"
 import { Transactions } from "@/components/transactions"
+import { StockMovements } from "@/components/stock-movements"
+import { DailyClosure } from "@/components/daily-closure"
 
 const App = () => {
   const [activeTab, setActiveTab] = useState("")
@@ -24,7 +26,7 @@ const App = () => {
   // Set initial tab based on user role
   useEffect(() => {
     if (user) {
-      setActiveTab(user.role === "manager" || user.role === "admin" ? "dashboard" : "sales")
+      setActiveTab(user.role === "manager" || user.role === "admin" ? "dashboard" : user.role === "cashier" ? "sales" : "dashboard")
     }
   }, [user])
 
@@ -75,8 +77,12 @@ const App = () => {
         return <SupplierProductManagement />
       case "staff":
         return <StaffManagement />
+      case "stock-movements":
+        return <StockMovements />
+      case "daily-closure":
+        return <DailyClosure />
       default:
-        return user?.role === "manager" || user?.role === "admin" ? <Dashboard onNavigate={setActiveTab} /> : <SalesInterface />
+        return user?.role === "cashier" ? <SalesInterface /> : <Dashboard onNavigate={setActiveTab} />
     }
   }
 
@@ -143,6 +149,8 @@ const App = () => {
                activeTab === 'suppliers' ? 'Suppliers' :
                activeTab === 'supplier-products' ? 'Supplier Products' :
                activeTab === 'staff' ? 'Staff' :
+               activeTab === 'stock-movements' ? 'Stock Movements' :
+               activeTab === 'daily-closure' ? 'Daily Closure' :
                activeTab === 'reports' ? 'Reports' : 'POS System'}
             </h1>
           </div>

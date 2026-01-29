@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient, useQueries } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
-import { api, endpoints, type ApiResponse, type Product, type CreateProductRequest, type UpdateProductRequest, type CreateSaleRequest, type Sale, type Supplier, type CreateSupplierRequest, type UpdateSupplierRequest, type SupplierProduct, type CreateSupplierProductRequest, type UpdateSupplierProductRequest, type SupplierProductWithDetails, type Staff, type CreateStaffRequest, type UpdateStaffRequest, type UpdateStaffRoleRequest, type UpdateStaffPasswordRequest, type DashboardStats, type InventoryReport } from '@/lib/api'
+import { api, endpoints, type ApiResponse, type Product, type CreateProductRequest, type UpdateProductRequest, type CreateSaleRequest, type Sale, type Supplier, type CreateSupplierRequest, type UpdateSupplierRequest, type SupplierProduct, type CreateSupplierProductRequest, type UpdateSupplierProductRequest, type SupplierProductWithDetails, type Staff, type CreateStaffRequest, type UpdateStaffRequest, type UpdateStaffRoleRequest, type UpdateStaffPasswordRequest, type DashboardStats, type InventoryReport, type StockMovement } from '@/lib/api'
 
 // Products hooks
 export const useProducts = (page = 1, limit = 10) => {
@@ -593,7 +593,7 @@ export const useStaffForm = () => {
       username: '',
       password: '',
       contact_info: '',
-      role: 'salesperson',
+      role: 'cashier',
       hourly_rate: 15.0,
     },
   })
@@ -602,8 +602,22 @@ export const useStaffForm = () => {
 // Payment method mapping - updated to match database schema
 export const PAYMENT_METHODS = {
   1: 'Cash',
-  2: 'Card', 
-  3: 'Mobile Money',
+  2: 'Mobile Money',
+  3: 'Bank Transfer',
 } as const
 
 export type PaymentMethodId = keyof typeof PAYMENT_METHODS
+
+// Stock Movements hooks
+export const useStockMovements = (productId?: string) => {
+  return useQuery({
+    queryKey: ['stock-movements', productId],
+    queryFn: async () => {
+      const url = productId
+        ? `/stock-movements?product_id=${productId}`
+        : '/stock-movements'
+      const response = await api.get<ApiResponse<StockMovement[]>>(url)
+      return response.data
+    },
+  })
+}

@@ -378,12 +378,19 @@ export interface Product {
   product_id: number
   name: string
   description: string
-  price: string
-  stock_quantity: number
+  price: string  // Retail price per kg or per bag
+  cost_price: string  // Cost price for profit tracking
+  stock_quantity: number  // Total quantity in kg
+  unit_type: 'bag' | 'loose'  // Whether sold by bag or loose kg
+  weight_per_bag?: number  // Weight in kg per bag
   category?: string
   barcode?: string
   supplier?: string
   suppliers?: SupplierInfo[]
+  expiry_date?: string  // ISO date string for feed expiration
+  batch_number?: string  // Batch tracking for quality control
+  manufacturer?: string  // Feed manufacturer
+  reorder_level?: number  // Alert threshold for reordering
 }
 
 export interface SupplierInfo {
@@ -397,10 +404,17 @@ export interface CreateProductRequest {
   name: string
   description: string
   price: string
+  cost_price: string
   stock_quantity: number
+  unit_type: 'bag' | 'loose'
+  weight_per_bag?: number
   category?: string
   barcode?: string
   supplier?: string
+  expiry_date?: string
+  batch_number?: string
+  manufacturer?: string
+  reorder_level?: number
 }
 
 export interface UpdateProductRequest extends Partial<CreateProductRequest> {}
@@ -408,7 +422,12 @@ export interface UpdateProductRequest extends Partial<CreateProductRequest> {}
 export interface SaleItem {
   product_id: number
   quantity: number
+  unit: 'bag' | 'kg'  // Whether sold as bags or kg
   price_at_sale: number
+  cost_price_at_sale: number  // For profit calculation
+  discount_amount?: number  // Per-item discount
+  batch_number?: string  // Track which batch was sold
+  expiry_date?: string  // Expiry of sold items
 }
 
 export interface CreateSaleRequest {
@@ -419,14 +438,18 @@ export interface CreateSaleRequest {
 export interface Sale {
   sale_id: number
   sale_date: string
-  salesperson_id: number
+  cashier_id: number  // Renamed from salesperson_id
   payment_method_id: number
   total_amount: string
+  subtotal: string  // Before discounts
+  total_discount: string  // Total discount applied
   items: SaleItem[]
-  // Additional fields from dashboard API response
   first_name?: string
   last_name?: string
   method_name?: string
+  customer_phone?: string  // For SMS receipts
+  profit_amount: string  // Total profit from this sale
+  receipt_generated: boolean  // Whether receipt was printed/sent
 }
 
 export interface PaymentMethod {
@@ -441,7 +464,7 @@ export interface User {
   last_name: string
   email: string
   username: string
-  role: 'salesperson' | 'manager' | 'admin'
+  role: 'cashier' | 'manager' | 'admin'
   contact_info: string
   status?: 'active' | 'inactive'
   hire_date?: string
@@ -492,7 +515,7 @@ export interface Staff {
   email: string
   username: string
   contact_info: string
-  role: 'salesperson' | 'manager' | 'admin'
+  role: 'cashier' | 'manager' | 'admin'
   status?: 'active' | 'inactive'
   hire_date?: string
   hourly_rate?: number
@@ -506,7 +529,7 @@ export interface CreateStaffRequest {
   username: string
   password: string
   contact_info: string
-  role: 'salesperson' | 'manager' | 'admin'
+  role: 'cashier' | 'manager' | 'admin'
   hourly_rate: number
 }
 
@@ -522,7 +545,7 @@ export interface UpdateStaffPasswordRequest {
 }
 
 export interface UpdateStaffRoleRequest {
-  role: 'salesperson' | 'manager' | 'admin'
+  role: 'cashier' | 'manager' | 'admin'
 }
 
 // Dashboard types
@@ -542,4 +565,74 @@ export interface DashboardStats {
 
 export interface InventoryReport {
   lowStockProducts: Product[]
+}
+
+// Stock Movement Tracking
+export interface StockMovement {
+  movement_id: number
+  product_id: number
+  movement_type: 'sale' | 'purchase' | 'adjustment' | 'return' | 'expiry'
+  quantity: number  // Positive for additions, negative for deductions
+  unit: 'bag' | 'kg'
+  reference_id?: number  // Sale ID or Purchase ID
+  reference_type?: 'sale' | 'purchase' | 'manual'
+  batch_number?: string
+  expiry_date?: string
+  notes?: string
+  created_by: number  // User ID
+  created_at: string
+}
+
+// Daily Closure Summary
+export interface DailyClosure {
+  closure_id: number
+  date: string
+  cashier_id: number
+  opening_balance: number
+  total_sales: number
+  total_cash: number
+  total_mobile_money: number
+  total_bank_transfer: number
+  expected_total: number
+  actual_total: number
+  variance: number
+  transactions_count: number
+  status: 'open' | 'closed'
+  closed_at?: string
+  notes?: string
+}
+
+// Report Types
+export interface ProfitReport {
+  period: string
+  total_revenue: number
+  total_cost: number
+  gross_profit: number
+  profit_margin: number
+  top_products: Array<{
+    product_id: number
+    name: string
+    profit: number
+    margin: number
+  }>
+}
+
+export interface ExpiryReport {
+  product_id: number
+  name: string
+  batch_number: string
+  expiry_date: string
+  quantity: number
+  days_until_expiry: number
+  status: 'expired' | 'expiring_soon' | 'ok'
+}
+
+export interface StaffPerformanceReport {
+  cashier_id: number
+  cashier_name: string
+  total_sales: number
+  total_transactions: number
+  average_transaction: number
+  total_profit: number
+  period: string
 }

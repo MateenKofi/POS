@@ -28,7 +28,7 @@ const Login = () => {
 
   const handleLogin = async (data: LoginFormData) => {
     setError("")
-    
+
     try {
       const success = await login(data.username, data.password)
       if (!success) {
@@ -115,12 +115,68 @@ const Login = () => {
             </Button>
           </form>
 
-          {/* API Info */}
-          <div className="mt-6 p-4 bg-slate-100 rounded-lg">
-            <p className="text-sm font-medium text-slate-700 mb-2">API Connection:</p>
-            <div className="space-y-1 text-sm text-slate-600">
-              <p>Make sure your backend API is running at:</p>
-              <p className="font-mono text-xs">http://localhost:3007</p>
+          {/* Quick Login Buttons */}
+          <div className="mt-6">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-white px-2 text-slate-500">Demo Accounts</span>
+              </div>
+            </div>
+            <div className="mt-4 grid grid-cols-3 gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="border-red-200 hover:bg-red-50 hover:border-red-300 text-red-700"
+                disabled={isLoading}
+                onClick={async () => {
+                  setError("")
+                  const success = await login("admin", "admin123")
+                  if (!success) setError("Login failed")
+                }}
+              >
+                <div className="flex flex-col items-center">
+                  <span className="font-semibold">Admin</span>
+                  <span className="text-[10px] text-slate-500">admin123</span>
+                </div>
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="border-blue-200 hover:bg-blue-50 hover:border-blue-300 text-blue-700"
+                disabled={isLoading}
+                onClick={async () => {
+                  setError("")
+                  const success = await login("manager", "manager123")
+                  if (!success) setError("Login failed")
+                }}
+              >
+                <div className="flex flex-col items-center">
+                  <span className="font-semibold">Manager</span>
+                  <span className="text-[10px] text-slate-500">manager123</span>
+                </div>
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="border-green-200 hover:bg-green-50 hover:border-green-300 text-green-700"
+                disabled={isLoading}
+                onClick={async () => {
+                  setError("")
+                  const success = await login("cashier", "cashier123")
+                  if (!success) setError("Login failed")
+                }}
+              >
+                <div className="flex flex-col items-center">
+                  <span className="font-semibold">Cashier</span>
+                  <span className="text-[10px] text-slate-500">cashier123</span>
+                </div>
+              </Button>
             </div>
           </div>
         </CardContent>

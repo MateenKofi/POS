@@ -1,10 +1,11 @@
-import type { Product, Supplier, Staff, Sale, SupplierProduct, User, DashboardStats, InventoryReport } from './api'
+import type { Product, Supplier, Staff, Sale, SupplierProduct, User, DashboardStats, InventoryReport, StockMovement } from './api'
 
 // Basic deterministic IDs for mock entities
 let nextProductId = 1001
 let nextSupplierId = 201
 let nextStaffId = 301
 let nextSaleId = 401
+let nextMovementId = 501
 
 export const mockUser: User = {
   salesperson_id: 1,
@@ -19,65 +20,246 @@ export const mockUser: User = {
   hourly_rate: 25,
 }
 
+// Mock users with credentials for different roles
+export const mockUsers: { user: User; password: string }[] = [
+  {
+    user: {
+      salesperson_id: 1,
+      first_name: 'Admin',
+      last_name: 'User',
+      email: 'admin@pos.com',
+      username: 'admin',
+      role: 'admin',
+      contact_info: '555-0001',
+      status: 'active',
+      hire_date: new Date().toISOString(),
+      hourly_rate: 30,
+    },
+    password: 'admin123',
+  },
+  {
+    user: {
+      salesperson_id: 2,
+      first_name: 'Manager',
+      last_name: 'User',
+      email: 'manager@pos.com',
+      username: 'manager',
+      role: 'manager',
+      contact_info: '555-0002',
+      status: 'active',
+      hire_date: new Date().toISOString(),
+      hourly_rate: 25,
+    },
+    password: 'manager123',
+  },
+  {
+    user: {
+      salesperson_id: 3,
+      first_name: 'Cashier',
+      last_name: 'User',
+      email: 'cashier@pos.com',
+      username: 'cashier',
+      role: 'cashier',
+      contact_info: '555-0003',
+      status: 'active',
+      hire_date: new Date().toISOString(),
+      hourly_rate: 15,
+    },
+    password: 'cashier123',
+  },
+]
+
+// Helper function to authenticate mock users
+export function authenticateMockUser(username: string, password: string): User | null {
+  const found = mockUsers.find(
+    (u) => u.user.username === username && u.password === password
+  )
+  return found ? found.user : null
+}
+
 export const mockProducts: Product[] = [
-  { product_id: 1, name: 'Wireless Mouse', description: 'Ergonomic 2.4G mouse', price: '19.99', stock_quantity: 45, category: 'Accessories', barcode: 'WM-001' },
-  { product_id: 2, name: 'Mechanical Keyboard', description: 'RGB backlit, blue switches', price: '79.99', stock_quantity: 20, category: 'Accessories', barcode: 'MK-002' },
-  { product_id: 3, name: 'USB-C Cable', description: '1m, fast charge', price: '9.99', stock_quantity: 120, category: 'Cables', barcode: 'UC-003' },
-  { product_id: 4, name: '27" Monitor', description: '144Hz FHD', price: '219.00', stock_quantity: 12, category: 'Displays', barcode: 'MN-004' },
-  { product_id: 5, name: 'External SSD 1TB', description: 'USB 3.2 Gen2', price: '129.00', stock_quantity: 18, category: 'Storage', barcode: 'ES-005' },
-  { product_id: 6, name: 'Webcam HD', description: '1080p autofocus', price: '49.00', stock_quantity: 34, category: 'Accessories', barcode: 'WC-006' },
-  { product_id: 7, name: 'Bluetooth Speaker', description: 'Portable, 12h battery', price: '39.00', stock_quantity: 27, category: 'Audio', barcode: 'BS-007' },
-  { product_id: 8, name: 'Gaming Headset', description: '7.1 surround', price: '59.00', stock_quantity: 22, category: 'Audio', barcode: 'GH-008' },
+  {
+    product_id: 1,
+    name: 'Layer Mash 50kg',
+    description: 'Complete feed for laying hens',
+    price: '250.00',
+    cost_price: '200.00',
+    stock_quantity: 150,
+    unit_type: 'bag',
+    weight_per_bag: 50,
+    category: 'Poultry Feed',
+    barcode: 'LM-050',
+    expiry_date: '2025-12-31',
+    batch_number: 'BATCH-2025-001',
+    manufacturer: 'AgriFeeds Ghana',
+    reorder_level: 50
+  },
+  {
+    product_id: 2,
+    name: 'Broiler Starter',
+    description: 'High protein starter for broilers',
+    price: '5.50',
+    cost_price: '4.20',
+    stock_quantity: 800,
+    unit_type: 'loose',
+    category: 'Poultry Feed',
+    barcode: 'BS-LOOSE',
+    expiry_date: '2025-08-15',
+    batch_number: 'BATCH-2025-042',
+    manufacturer: 'Premium Feeds Ltd',
+    reorder_level: 200
+  },
+  {
+    product_id: 3,
+    name: 'NPK 15-15-15',
+    description: 'Balanced fertilizer for crops',
+    price: '180.00',
+    cost_price: '140.00',
+    stock_quantity: 75,
+    unit_type: 'bag',
+    weight_per_bag: 50,
+    category: 'Fertilizer',
+    barcode: 'NPK-151515',
+    expiry_date: '2026-06-30',
+    batch_number: 'FERT-2025-003',
+    manufacturer: 'AgroChem Corp',
+    reorder_level: 30
+  },
+  {
+    product_id: 4,
+    name: 'Cattle Feed Cubes',
+    description: 'Nutritious cubes for cattle',
+    price: '8.00',
+    cost_price: '6.00',
+    stock_quantity: 1200,
+    unit_type: 'loose',
+    category: 'Cattle Feed',
+    barcode: 'CC-LOOSE',
+    expiry_date: '2025-10-20',
+    batch_number: 'BATCH-2025-088',
+    manufacturer: 'Livestock Feeds Co',
+    reorder_level: 300
+  },
+  {
+    product_id: 5,
+    name: 'Grower Pellets',
+    description: 'Transition feed for growing poultry',
+    price: '220.00',
+    cost_price: '175.00',
+    stock_quantity: 90,
+    unit_type: 'bag',
+    weight_per_bag: 50,
+    category: 'Poultry Feed',
+    barcode: 'GP-050',
+    expiry_date: '2025-11-30',
+    batch_number: 'BATCH-2025-095',
+    manufacturer: 'AgriFeeds Ghana',
+    reorder_level: 40
+  },
+  {
+    product_id: 6,
+    name: 'Urea 46%',
+    description: 'Nitrogen fertilizer for crops',
+    price: '3.50',
+    cost_price: '2.80',
+    stock_quantity: 2500,
+    unit_type: 'loose',
+    category: 'Fertilizer',
+    barcode: 'UREA-46',
+    expiry_date: '2026-12-31',
+    batch_number: 'FERT-2025-112',
+    manufacturer: 'AgroChem Corp',
+    reorder_level: 500
+  },
+  {
+    product_id: 7,
+    name: 'Vitamin Premix',
+    description: 'Supplement for animal feed',
+    price: '45.00',
+    cost_price: '35.00',
+    stock_quantity: 150,
+    unit_type: 'loose',
+    category: 'Feed Supplements',
+    barcode: 'VP-001',
+    expiry_date: '2025-07-01',
+    batch_number: 'SUPP-2025-015',
+    manufacturer: 'NutriAdd Ghana',
+    reorder_level: 50
+  },
+  {
+    product_id: 8,
+    name: 'Pig Finisher',
+    description: 'Final stage feed for pigs',
+    price: '6.20',
+    cost_price: '4.80',
+    stock_quantity: 600,
+    unit_type: 'loose',
+    category: 'Swine Feed',
+    barcode: 'PF-LOOSE',
+    expiry_date: '2025-09-15',
+    batch_number: 'BATCH-2025-128',
+    manufacturer: 'Premium Feeds Ltd',
+    reorder_level: 150
+  },
 ]
 
 export const mockSuppliers: Supplier[] = [
-  { supplier_id: 1, name: 'TechSource Ltd', contact_info: 'techsource@example.com' },
-  { supplier_id: 2, name: 'GadgetHub Inc', contact_info: 'gadgethub@example.com' },
-  { supplier_id: 3, name: 'PixelParts Co', contact_info: 'pixelparts@example.com' },
+  { supplier_id: 1, name: 'AgriFeeds Ghana Ltd', contact_info: 'info@agrifeedsgh.com' },
+  { supplier_id: 2, name: 'Premium Feeds Ltd', contact_info: 'sales@premiumfeeds.com' },
+  { supplier_id: 3, name: 'AgroChem Corp', contact_info: 'orders@agrochemcorp.com' },
 ]
 
 export const mockStaff: Staff[] = [
   { salesperson_id: 1, first_name: 'Alex', last_name: 'Doe', email: 'alex@example.com', username: 'alex', contact_info: '555-1234', role: 'manager', status: 'active', hourly_rate: 25 },
-  { salesperson_id: 2, first_name: 'Sam', last_name: 'Lee', email: 'sam@example.com', username: 'sam', contact_info: '555-5678', role: 'salesperson', status: 'active', hourly_rate: 15 },
-  { salesperson_id: 3, first_name: 'Riley', last_name: 'Kim', email: 'riley@example.com', username: 'riley', contact_info: '555-2468', role: 'salesperson', status: 'inactive', hourly_rate: 14 },
+  { salesperson_id: 2, first_name: 'Sam', last_name: 'Lee', email: 'sam@example.com', username: 'sam', contact_info: '555-5678', role: 'cashier', status: 'active', hourly_rate: 15 },
+  { salesperson_id: 3, first_name: 'Riley', last_name: 'Kim', email: 'riley@example.com', username: 'riley', contact_info: '555-2468', role: 'cashier', status: 'inactive', hourly_rate: 14 },
   { salesperson_id: 4, first_name: 'Jordan', last_name: 'Ng', email: 'jordan@example.com', username: 'jordan', contact_info: '555-9876', role: 'admin', status: 'active', hourly_rate: 28 },
 ]
 
 export const mockSupplierProducts: SupplierProduct[] = [
-  { supplier_product_id: 1, supplier_id: 1, product_id: 1, supply_price: '12.00' },
-  { supplier_product_id: 2, supplier_id: 1, product_id: 3, supply_price: '4.00' },
-  { supplier_product_id: 3, supplier_id: 2, product_id: 2, supply_price: '55.00' },
-  { supplier_product_id: 4, supplier_id: 2, product_id: 6, supply_price: '30.00' },
-  { supplier_product_id: 5, supplier_id: 3, product_id: 5, supply_price: '95.00' },
-  { supplier_product_id: 6, supplier_id: 3, product_id: 7, supply_price: '25.00' },
+  { supplier_product_id: 1, supplier_id: 1, product_id: 1, supply_price: '200.00' },
+  { supplier_product_id: 2, supplier_id: 1, product_id: 5, supply_price: '175.00' },
+  { supplier_product_id: 3, supplier_id: 2, product_id: 2, supply_price: '4.20' },
+  { supplier_product_id: 4, supplier_id: 2, product_id: 8, supply_price: '4.80' },
+  { supplier_product_id: 5, supplier_id: 3, product_id: 3, supply_price: '140.00' },
+  { supplier_product_id: 6, supplier_id: 3, product_id: 6, supply_price: '2.80' },
 ]
 
 export const mockSales: Sale[] = [
   {
     sale_id: 1,
     sale_date: new Date().toISOString(),
-    salesperson_id: 2,
+    cashier_id: 2,
     payment_method_id: 1,
-    total_amount: '69.98',
+    total_amount: '750.00',
+    subtotal: '750.00',
+    total_discount: '0.00',
     items: [
-      { product_id: 1, quantity: 2, price_at_sale: 19.99 },
+      { product_id: 1, quantity: 3, unit: 'bag', price_at_sale: 250.00, cost_price_at_sale: 200.00, batch_number: 'BATCH-2025-001', expiry_date: '2025-12-31' },
     ],
     first_name: 'Sam',
     last_name: 'Lee',
     method_name: 'Cash',
+    profit_amount: '150.00',
+    receipt_generated: true,
   },
   {
     sale_id: 2,
     sale_date: new Date(Date.now() - 86400000).toISOString(),
-    salesperson_id: 2,
+    cashier_id: 2,
     payment_method_id: 2,
-    total_amount: '79.99',
+    total_amount: '220.00',
+    subtotal: '220.00',
+    total_discount: '0.00',
     items: [
-      { product_id: 2, quantity: 1, price_at_sale: 79.99 },
+      { product_id: 5, quantity: 1, unit: 'bag', price_at_sale: 220.00, cost_price_at_sale: 175.00, batch_number: 'BATCH-2025-095', expiry_date: '2025-11-30' },
     ],
     first_name: 'Sam',
     last_name: 'Lee',
-    method_name: 'Card',
+    method_name: 'Mobile Money',
+    customer_phone: '+233-24-123-4567',
+    profit_amount: '45.00',
+    receipt_generated: false,
   },
 ]
 
@@ -195,23 +377,58 @@ export function toggleStaffStatus(id: number): Staff | undefined {
   return staff
 }
 
-export function createSale(data: Omit<Sale, 'sale_id' | 'sale_date' | 'first_name' | 'last_name' | 'method_name' | 'total_amount'>): Sale {
-  const staff = mockStaff.find(s => s.salesperson_id === data.salesperson_id) || mockStaff[0]
-  const total = data.items.reduce((acc, it) => acc + it.price_at_sale * it.quantity, 0)
+export function createSale(data: Omit<Sale, 'sale_id' | 'sale_date' | 'first_name' | 'last_name' | 'method_name' | 'total_amount' | 'subtotal' | 'total_discount' | 'profit_amount' | 'receipt_generated'>): Sale {
+  const staff = mockStaff.find(s => s.salesperson_id === data.cashier_id) || mockStaff[0]
+
+  // Calculate totals
+  const subtotal = data.items.reduce((acc, it) => {
+    const itemTotal = it.price_at_sale * it.quantity
+    const discount = it.discount_amount || 0
+    return acc + itemTotal - discount
+  }, 0)
+
+  const totalDiscount = data.items.reduce((acc, it) => acc + (it.discount_amount || 0), 0)
+
+  const totalCost = data.items.reduce((acc, it) => acc + (it.cost_price_at_sale * it.quantity), 0)
+  const profit = subtotal - totalCost
+
   const sale: Sale = {
     sale_id: nextSaleId++,
     sale_date: new Date().toISOString(),
-    total_amount: total.toFixed(2),
+    subtotal: subtotal.toFixed(2),
+    total_discount: totalDiscount.toFixed(2),
+    total_amount: (subtotal - totalDiscount).toFixed(2),
+    profit_amount: profit.toFixed(2),
+    receipt_generated: false,
     first_name: staff.first_name,
     last_name: staff.last_name,
-    method_name: data.payment_method_id === 2 ? 'Card' : data.payment_method_id === 3 ? 'Mobile Money' : 'Cash',
+    method_name: data.payment_method_id === 2 ? 'Mobile Money' : data.payment_method_id === 3 ? 'Bank Transfer' : 'Cash',
     ...data,
   }
   mockSales.unshift(sale)
-  // Decrement stock
+
+  // Decrement stock and create stock movement records
   for (const item of data.items) {
     const product = mockProducts.find(p => p.product_id === item.product_id)
-    if (product) product.stock_quantity = Math.max(0, product.stock_quantity - item.quantity)
+    if (product) {
+      // Convert bags to kg for stock tracking
+      const qtyInKg = item.unit === 'bag' && product.weight_per_bag ? item.quantity * product.weight_per_bag : item.quantity
+      product.stock_quantity = Math.max(0, product.stock_quantity - qtyInKg)
+
+      // Create stock movement record
+      createStockMovement({
+        product_id: item.product_id,
+        movement_type: 'sale',
+        quantity: -qtyInKg,
+        unit: 'kg',
+        reference_id: sale.sale_id,
+        reference_type: 'sale',
+        batch_number: item.batch_number,
+        expiry_date: item.expiry_date,
+        created_by: data.cashier_id,
+        notes: `Sale of ${item.quantity} ${item.unit}${item.quantity > 1 ? 's' : ''} of ${product.name}`
+      })
+    }
   }
   return sale
 }
@@ -232,4 +449,17 @@ export function removeSupplierProduct(supplierId: number, productId: number): bo
   if (idx === -1) return false
   mockSupplierProducts.splice(idx, 1)
   return true
+}
+
+// Stock Movements
+export const mockStockMovements: StockMovement[] = []
+
+export function createStockMovement(movement: Omit<StockMovement, 'movement_id' | 'created_at'>): StockMovement {
+  const newMovement: StockMovement = {
+    movement_id: nextMovementId++,
+    created_at: new Date().toISOString(),
+    ...movement
+  }
+  mockStockMovements.unshift(newMovement)
+  return newMovement
 }

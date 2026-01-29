@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react'
 import { api, endpoints, type User, type ApiResponse } from '@/lib/api'
-import { mockUser } from '@/lib/mock-data'
+import { mockUser, authenticateMockUser } from '@/lib/mock-data'
 const USE_MOCKS = String((import.meta as any)?.env?.VITE_USE_MOCKS ?? 'true') === 'true'
 
 interface AuthContextType {
@@ -32,11 +32,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   useEffect(() => {
     if (USE_MOCKS) {
-      // Presentation mode: auto-log in with mock user
-      const authToken = 'mock-token'
-      localStorage.setItem('authToken', authToken)
-      setToken(authToken)
-      setUser(mockUser)
+      // In mock mode, check if there's a stored user
+      const storedUser = localStorage.getItem('mockUser')
+      if (storedUser) {
+        try {
+          const parsedUser = JSON.parse(storedUser)
+          setUser(parsedUser)
+          setToken('mock-token')
+        } catch {
+          localStorage.removeItem('mockUser')
+        }
+      }
       setIsLoading(false)
       return
     }
@@ -74,13 +80,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = async (_username: string, _password: string): Promise<boolean> => {
     try {
       setIsLoading(true)
-      if (USE_MOCKS) {
+      const authenticatedUser = authenticateMockUser(_username, _password)
+      if (authenticatedUser) {
         const authToken = 'mock-token'
         localStorage.setItem('authToken', authToken)
+        localStorage.setItem('mockUser', JSON.stringify(authenticatedUser))
         setToken(authToken)
-        setUser(mockUser)
+        setUser(authenticatedUser)
         return true
       }
+      return false
       const response = await api.post<ApiResponse<{ user: User; token: string }>>(
         endpoints.auth.login,
         { username: _username, password: _password }
@@ -100,11 +109,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const logout = () => {
     if (USE_MOCKS) {
-      // Presentation mode: keep mock user logged in
-      const authToken = 'mock-token'
-      localStorage.setItem('authToken', authToken)
-      setToken(authToken)
-      setUser(mockUser)
+      // Clear mock user session
+      localStorage.removeItem('authToken')
+      localStorage.removeItem('mockUser')
+      setUser(null)
+      setToken(null)
       return
     }
     setUser(null)

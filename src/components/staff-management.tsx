@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Modal } from "@/components/modal"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 import { Plus, Search, Eye, EyeOff, Edit2, Trash2 } from "lucide-react"
@@ -94,7 +94,7 @@ export function StaffManagement() {
     username: "",
     password: "",
     contact_info: "",
-    role: "salesperson",
+    role: "cashier",
     hourly_rate: 15.0,
   })
 
@@ -103,7 +103,7 @@ export function StaffManagement() {
     last_name: "",
     email: "",
     contact_info: "",
-    role: "salesperson",
+    role: "cashier",
     hourly_rate: 15.0,
   })
 
@@ -142,7 +142,7 @@ export function StaffManagement() {
           username: "",
           password: "",
           contact_info: "",
-          role: "salesperson",
+          role: "cashier",
           hourly_rate: 15.0,
         })
       }
@@ -170,7 +170,7 @@ export function StaffManagement() {
           last_name: "",
           email: "",
           contact_info: "",
-          role: "salesperson",
+          role: "cashier",
           hourly_rate: 15.0,
         })
       }
@@ -246,17 +246,21 @@ export function StaffManagement() {
           <p className="text-sm sm:text-base text-slate-600">Manage your team members and their roles</p>
         </div>
 
-        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="bg-blue-600 hover:bg-blue-700 text-white gap-2 w-full sm:w-auto text-sm sm:text-base py-2 sm:py-3">
-              <Plus className="h-4 w-4" />
-              Add Staff Member
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="w-[95vw] max-w-md mx-auto">
-            <DialogHeader>
-              <DialogTitle className="text-lg sm:text-xl">Add New Staff Member</DialogTitle>
-            </DialogHeader>
+        <Button
+          onClick={() => setIsAddDialogOpen(true)}
+          className="bg-blue-600 hover:bg-blue-700 text-white gap-2 w-full sm:w-auto text-sm sm:text-base py-2 sm:py-3"
+        >
+          <Plus className="h-4 w-4" />
+          Add Staff Member
+        </Button>
+
+      {isAddDialogOpen && (
+        <Modal
+          isOpen={isAddDialogOpen}
+          onClose={() => setIsAddDialogOpen(false)}
+          title="Add New Staff Member"
+          size="md"
+        >
             <div className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
@@ -317,12 +321,12 @@ export function StaffManagement() {
                 </div>
                 <div>
                   <Label htmlFor="role">Role *</Label>
-                  <Select value={newStaff.role} onValueChange={(value: "salesperson" | "manager" | "admin") => setNewStaff({ ...newStaff, role: value })}>
+                  <Select value={newStaff.role} onValueChange={(value: "cashier" | "manager" | "admin") => setNewStaff({ ...newStaff, role: value })}>
                     <SelectTrigger className="text-sm sm:text-base">
                       <SelectValue placeholder="Select role" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="salesperson">Salesperson</SelectItem>
+                      <SelectItem value="cashier">Salesperson</SelectItem>
                       <SelectItem value="manager">Manager</SelectItem>
                       <SelectItem value="admin">Admin</SelectItem>
                     </SelectContent>
@@ -377,7 +381,7 @@ export function StaffManagement() {
                       username: "",
                       password: "",
                       contact_info: "",
-                      role: "salesperson",
+                      role: "cashier",
                       hourly_rate: 15.0,
                     })
                   }}
@@ -387,8 +391,8 @@ export function StaffManagement() {
                 </Button>
               </div>
             </div>
-          </DialogContent>
-        </Dialog>
+          </Modal>
+        )}
       </div>
 
       <div className="mb-6">
@@ -436,7 +440,7 @@ export function StaffManagement() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredStaff?.map((staff) => (
+                  {filteredStaff?.map((staff: Staff) => (
                     <StaffRow 
                       key={staff.salesperson_id} 
                       staff={staff} 
@@ -458,12 +462,14 @@ export function StaffManagement() {
         </CardContent>
       </Card>
 
-      {/* Edit Staff Dialog */}
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Edit Staff Member</DialogTitle>
-          </DialogHeader>
+      {/* Edit Staff Modal */}
+      {isEditDialogOpen && (
+        <Modal
+          isOpen={isEditDialogOpen}
+          onClose={() => setIsEditDialogOpen(false)}
+          title="Edit Staff Member"
+          size="md"
+        >
           <div className="space-y-4">
             <div className="flex gap-2">
               <div className="w-1/2">
@@ -506,12 +512,12 @@ export function StaffManagement() {
             </div>
             <div>
               <Label htmlFor="edit-role">Role</Label>
-              <Select value={editStaff.role} onValueChange={(value: "salesperson" | "manager" | "admin") => setEditStaff({ ...editStaff, role: value })}>
+              <Select value={editStaff.role} onValueChange={(value: "cashier" | "manager" | "admin") => setEditStaff({ ...editStaff, role: value })}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select a role" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="salesperson">Salesperson</SelectItem>
+                  <SelectItem value="cashier">Salesperson</SelectItem>
                   <SelectItem value="manager">Manager</SelectItem>
                   <SelectItem value="admin">Admin</SelectItem>
                 </SelectContent>
@@ -545,15 +551,17 @@ export function StaffManagement() {
               </Button>
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
+        </Modal>
+      )}
 
-      {/* Change Password Dialog */}
-      <Dialog open={isPasswordDialogOpen} onOpenChange={setIsPasswordDialogOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Change Password</DialogTitle>
-          </DialogHeader>
+      {/* Change Password Modal */}
+      {isPasswordDialogOpen && (
+        <Modal
+          isOpen={isPasswordDialogOpen}
+          onClose={() => setIsPasswordDialogOpen(false)}
+          title="Change Password"
+          size="md"
+        >
           <div className="space-y-4">
             <div>
               <Label htmlFor="current-password">Current Password</Label>
@@ -605,8 +613,8 @@ export function StaffManagement() {
               </Button>
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
+        </Modal>
+      )}
     </div>
   )
 }
