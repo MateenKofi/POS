@@ -1,6 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { DollarSign, TrendingUp, Package } from "lucide-react"
-import type { Sale } from "@/lib/api"
 
 interface ProductProfit {
   name: string

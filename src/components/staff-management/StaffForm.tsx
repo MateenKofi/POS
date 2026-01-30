@@ -2,7 +2,7 @@ import { Button, TextInput } from "@/components/custom-components"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Loader2 } from "lucide-react"
-import type { CreateStaffRequest, UpdateStaffRequest, Staff } from "@/lib/api"
+import type { CreateStaffRequest, UpdateStaffRequest } from "@/lib/api"
 import type { StaffRole } from "./types"
 
 interface StaffFormProps {

@@ -1,15 +1,11 @@
 import { Button, TextInput, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/custom-components"
-import { Search, Edit, Trash2, Loader2, Plus } from "lucide-react"
+import { Search, Edit, Trash2, Loader2 } from "lucide-react"
 import type { Supplier } from "@/lib/api"
 import { Modal } from "@/components/modal"
 
 interface SupplierTableProps {
-  filteredSuppliers: Supplier[]
-  isLoading: boolean
   searchTerm: string
   onSearchChange: (value: string) => void
-  onEdit: (supplier: Supplier) => void
-  onDelete: (id: number) => void
 }
 
 interface SupplierTableWithAddProps extends SupplierTableProps {
@@ -18,7 +14,7 @@ interface SupplierTableWithAddProps extends SupplierTableProps {
   addDialogContent: React.ReactNode
 }
 
-export function SupplierTable({ filteredSuppliers, isLoading, searchTerm, onSearchChange, onEdit, onDelete }: SupplierTableProps) {
+export function SupplierTable({ searchTerm, onSearchChange }: SupplierTableProps) {
   return (
     <>
       <div className="mb-6">

@@ -6,6 +6,7 @@ import { Plus, Loader2 } from "lucide-react"
 import { useSuppliers, useCreateSupplier, useUpdateSupplier, useDeleteSupplier } from "@/hooks/useApi"
 import type { Supplier, CreateSupplierRequest } from "@/lib/api"
 import { toast } from "sonner"
+import { Modal } from "@/components/modal"
 
 // Supplier management sub-components
 import { SupplierForm } from "./supplier-management/SupplierForm"
@@ -204,7 +205,7 @@ export function SupplierManagement() {
           <SupplierForm
             data={newSupplier}
             isPending={createSupplier.isPending}
-            onChange={setNewSupplier}
+            onChange={(data) => setNewSupplier(data as CreateSupplierRequest)}
             onSubmit={handleAddSupplier}
             onCancel={() => {
               setIsAddDialogOpen(false)
@@ -226,7 +227,7 @@ export function SupplierManagement() {
             isEdit
             data={editingSupplier}
             isPending={updateSupplier.isPending}
-            onChange={setEditingSupplier}
+            onChange={(data) => setEditingSupplier(data as Supplier)}
             onSubmit={handleEditSupplier}
             onCancel={() => {
               setIsEditDialogOpen(false)

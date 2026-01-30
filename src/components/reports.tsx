@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react"
 import { Loader2 } from "lucide-react"
 import { useSales, useProducts, useStaff } from "@/hooks/useApi"
-import type { Sale, Product, Staff } from "@/lib/api"
+import type { Sale, Staff } from "@/lib/api"
 
 // Reports sub-components
 import { ReportHeader } from "./reports/ReportHeader"

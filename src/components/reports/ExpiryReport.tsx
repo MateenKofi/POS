@@ -13,12 +13,15 @@ interface ExpiryReportProps {
 }
 
 export function ExpiryReport({ expiringProducts }: ExpiryReportProps) {
-  const getStatusBadge = (status: 'expired' | 'expiring_soon') => {
+  const getStatusBadge = (status: 'expired' | 'expiring_soon' | 'ok') => {
     if (status === 'expired') {
       return <Badge className="bg-red-100 text-red-800 hover:bg-red-100">Expired</Badge>
     }
-    return <Badge className="bg-orange-100 text-orange-800 hover:bg-orange-100">Expiring Soon</Badge>
+    if (status === 'ok') {
+      return <Badge className="bg-green-100 text-green-800 hover:bg-green-100">OK</Badge>
     }
+    return <Badge className="bg-orange-100 text-orange-800 hover:bg-orange-100">Expiring Soon</Badge>
+  }
 
   return (
     <Card className="border-slate-200">

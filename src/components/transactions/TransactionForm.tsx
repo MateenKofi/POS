@@ -1,7 +1,6 @@
 import { useState } from "react"
 import { Button, TextInput } from "@/components/custom-components"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Loader2 } from "lucide-react"
 import { useCreateTransaction, useUpdateTransaction } from "@/hooks/useApi"
 import { toast } from "sonner"
 import type { Transaction, TransactionType, TransactionStatus } from "@/lib/api"

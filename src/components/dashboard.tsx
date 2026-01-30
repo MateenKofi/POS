@@ -10,7 +10,6 @@ import {
   useSales,
   useProducts,
 } from "@/hooks/useApi";
-import type { Product } from "@/lib/api";
 
 // Dashboard sub-components
 import { DashboardHeader } from "./dashboard/DashboardHeader"

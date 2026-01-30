@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Download, BarChart3, DollarSign, AlertTriangle, Users } from "lucide-react"
+import { Download, DollarSign, AlertTriangle, Users } from "lucide-react"
 
 type ReportTab = "profit" | "expiry" | "staff"
 type PeriodType = "today" | "week" | "month"
