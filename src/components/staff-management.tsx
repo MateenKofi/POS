@@ -197,7 +197,7 @@ export function StaffManagement() {
           <StaffForm
             data={newStaff}
             isPending={createStaffMutation.isPending}
-            onChange={setNewStaff}
+            onChange={(data) => setNewStaff(data as CreateStaffRequest)}
             onSubmit={handleAddStaff}
             onCancel={() => {
               setIsAddDialogOpen(false)

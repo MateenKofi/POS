@@ -8,7 +8,13 @@ interface SupplierTableProps {
   onSearchChange: (value: string) => void
 }
 
-interface SupplierTableWithAddProps extends SupplierTableProps {
+interface SupplierTableWithAddProps {
+  filteredSuppliers: Supplier[]
+  isLoading: boolean
+  searchTerm: string
+  onSearchChange: (value: string) => void
+  onEdit: (supplier: Supplier) => void
+  onDelete: (id: number) => void
   isAddDialogOpen: boolean
   onAddDialogOpen: () => void
   addDialogContent: React.ReactNode
@@ -45,14 +51,7 @@ export function SupplierTableWithAdd({
 }: SupplierTableWithAddProps) {
   return (
     <>
-      <SupplierTable
-        filteredSuppliers={filteredSuppliers}
-        isLoading={isLoading}
-        searchTerm={searchTerm}
-        onSearchChange={onSearchChange}
-        onEdit={onEdit}
-        onDelete={onDelete}
-      />
+      <SupplierTable searchTerm={searchTerm} onSearchChange={onSearchChange} />
 
       <Modal
         isOpen={isAddDialogOpen}
@@ -86,7 +85,7 @@ export function SupplierTableWithAdd({
                 </TableCell>
               </TableRow>
             ) : (
-              filteredSuppliers.map((supplier) => (
+              filteredSuppliers.map((supplier: Supplier) => (
                 <TableRow key={supplier.supplier_id}>
                   <TableCell className="font-medium">{supplier.name}</TableCell>
                   <TableCell className="text-sm text-slate-600">{supplier.contact_info}</TableCell>
