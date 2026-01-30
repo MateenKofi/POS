@@ -15,7 +15,7 @@ import { Loader2 } from "lucide-react"
 const MOVEMENT_TYPES = {
   sale: { icon: ShoppingCart, color: "text-red-600", bgColor: "bg-red-100", label: "Sale" },
   purchase: { icon: Package, color: "text-green-600", bgColor: "bg-green-100", label: "Purchase" },
-  adjustment: { icon: RefreshCw, color: "text-blue-600", bgColor: "bg-blue-100", label: "Adjustment" },
+  adjustment: { icon: RefreshCw, color: "text-green-600", bgColor: "bg-green-100", label: "Adjustment" },
   return: { icon: Undo, color: "text-orange-600", bgColor: "bg-orange-100", label: "Return" },
   expiry: { icon: AlertTriangle, color: "text-purple-600", bgColor: "bg-purple-100", label: "Expired" },
 } as const
@@ -127,7 +127,7 @@ export function StockMovements() {
         <CardContent className="p-0 sm:p-6">
           {isLoading ? (
             <div className="flex items-center justify-center py-8">
-              <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+              <Loader2 className="h-8 w-8 animate-spin text-green-600" />
               <span className="ml-2 text-gray-600">Loading stock movements...</span>
             </div>
           ) : (

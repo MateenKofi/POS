@@ -1,12 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Modal } from "@/components/modal"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Card, CardContent, CardHeader, CardTitle, Button, TextInput, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/custom-components"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Plus, Search, Edit, Trash2, Loader2, Building2, Package, BadgeCent } from "lucide-react"
 import { useCreateSupplierProduct, useUpdateSupplierProduct, useDeleteSupplierProduct, useSuppliers, useProducts, useAllSupplierProducts } from "@/hooks/useApi"
@@ -134,19 +129,19 @@ export function SupplierProductManagement() {
 
         <Button
           onClick={() => setIsAddDialogOpen(true)}
-          className="bg-blue-600 hover:bg-blue-700 text-white gap-2"
+          className="bg-green-600 hover:bg-green-700 text-white gap-2"
         >
           <Plus className="h-4 w-4" />
           Add Supplier Product
         </Button>
 
-      {isAddDialogOpen && (
-        <Modal
-          isOpen={isAddDialogOpen}
-          onClose={() => setIsAddDialogOpen(false)}
-          title="Add New Supplier Product Relationship"
-          size="md"
-        >
+        {isAddDialogOpen && (
+          <Modal
+            isOpen={isAddDialogOpen}
+            onClose={() => setIsAddDialogOpen(false)}
+            title="Add New Supplier Product Relationship"
+            size="md"
+          >
             <div className="space-y-4">
               <div>
                 <Label htmlFor="supplier">Supplier *</Label>
@@ -187,7 +182,7 @@ export function SupplierProductManagement() {
               </div>
               <div>
                 <Label htmlFor="supply-price">Supply Price ($) *</Label>
-                <Input
+                <TextInput
                   id="supply-price"
                   type="number"
                   step="0.01"
@@ -197,9 +192,9 @@ export function SupplierProductManagement() {
                 />
               </div>
               <div className="flex gap-2">
-                <Button 
-                  onClick={handleAddSupplierProduct} 
-                  className="flex-1 bg-blue-600 hover:bg-blue-700"
+                <Button
+                  onClick={handleAddSupplierProduct}
+                  className="flex-1 bg-green-600 hover:bg-green-700"
                   disabled={createSupplierProduct.isPending}
                 >
                   {createSupplierProduct.isPending ? (
@@ -211,8 +206,8 @@ export function SupplierProductManagement() {
                     "Add Relationship"
                   )}
                 </Button>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   onClick={() => {
                     setIsAddDialogOpen(false)
                     resetForm()
@@ -229,7 +224,7 @@ export function SupplierProductManagement() {
       <div className="mb-6">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
-          <Input
+          <TextInput
             placeholder="Search by supplier name or product name..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -241,7 +236,7 @@ export function SupplierProductManagement() {
       <Card>
         <CardHeader>
           <CardTitle>
-            Supplier Product Relationships 
+            Supplier Product Relationships
             {isLoading ? (
               <span className="text-sm font-normal text-gray-500 ml-2">Loading...</span>
             ) : (
@@ -254,7 +249,7 @@ export function SupplierProductManagement() {
         <CardContent>
           {isLoading ? (
             <div className="flex items-center justify-center py-8">
-              <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+              <Loader2 className="h-8 w-8 animate-spin text-green-600" />
               <span className="ml-2 text-gray-600">Loading supplier product relationships...</span>
             </div>
           ) : (
@@ -276,12 +271,12 @@ export function SupplierProductManagement() {
                   const retailPrice = parseFloat(sp.retail_price)
                   const profitMargin = retailPrice - supplyPrice
                   const profitMarginPercent = ((profitMargin / retailPrice) * 100).toFixed(1)
-                  
+
                   return (
                     <TableRow key={`${sp.supplier_id}-${sp.product_id}`}>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          <Building2 className="h-4 w-4 text-blue-600" />
+                          <Building2 className="h-4 w-4 text-green-600" />
                           <span className="font-medium">{sp.supplier_name}</span>
                         </div>
                       </TableCell>
@@ -315,9 +310,9 @@ export function SupplierProductManagement() {
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-1">
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
+                          <Button
+                            variant="ghost"
+                            size="sm"
                             className="h-8 w-8 p-0"
                             onClick={() => openEditDialog(sp)}
                           >
@@ -366,7 +361,7 @@ export function SupplierProductManagement() {
             <div className="space-y-4">
               <div>
                 <Label htmlFor="edit-supplier">Supplier</Label>
-                <Input
+                <TextInput
                   id="edit-supplier"
                   value={editingSupplierProduct.supplier_name}
                   disabled
@@ -375,7 +370,7 @@ export function SupplierProductManagement() {
               </div>
               <div>
                 <Label htmlFor="edit-product">Product</Label>
-                <Input
+                <TextInput
                   id="edit-product"
                   value={editingSupplierProduct.product_name}
                   disabled
@@ -384,7 +379,7 @@ export function SupplierProductManagement() {
               </div>
               <div>
                 <Label htmlFor="edit-supply-price">Supply Price ($) *</Label>
-                <Input
+                <TextInput
                   id="edit-supply-price"
                   type="number"
                   step="0.01"
@@ -394,9 +389,9 @@ export function SupplierProductManagement() {
                 />
               </div>
               <div className="flex gap-2">
-                <Button 
-                  onClick={handleEditSupplierProduct} 
-                  className="flex-1 bg-blue-600 hover:bg-blue-700"
+                <Button
+                  onClick={handleEditSupplierProduct}
+                  className="flex-1 bg-green-600 hover:bg-green-700"
                   disabled={updateSupplierProduct.isPending}
                 >
                   {updateSupplierProduct.isPending ? (
@@ -408,8 +403,8 @@ export function SupplierProductManagement() {
                     "Update Price"
                   )}
                 </Button>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   onClick={() => {
                     setIsEditDialogOpen(false)
                     resetForm()

@@ -240,7 +240,7 @@ Thank you for your purchase!`
               <Button
                 variant={selectedMethod === "print" ? "default" : "outline"}
                 onClick={() => setSelectedMethod("print")}
-                className={`flex flex-col gap-1 h-auto py-3 ${selectedMethod === "print" ? "bg-blue-600 hover:bg-blue-700" : ""}`}
+                className={`flex flex-col gap-1 h-auto py-3 ${selectedMethod === "print" ? "bg-green-600 hover:bg-green-700" : ""}`}
               >
                 <Printer className="h-5 w-5" />
                 <span className="text-xs">Print</span>
@@ -248,7 +248,7 @@ Thank you for your purchase!`
               <Button
                 variant={selectedMethod === "sms" ? "default" : "outline"}
                 onClick={() => setSelectedMethod("sms")}
-                className={`flex flex-col gap-1 h-auto py-3 ${selectedMethod === "sms" ? "bg-blue-600 hover:bg-blue-700" : ""}`}
+                className={`flex flex-col gap-1 h-auto py-3 ${selectedMethod === "sms" ? "bg-green-600 hover:bg-green-700" : ""}`}
               >
                 <MessageCircle className="h-5 w-5" />
                 <span className="text-xs">SMS</span>
@@ -256,7 +256,7 @@ Thank you for your purchase!`
               <Button
                 variant={selectedMethod === "whatsapp" ? "default" : "outline"}
                 onClick={() => setSelectedMethod("whatsapp")}
-                className={`flex flex-col gap-1 h-auto py-3 ${selectedMethod === "whatsapp" ? "bg-blue-600 hover:bg-blue-700" : ""}`}
+                className={`flex flex-col gap-1 h-auto py-3 ${selectedMethod === "whatsapp" ? "bg-green-600 hover:bg-green-700" : ""}`}
               >
                 <Share2 className="h-5 w-5" />
                 <span className="text-xs">WhatsApp</span>
@@ -306,7 +306,7 @@ Thank you for your purchase!`
             <Button
               onClick={handleConfirm}
               disabled={isSending}
-              className="flex-1 bg-blue-600 hover:bg-blue-700 text-sm sm:text-base py-2 sm:py-3"
+              className="flex-1 bg-green-600 hover:bg-green-700 text-sm sm:text-base py-2 sm:py-3"
             >
               {isSending ? (
                 <>

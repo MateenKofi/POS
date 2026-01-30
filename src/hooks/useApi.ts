@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient, useQueries } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
-import { api, endpoints, type ApiResponse, type Product, type CreateProductRequest, type UpdateProductRequest, type CreateSaleRequest, type Sale, type Supplier, type CreateSupplierRequest, type UpdateSupplierRequest, type SupplierProduct, type CreateSupplierProductRequest, type UpdateSupplierProductRequest, type SupplierProductWithDetails, type Staff, type CreateStaffRequest, type UpdateStaffRequest, type UpdateStaffRoleRequest, type UpdateStaffPasswordRequest, type DashboardStats, type InventoryReport, type StockMovement } from '@/lib/api'
+import { api, endpoints, type ApiResponse, type Product, type CreateProductRequest, type UpdateProductRequest, type CreateSaleRequest, type Sale, type Supplier, type CreateSupplierRequest, type UpdateSupplierRequest, type SupplierProduct, type CreateSupplierProductRequest, type UpdateSupplierProductRequest, type SupplierProductWithDetails, type Staff, type CreateStaffRequest, type UpdateStaffRequest, type UpdateStaffRoleRequest, type UpdateStaffPasswordRequest, type DashboardStats, type InventoryReport, type StockMovement, type Transaction, type CreateTransactionRequest, type UpdateTransactionRequest } from '@/lib/api'
 
 // Products hooks
 export const useProducts = (page = 1, limit = 10) => {
@@ -30,7 +30,7 @@ export const useProduct = (id: string) => {
 
 export const useCreateProduct = () => {
   const queryClient = useQueryClient()
-  
+
   return useMutation({
     mutationFn: async (data: CreateProductRequest) => {
       const response = await api.post<ApiResponse<Product>>(endpoints.products.create, data)
@@ -44,7 +44,7 @@ export const useCreateProduct = () => {
 
 export const useUpdateProduct = () => {
   const queryClient = useQueryClient()
-  
+
   return useMutation({
     mutationFn: async ({ id, data }: { id: string; data: UpdateProductRequest }) => {
       const response = await api.put<ApiResponse<Product>>(endpoints.products.update(id), data)
@@ -59,7 +59,7 @@ export const useUpdateProduct = () => {
 
 export const useDeleteProduct = () => {
   const queryClient = useQueryClient()
-  
+
   return useMutation({
     mutationFn: async (id: string) => {
       const response = await api.delete<ApiResponse<void>>(endpoints.products.delete(id))
@@ -103,9 +103,10 @@ export const useSale = (id: string) => {
 
 export const useCreateSale = () => {
   const queryClient = useQueryClient()
-  
+
   return useMutation({
     mutationFn: async (data: CreateSaleRequest) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const response = await api.post<ApiResponse<{ sale: Sale; items: any[] }>>(
         endpoints.sales.create,
         data
@@ -159,6 +160,7 @@ export const useSalesReport = (startDate: string, endDate: string, groupBy = 'da
   return useQuery({
     queryKey: ['dashboard', 'sales-report', startDate, endDate, groupBy],
     queryFn: async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const response = await api.get<ApiResponse<any>>(
         `${endpoints.dashboard.salesReport}?start_date=${startDate}&end_date=${endDate}&group_by=${groupBy}`
       )
@@ -196,7 +198,7 @@ export const useSupplier = (id: string) => {
 
 export const useCreateSupplier = () => {
   const queryClient = useQueryClient()
-  
+
   return useMutation({
     mutationFn: async (data: CreateSupplierRequest) => {
       const response = await api.post<ApiResponse<Supplier>>(endpoints.suppliers.create, data)
@@ -210,7 +212,7 @@ export const useCreateSupplier = () => {
 
 export const useUpdateSupplier = () => {
   const queryClient = useQueryClient()
-  
+
   return useMutation({
     mutationFn: async ({ id, data }: { id: string; data: UpdateSupplierRequest }) => {
       const response = await api.put<ApiResponse<Supplier>>(endpoints.suppliers.update(id), data)
@@ -225,7 +227,7 @@ export const useUpdateSupplier = () => {
 
 export const useDeleteSupplier = () => {
   const queryClient = useQueryClient()
-  
+
   return useMutation({
     mutationFn: async (id: string) => {
       const response = await api.delete<ApiResponse<void>>(endpoints.suppliers.delete(id))
@@ -271,7 +273,7 @@ export const useStaffMember = (id: string) => {
 
 export const useCreateStaff = () => {
   const queryClient = useQueryClient()
-  
+
   return useMutation({
     mutationFn: async (data: CreateStaffRequest) => {
       const response = await api.post<ApiResponse<Staff>>(endpoints.staff.create, data)
@@ -285,7 +287,7 @@ export const useCreateStaff = () => {
 
 export const useUpdateStaff = () => {
   const queryClient = useQueryClient()
-  
+
   return useMutation({
     mutationFn: async ({ id, data }: { id: string; data: UpdateStaffRequest }) => {
       const response = await api.put<ApiResponse<Staff>>(endpoints.staff.update(id), data)
@@ -300,7 +302,7 @@ export const useUpdateStaff = () => {
 
 export const useDeleteStaff = () => {
   const queryClient = useQueryClient()
-  
+
   return useMutation({
     mutationFn: async (id: string) => {
       const response = await api.delete<ApiResponse<void>>(endpoints.staff.delete(id))
@@ -314,7 +316,7 @@ export const useDeleteStaff = () => {
 
 export const useToggleStaffStatus = () => {
   const queryClient = useQueryClient()
-  
+
   return useMutation({
     mutationFn: async (id: string) => {
       const response = await api.patch<ApiResponse<Staff>>(endpoints.staff.toggleStatus(id))
@@ -328,7 +330,7 @@ export const useToggleStaffStatus = () => {
 
 export const useUpdateStaffRole = () => {
   const queryClient = useQueryClient()
-  
+
   return useMutation({
     mutationFn: async ({ id, data }: { id: string; data: UpdateStaffRoleRequest }) => {
       const response = await api.patch<ApiResponse<Staff>>(endpoints.staff.updateRole(id), data)
@@ -342,7 +344,7 @@ export const useUpdateStaffRole = () => {
 
 export const useUpdateStaffPassword = () => {
   const queryClient = useQueryClient()
-  
+
   return useMutation({
     mutationFn: async ({ id, data }: { id: string; data: UpdateStaffPasswordRequest }) => {
       const response = await api.patch<ApiResponse<void>>(endpoints.staff.updatePassword(id), data)
@@ -393,9 +395,10 @@ export const useSupplierProductsBySupplier = (supplierId: string) => {
           supply_price: string;
           total_supply_value: string;
         }>;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         pagination: any;
       }>>(endpoints.suppliers.getProducts(supplierId))
-      
+
       // Transform the response to match the expected SupplierProductWithDetails format
       const supplierProducts: SupplierProductWithDetails[] = response.data.products.map(product => ({
         supplier_product_id: 0, // This might not be available in the current response
@@ -408,7 +411,7 @@ export const useSupplierProductsBySupplier = (supplierId: string) => {
         retail_price: product.retail_price,
         stock_quantity: product.stock_quantity,
       }))
-      
+
       return supplierProducts
     },
     enabled: !!supplierId,
@@ -432,7 +435,7 @@ export const useSupplierProductsByProduct = (productId: string) => {
 // New hook to get all supplier products by fetching from all suppliers
 export const useAllSupplierProducts = () => {
   const { data: suppliers } = useSuppliers()
-  
+
   return useQueries({
     queries: suppliers?.map(supplier => ({
       queryKey: ['supplier-products', 'supplier', supplier.supplier_id],
@@ -448,9 +451,10 @@ export const useAllSupplierProducts = () => {
             supply_price: string;
             total_supply_value: string;
           }>;
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           pagination: any;
         }>>(endpoints.suppliers.getProducts(supplier.supplier_id.toString()))
-        
+
         // Transform the response to match the expected SupplierProductWithDetails format
         const supplierProducts: SupplierProductWithDetails[] = response.data.products.map(product => ({
           supplier_product_id: 0, // This might not be available in the current response
@@ -463,19 +467,24 @@ export const useAllSupplierProducts = () => {
           retail_price: product.retail_price,
           stock_quantity: product.stock_quantity,
         }))
-        
+
         return supplierProducts
       },
       enabled: !!suppliers,
     })) || [],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     combine: (results: any[]) => {
       const allProducts = results
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .filter((result: any) => result.data)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .flatMap((result: any) => result.data || [])
-      
+
       return {
         data: allProducts,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         isLoading: results.some((result: any) => result.isLoading),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         error: results.find((result: any) => result.error)?.error,
       }
     },
@@ -484,7 +493,7 @@ export const useAllSupplierProducts = () => {
 
 export const useCreateSupplierProduct = () => {
   const queryClient = useQueryClient()
-  
+
   return useMutation({
     mutationFn: async (data: CreateSupplierProductRequest) => {
       // Use the nested supplier endpoint
@@ -504,7 +513,7 @@ export const useCreateSupplierProduct = () => {
 
 export const useUpdateSupplierProduct = () => {
   const queryClient = useQueryClient()
-  
+
   return useMutation({
     mutationFn: async ({ supplierId, productId, data }: { supplierId: string; productId: string; data: UpdateSupplierProductRequest }) => {
       // Use the nested supplier endpoint for updating price
@@ -524,7 +533,7 @@ export const useUpdateSupplierProduct = () => {
 
 export const useDeleteSupplierProduct = () => {
   const queryClient = useQueryClient()
-  
+
   return useMutation({
     mutationFn: async ({ supplierId, productId }: { supplierId: string; productId: string }) => {
       // Use the nested supplier endpoint for removing product
@@ -618,6 +627,124 @@ export const useStockMovements = (productId?: string) => {
         : '/stock-movements'
       const response = await api.get<ApiResponse<StockMovement[]>>(url)
       return response.data
+    },
+  })
+}
+
+// Transaction hooks
+export const useTransactions = (page = 1, limit = 50) => {
+  return useQuery({
+    queryKey: ['transactions', page, limit],
+    queryFn: async () => {
+      const response = await api.get<ApiResponse<{
+        transactions: Transaction[]
+        pagination: {
+          page: number
+          limit: number
+          total: number
+          pages: number
+        }
+      }>>(`${endpoints.transactions.all}?page=${page}&limit=${limit}`)
+      return response.data
+    },
+  })
+}
+
+export const useTransaction = (id: string) => {
+  return useQuery({
+    queryKey: ['transaction', id],
+    queryFn: async () => {
+      const response = await api.get<ApiResponse<Transaction>>(endpoints.transactions.byId(id))
+      return response.data
+    },
+    enabled: !!id,
+  })
+}
+
+export const useTransactionsByDateRange = (startDate: string, endDate: string) => {
+  return useQuery({
+    queryKey: ['transactions', 'date-range', startDate, endDate],
+    queryFn: async () => {
+      const response = await api.get<ApiResponse<Transaction[]>>(
+        endpoints.transactions.byDateRange(startDate, endDate)
+      )
+      return response.data || []
+    },
+    enabled: !!startDate && !!endDate && startDate !== "" && endDate !== "",
+  })
+}
+
+export const useTransactionsByType = (type: string) => {
+  return useQuery({
+    queryKey: ['transactions', 'type', type],
+    queryFn: async () => {
+      const response = await api.get<ApiResponse<Transaction[]>>(
+        endpoints.transactions.byType(type)
+      )
+      return response.data
+    },
+    enabled: !!type,
+  })
+}
+
+export const useCreateTransaction = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (data: CreateTransactionRequest) => {
+      const response = await api.post<ApiResponse<Transaction>>(
+        endpoints.transactions.create,
+        data
+      )
+      return response.data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['transactions'] })
+    },
+  })
+}
+
+export const useUpdateTransaction = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({ id, data }: { id: string; data: UpdateTransactionRequest }) => {
+      const response = await api.put<ApiResponse<Transaction>>(
+        endpoints.transactions.update(id),
+        data
+      )
+      return response.data
+    },
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ['transactions'] })
+      queryClient.invalidateQueries({ queryKey: ['transaction', id] })
+    },
+  })
+}
+
+export const useDeleteTransaction = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const response = await api.delete<ApiResponse<void>>(
+        endpoints.transactions.delete(id)
+      )
+      return response.data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['transactions'] })
+    },
+  })
+}
+
+export const useTransactionForm = () => {
+  return useForm<CreateTransactionRequest>({
+    defaultValues: {
+      transaction_type: 'sale_payment',
+      amount: '',
+      payment_method: 'cash',
+      description: '',
     },
   })
 }

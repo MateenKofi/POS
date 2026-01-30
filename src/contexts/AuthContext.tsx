@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react'
 import { api, endpoints, type User, type ApiResponse } from '@/lib/api'
 import { mockUser, authenticateMockUser } from '@/lib/mock-data'
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const USE_MOCKS = String((import.meta as any)?.env?.VITE_USE_MOCKS ?? 'true') === 'true'
 
 interface AuthContextType {
@@ -13,6 +14,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
   const context = useContext(AuthContext)
   if (context === undefined) {
@@ -58,6 +60,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, [])
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const fetchUserProfile = async (_authToken: string) => {
     if (USE_MOCKS) {
       setUser(mockUser)

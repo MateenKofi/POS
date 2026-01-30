@@ -2,7 +2,6 @@
 
 import {
   LayoutDashboard,
-  ShoppingCart,
   Package,
   // History,
   Truck,
@@ -10,10 +9,10 @@ import {
   // BarChart3,
   LogOut,
   X,
-  Receipt,
   History,
   RefreshCw,
   FileText,
+  CreditCard,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -40,12 +39,6 @@ export function Sidebar({
       roles: ["manager", "admin"],
     },
     {
-      id: "invoices",
-      label: "Invoices",
-      icon: Receipt,
-      roles: ["cashier", "manager", "admin"],
-    },
-    {
       id: "transactions",
       label: "Transactions",
       icon: History,
@@ -53,8 +46,8 @@ export function Sidebar({
     },
     {
       id: "sales",
-      label: "Sales",
-      icon: ShoppingCart,
+      label: "Sales Terminal",
+      icon: CreditCard,
       roles: ["cashier", "manager", "admin"],
     },
     {
@@ -130,12 +123,17 @@ export function Sidebar({
               className={cn(
                 "w-full justify-start gap-3 h-11 text-sm",
                 activeTab === item.id
-                  ? "bg-blue-600 text-white hover:bg-blue-700"
-                  : "text-slate-700 hover:bg-slate-100"
+                  ? "bg-gradient-to-r from-green-50 to-emerald-50 text-green-700 border-r-2 border-green-500 font-medium"
+                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
               )}
               onClick={() => onTabChange(item.id)}
             >
-              <Icon className="h-5 w-5" />
+              <div className={cn(
+                "p-1 rounded-md transition-colors",
+                activeTab === item.id ? "bg-white shadow-sm" : "bg-transparent group-hover:bg-white"
+              )}>
+                <Icon className={cn("h-4 w-4", activeTab === item.id ? "text-green-600" : "text-slate-400")} />
+              </div>
               <span className="truncate">{item.label}</span>
             </Button>
           );

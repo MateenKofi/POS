@@ -6,6 +6,7 @@ import {
   mockStaff,
   mockSales,
   mockSupplierProducts,
+  mockTransactions,
   paginate,
   computeDashboardStats,
   computeInventoryReport,
@@ -22,9 +23,15 @@ import {
   createSale,
   upsertSupplierProduct,
   removeSupplierProduct,
+  getTransactionsByDateRange,
+  getTransactionsByType,
+  createTransaction,
+  updateTransaction,
+  deleteTransaction,
 } from './mock-data'
 
 const API_BASE_URL = 'http://localhost:3007/api'
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const USE_MOCKS = String((import.meta as any)?.env?.VITE_USE_MOCKS ?? 'true') === 'true'
 
 async function mockApiRequest<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
@@ -32,10 +39,13 @@ async function mockApiRequest<T>(endpoint: string, options: RequestInit = {}): P
   const url = new URL(endpoint, 'http://mock.local')
   const path = url.pathname
   const search = url.searchParams
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const parseBody = <B = any>(): B => {
     try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return options.body ? JSON.parse(options.body as string) : ({} as any)
     } catch {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return {} as any
     }
   }
@@ -57,6 +67,7 @@ async function mockApiRequest<T>(endpoint: string, options: RequestInit = {}): P
     return ok(data)
   }
   if (path === '/products' && method === 'POST') {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const body = parseBody<any>()
     const created = createProduct(body)
     return ok(created)
@@ -68,6 +79,7 @@ async function mockApiRequest<T>(endpoint: string, options: RequestInit = {}): P
   }
   if (path.startsWith('/products/') && method === 'PUT') {
     const id = Number(path.split('/')[2])
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const body = parseBody<any>()
     const updated = updateProduct(id, body)
     return ok(updated!)
@@ -86,6 +98,7 @@ async function mockApiRequest<T>(endpoint: string, options: RequestInit = {}): P
     return ok({ sales: data, pagination })
   }
   if (path === '/sales' && method === 'POST') {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const body = parseBody<any>()
     const sale = createSale(body)
     return ok({ sale, items: sale.items })
@@ -113,6 +126,7 @@ async function mockApiRequest<T>(endpoint: string, options: RequestInit = {}): P
     return ok({ salespersons: data, pagination })
   }
   if (path === '/salespersons' && method === 'POST') {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const body = parseBody<any>()
     const created = createStaff(body)
     return ok(created)
@@ -124,6 +138,7 @@ async function mockApiRequest<T>(endpoint: string, options: RequestInit = {}): P
   }
   if (path.startsWith('/salespersons/') && method === 'PUT') {
     const id = Number(path.split('/')[2])
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const body = parseBody<any>()
     const updated = updateStaff(id, body)
     return ok(updated!)
@@ -140,6 +155,7 @@ async function mockApiRequest<T>(endpoint: string, options: RequestInit = {}): P
   }
   if (path.endsWith('/role') && method === 'PATCH') {
     const id = Number(path.split('/')[2])
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const body = parseBody<any>()
     const updated = updateStaff(id, { role: body.role })
     return ok(updated!)
@@ -156,6 +172,7 @@ async function mockApiRequest<T>(endpoint: string, options: RequestInit = {}): P
     return ok(data)
   }
   if (path === '/suppliers' && method === 'POST') {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const body = parseBody<any>()
     const created = createSupplier(body)
     return ok(created)
@@ -167,6 +184,7 @@ async function mockApiRequest<T>(endpoint: string, options: RequestInit = {}): P
   }
   if (path.startsWith('/suppliers/') && !path.endsWith('/products') && method === 'PUT') {
     const id = Number(path.split('/')[2])
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const body = parseBody<any>()
     const updated = updateSupplier(id, body)
     return ok(updated!)
@@ -200,6 +218,7 @@ async function mockApiRequest<T>(endpoint: string, options: RequestInit = {}): P
   // Supplier nested products (POST add)
   if (path.match(/^\/suppliers\/(\d+)\/products$/) && method === 'POST') {
     const supplierId = Number(path.split('/')[2])
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const body = parseBody<any>()
     const added = upsertSupplierProduct(supplierId, Number(body.product_id), String(body.supply_price))
     return ok(added)
@@ -207,6 +226,7 @@ async function mockApiRequest<T>(endpoint: string, options: RequestInit = {}): P
   // Supplier product price update
   if (path.match(/^\/suppliers\/(\d+)\/products\/(\d+)\/price$/) && method === 'PUT') {
     const [, , supplierIdStr, , productIdStr] = path.split('/')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const body = parseBody<any>()
     const updated = upsertSupplierProduct(Number(supplierIdStr), Number(productIdStr), String(body.supply_price))
     return ok(updated)
@@ -243,6 +263,49 @@ async function mockApiRequest<T>(endpoint: string, options: RequestInit = {}): P
     return ok({ series })
   }
 
+  // Transactions
+  if (path === '/transactions' && method === 'GET') {
+    const page = Number(search.get('page') || '1')
+    const limit = Number(search.get('limit') || '50')
+    const { data, pagination } = paginate(mockTransactions, page, limit)
+    return ok({ transactions: data, pagination })
+  }
+  if (path === '/transactions' && method === 'POST') {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const body = parseBody<any>()
+    const created = createTransaction(body)
+    return ok(created)
+  }
+  if (path.startsWith('/transactions/') && path.split('/').length === 3 && method === 'GET') {
+    const id = Number(path.split('/')[2])
+    const transaction = mockTransactions.find(t => t.transaction_id === id)
+    return ok(transaction!)
+  }
+  if (path.startsWith('/transactions/') && path.split('/').length === 3 && method === 'PUT') {
+    const id = Number(path.split('/')[2])
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const body = parseBody<any>()
+    const updated = updateTransaction(id, body)
+    return ok(updated!)
+  }
+  if (path.startsWith('/transactions/') && path.split('/').length === 3 && method === 'DELETE') {
+    const id = Number(path.split('/')[2])
+    deleteTransaction(id)
+    return ok(undefined)
+  }
+  if (path.startsWith('/transactions/date-range') && method === 'GET') {
+    const start = search.get('start_date') || '1970-01-01'
+    const end = search.get('end_date') || new Date().toISOString()
+    const filtered = getTransactionsByDateRange(start, end)
+    return ok(filtered)
+  }
+  if (path.match(/^\/transactions\/type\/[^/]+$/) && method === 'GET') {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const type = path.split('/')[3] as any
+    const filtered = getTransactionsByType(type)
+    return ok(filtered)
+  }
+
   // Fallback: return empty success
   return ok(undefined as unknown as T)
 }
@@ -257,7 +320,7 @@ async function apiRequest<T>(
   }
 
   const token = localStorage.getItem('authToken')
-  
+
   const config: RequestInit = {
     headers: {
       'Content-Type': 'application/json',
@@ -268,7 +331,7 @@ async function apiRequest<T>(
   }
 
   const response = await fetch(`${API_BASE_URL}${endpoint}`, config)
-  
+
   if (!response.ok) {
     if (response.status === 401) {
       // Token expired or invalid, redirect to login
@@ -284,10 +347,12 @@ async function apiRequest<T>(
 // API methods
 export const api = {
   get: <T>(endpoint: string) => apiRequest<T>(endpoint),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   post: <T>(endpoint: string, data?: any) => apiRequest<T>(endpoint, {
     method: 'POST',
     body: JSON.stringify(data),
   }),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   put: <T>(endpoint: string, data?: any) => apiRequest<T>(endpoint, {
     method: 'PUT',
     body: JSON.stringify(data),
@@ -295,6 +360,7 @@ export const api = {
   delete: <T>(endpoint: string) => apiRequest<T>(endpoint, {
     method: 'DELETE',
   }),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   patch: <T>(endpoint: string, data?: any) => apiRequest<T>(endpoint, {
     method: 'PATCH',
     body: JSON.stringify(data),
@@ -321,7 +387,7 @@ export const endpoints = {
     create: '/sales',
     all: '/sales',
     byId: (id: string) => `/sales/${id}`,
-    byDateRange: (startDate: string, endDate: string) => 
+    byDateRange: (startDate: string, endDate: string) =>
       `/sales/date-range?start_date=${startDate}&end_date=${endDate}`,
     bySalesperson: (salespersonId: string) => `/sales/salesperson/${salespersonId}`,
   },
@@ -345,9 +411,9 @@ export const endpoints = {
     search: (query: string) => `/suppliers/search?q=${encodeURIComponent(query)}`,
     getProducts: (supplierId: string) => `/suppliers/${supplierId}/products`, // GET endpoint for supplier products
     addProduct: (supplierId: string) => `/suppliers/${supplierId}/products`,
-    removeProduct: (supplierId: string, productId: string) => 
+    removeProduct: (supplierId: string, productId: string) =>
       `/suppliers/${supplierId}/products/${productId}`,
-    updatePrice: (supplierId: string, productId: string) => 
+    updatePrice: (supplierId: string, productId: string) =>
       `/suppliers/${supplierId}/products/${productId}/price`,
     products: (supplierId: string) => `/suppliers/${supplierId}/products`,
   },
@@ -364,6 +430,16 @@ export const endpoints = {
     stats: '/dashboard/stats',
     inventoryReport: '/dashboard/inventory-report',
     salesReport: '/dashboard/sales-report',
+  },
+  transactions: {
+    all: '/transactions',
+    byId: (id: string) => `/transactions/${id}`,
+    byDateRange: (startDate: string, endDate: string) =>
+      `/transactions/date-range?start_date=${startDate}&end_date=${endDate}`,
+    byType: (type: string) => `/transactions/type/${type}`,
+    create: '/transactions',
+    update: (id: string) => `/transactions/${id}`,
+    delete: (id: string) => `/transactions/${id}`,
   },
 }
 
@@ -417,7 +493,7 @@ export interface CreateProductRequest {
   reorder_level?: number
 }
 
-export interface UpdateProductRequest extends Partial<CreateProductRequest> {}
+export type UpdateProductRequest = Partial<CreateProductRequest>
 
 export interface SaleItem {
   product_id: number
@@ -483,7 +559,7 @@ export interface CreateSupplierRequest {
   contact_info: string
 }
 
-export interface UpdateSupplierRequest extends Partial<CreateSupplierRequest> {}
+export type UpdateSupplierRequest = Partial<CreateSupplierRequest>
 
 export interface SupplierProduct {
   supplier_product_id: number
@@ -498,7 +574,7 @@ export interface CreateSupplierProductRequest {
   supply_price: string
 }
 
-export interface UpdateSupplierProductRequest extends Partial<CreateSupplierProductRequest> {}
+export type UpdateSupplierProductRequest = Partial<CreateSupplierProductRequest>
 
 export interface SupplierProductWithDetails extends SupplierProduct {
   supplier_name: string
@@ -635,4 +711,44 @@ export interface StaffPerformanceReport {
   average_transaction: number
   total_profit: number
   period: string
+}
+
+// Transaction - Independent financial transaction tracking
+// Transactions are NOT linked to invoices - they are separate money movement records
+export type TransactionType = 'sale_payment' | 'refund' | 'expense' | 'supplier_payment' | 'cash_deposit' | 'cash_withdrawal'
+
+export type TransactionStatus = 'pending' | 'completed' | 'failed' | 'cancelled'
+
+export interface Transaction {
+  transaction_id: number
+  transaction_date: string
+  transaction_type: TransactionType
+  status: TransactionStatus
+  amount: string  // Transaction amount
+  payment_method: 'cash' | 'mobile_money' | 'bank_transfer' | 'card'
+  reference_number?: string  // External reference (receipt number, check number, etc.)
+  description: string  // Description of the transaction
+  category?: string  // For expense categorization (e.g., 'utilities', 'rent', 'transport')
+  related_entity_id?: number  // Optional: sale_id, supplier_id, etc.
+  related_entity_type?: 'sale' | 'supplier' | 'expense' | null
+  cashier_id: number  // User who processed the transaction
+  cashier_name?: string  // Denormalized for display
+  notes?: string
+  created_at: string
+}
+
+export interface CreateTransactionRequest {
+  transaction_type: TransactionType
+  amount: string
+  payment_method: 'cash' | 'mobile_money' | 'bank_transfer' | 'card'
+  reference_number?: string
+  description: string
+  category?: string
+  related_entity_id?: number
+  related_entity_type?: 'sale' | 'supplier' | 'expense'
+  notes?: string
+}
+
+export interface UpdateTransactionRequest extends Partial<CreateTransactionRequest> {
+  status?: TransactionStatus
 }

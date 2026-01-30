@@ -1,4 +1,4 @@
-import type { Product, Supplier, Staff, Sale, SupplierProduct, User, DashboardStats, InventoryReport, StockMovement } from './api'
+import type { Product, Supplier, Staff, Sale, SupplierProduct, User, DashboardStats, InventoryReport, StockMovement, Transaction, CreateTransactionRequest, TransactionType } from './api'
 
 // Basic deterministic IDs for mock entities
 let nextProductId = 1001
@@ -6,6 +6,7 @@ let nextSupplierId = 201
 let nextStaffId = 301
 let nextSaleId = 401
 let nextMovementId = 501
+let nextTransactionId = 601
 
 export const mockUser: User = {
   salesperson_id: 1,
@@ -462,4 +463,149 @@ export function createStockMovement(movement: Omit<StockMovement, 'movement_id' 
   }
   mockStockMovements.unshift(newMovement)
   return newMovement
+}
+
+// Transactions - Independent financial transaction tracking
+// NOT linked to invoices - separate money movement records
+export const mockTransactions: Transaction[] = [
+  {
+    transaction_id: 1,
+    transaction_date: new Date().toISOString(),
+    transaction_type: 'sale_payment',
+    status: 'completed',
+    amount: '750.00',
+    payment_method: 'cash',
+    reference_number: 'TXN-20250129-001',
+    description: 'Sale payment - Layer Mash 50kg x3',
+    related_entity_id: 1,
+    related_entity_type: 'sale',
+    cashier_id: 2,
+    cashier_name: 'Sam Lee',
+    created_at: new Date().toISOString(),
+  },
+  {
+    transaction_id: 2,
+    transaction_date: new Date(Date.now() - 3600000).toISOString(),
+    transaction_type: 'sale_payment',
+    status: 'completed',
+    amount: '220.00',
+    payment_method: 'mobile_money',
+    reference_number: 'TXN-20250129-002',
+    description: 'Sale payment - Grower Pellets x1',
+    related_entity_id: 2,
+    related_entity_type: 'sale',
+    cashier_id: 2,
+    cashier_name: 'Sam Lee',
+    created_at: new Date(Date.now() - 3600000).toISOString(),
+  },
+  {
+    transaction_id: 3,
+    transaction_date: new Date(Date.now() - 7200000).toISOString(),
+    transaction_type: 'expense',
+    status: 'completed',
+    amount: '150.00',
+    payment_method: 'mobile_money',
+    reference_number: 'EXP-20250129-001',
+    description: 'Utility bill payment',
+    category: 'utilities',
+    cashier_id: 1,
+    cashier_name: 'Alex Doe',
+    notes: 'Electricity for January 2025',
+    created_at: new Date(Date.now() - 7200000).toISOString(),
+  },
+  {
+    transaction_id: 4,
+    transaction_date: new Date(Date.now() - 86400000).toISOString(),
+    transaction_type: 'supplier_payment',
+    status: 'completed',
+    amount: '5000.00',
+    payment_method: 'bank_transfer',
+    reference_number: 'SUP-20250128-001',
+    description: 'Payment to AgriFeeds Ghana Ltd',
+    category: 'supplier',
+    related_entity_id: 1,
+    related_entity_type: 'supplier',
+    cashier_id: 1,
+    cashier_name: 'Alex Doe',
+    notes: 'Bulk feed purchase payment',
+    created_at: new Date(Date.now() - 86400000).toISOString(),
+  },
+  {
+    transaction_id: 5,
+    transaction_date: new Date(Date.now() - 90000000).toISOString(),
+    transaction_type: 'cash_deposit',
+    status: 'completed',
+    amount: '2000.00',
+    payment_method: 'cash',
+    reference_number: 'DEP-20250128-001',
+    description: 'Daily sales cash deposit to bank',
+    cashier_id: 1,
+    cashier_name: 'Alex Doe',
+    created_at: new Date(Date.now() - 90000000).toISOString(),
+  },
+  {
+    transaction_id: 6,
+    transaction_date: new Date(Date.now() - 90000000).toISOString(),
+    transaction_type: 'refund',
+    status: 'completed',
+    amount: '45.00',
+    payment_method: 'cash',
+    reference_number: 'REF-20250128-001',
+    description: 'Refund - Customer returned Vitamin Premix',
+    related_entity_id: 2,
+    related_entity_type: 'sale',
+    cashier_id: 2,
+    cashier_name: 'Sam Lee',
+    notes: 'Product quality issue - customer approved refund',
+    created_at: new Date(Date.now() - 90000000).toISOString(),
+  },
+]
+
+export function getTransactions(page = 1, limit = 50) {
+  const { data, pagination } = paginate(mockTransactions, page, limit)
+  return { transactions: data, pagination }
+}
+
+export function getTransactionsByDateRange(startDate: string, endDate: string): Transaction[] {
+  const start = new Date(startDate)
+  const end = new Date(endDate)
+  return mockTransactions.filter(t => {
+    const d = new Date(t.transaction_date)
+    return d >= start && d <= end
+  })
+}
+
+export function getTransactionsByType(type: TransactionType): Transaction[] {
+  return mockTransactions.filter(t => t.transaction_type === type)
+}
+
+export function createTransaction(data: Omit<Transaction, 'transaction_id' | 'transaction_date' | 'cashier_name' | 'created_at'> & { cashier_id?: number }): Transaction {
+  const cashierId = data.cashier_id || 1 // Default to admin user
+  const staff = mockStaff.find(s => s.salesperson_id === cashierId) || mockStaff[0]
+
+  const transaction: Transaction = {
+    transaction_id: nextTransactionId++,
+    transaction_date: new Date().toISOString(),
+    cashier_name: `${staff.first_name} ${staff.last_name}`,
+    created_at: new Date().toISOString(),
+    ...data,
+    status: data.status || 'completed',
+    cashier_id: cashierId,
+  }
+  mockTransactions.unshift(transaction)
+  return transaction
+}
+
+export function updateTransaction(id: number, data: Partial<CreateTransactionRequest & { status?: Transaction['status'] }>): Transaction | undefined {
+  const idx = mockTransactions.findIndex(t => t.transaction_id === id)
+  if (idx === -1) return undefined
+  mockTransactions[idx] = { ...mockTransactions[idx], ...data }
+  return mockTransactions[idx]
+}
+
+export function deleteTransaction(id: number): boolean {
+  const idx = mockTransactions.findIndex(t => t.transaction_id === id)
+  if (idx === -1) return false
+  mockTransactions.splice(idx, 1)
+  return true
 }

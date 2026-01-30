@@ -123,7 +123,7 @@ export function DailyClosure() {
 
       {isLoading ? (
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+          <Loader2 className="h-8 w-8 animate-spin text-green-600" />
           <span className="ml-2 text-gray-600">Loading sales data...</span>
         </div>
       ) : (
@@ -143,12 +143,12 @@ export function DailyClosure() {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <div className="p-4 bg-green-50 rounded-lg border border-green-200">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm text-slate-600">Total Sales</span>
-                    <DollarSign className="h-4 w-4 text-blue-600" />
+                    <DollarSign className="h-4 w-4 text-green-600" />
                   </div>
-                  <p className="text-2xl font-bold text-blue-600">{formatCurrency(todaySummary.totalSales)}</p>
+                  <p className="text-2xl font-bold text-green-600">{formatCurrency(todaySummary.totalSales)}</p>
                   <p className="text-xs text-slate-600 mt-1">{todaySummary.transactions} transactions</p>
                 </div>
 
@@ -186,7 +186,7 @@ export function DailyClosure() {
           <div className="flex justify-end">
             <Button
               onClick={() => setShowCloseDialog(true)}
-              className="bg-blue-600 hover:bg-blue-700 text-sm sm:text-base py-2 sm:py-3"
+              className="bg-green-600 hover:bg-green-700 text-sm sm:text-base py-2 sm:py-3"
               disabled={todaySummary.transactions === 0}
             >
               <FileText className="h-4 w-4 mr-2" />
@@ -262,7 +262,7 @@ export function DailyClosure() {
                 </div>
                 <div className="flex justify-between font-bold border-t border-slate-300 pt-2">
                   <span>Total Expected:</span>
-                  <span className="text-blue-600">{formatCurrency(todaySummary.totalSales)}</span>
+                  <span className="text-green-600">{formatCurrency(todaySummary.totalSales)}</span>
                 </div>
               </div>
             </div>
@@ -387,7 +387,7 @@ export function DailyClosure() {
               </Button>
               <Button
                 onClick={handleSubmitClosure}
-                className="flex-1 bg-blue-600 hover:bg-blue-700"
+                className="flex-1 bg-green-600 hover:bg-green-700"
                 disabled={isSubmitting || (!actualCash && !actualMobileMoney && !actualBankTransfer)}
               >
                 {isSubmitting ? (
