@@ -29,7 +29,7 @@ export function DailySalesChart({ data, formatCurrency }: DailySalesChartProps) 
               axisLine={false}
               tickLine={false}
               tick={{ fill: '#64748b', fontSize: 12 }}
-              tickFormatter={(value) => `GHS${value}`}
+              tickFormatter={(value) => `GH₵${value}`}
             />
             <Tooltip
               contentStyle={{

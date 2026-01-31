@@ -74,11 +74,11 @@ export function SupplierProductsModal({ isOpen, onClose, supplier }: SupplierPro
                       <TableCell>
                         <div className="flex items-center gap-1">
                           <BadgeCent className="h-4 w-4 text-gray-400" />
-                          <span className="font-semibold">GHS {supplyPrice.toFixed(2)}</span>
+                          <span className="font-semibold">GH₵ {supplyPrice.toFixed(2)}</span>
                         </div>
                       </TableCell>
                       <TableCell>
-                        <span className="font-semibold text-green-600">GHS {retailPrice.toFixed(2)}</span>
+                        <span className="font-semibold text-green-600">GH₵ {retailPrice.toFixed(2)}</span>
                       </TableCell>
                       <TableCell>
                         <span className={`font-medium ${sp.stock_quantity < 20 ? "text-red-600" : "text-green-600"}`}>
@@ -87,7 +87,7 @@ export function SupplierProductsModal({ isOpen, onClose, supplier }: SupplierPro
                       </TableCell>
                       <TableCell>
                         <span className={`font-medium ${profitMargin >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                          GHS {profitMargin.toFixed(2)} ({profitMarginPercent}%)
+                          GH₵ {profitMargin.toFixed(2)} ({profitMarginPercent}%)
                         </span>
                       </TableCell>
                     </TableRow>

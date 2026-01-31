@@ -199,11 +199,6 @@ export function SalesInterface() {
   }
 
   const processPayment = async () => {
-    if (paymentDetails.method === 1 && paymentDetails.amount < total) {
-      alert("Cash amount must be greater than or equal to total")
-      return
-    }
-
     if (!paymentDetails.method) {
       alert("Please select a payment method")
       return

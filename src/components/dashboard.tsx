@@ -1,5 +1,5 @@
 import {
-  DollarSign,
+  Banknote,
   Package,
   ShoppingCart,
   TrendingUp,
@@ -50,7 +50,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-GH", {
       style: "currency",
-      currency: "GHS",
+      currency: "GHS", // Using GHS for Intl.NumberFormat, display uses GH₵,
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     }).format(amount);
@@ -102,7 +102,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
     {
       title: "Today's Revenue",
       value: formatCurrency(stats.todayRevenue || 0),
-      icon: DollarSign,
+      icon: Banknote,
       change: calculateChange(
         stats.todayRevenue || 0,
         (stats.todayRevenue || 0) * 0.9

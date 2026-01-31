@@ -13,6 +13,7 @@ import { useAuth } from "@/contexts/AuthContext"
 import { ProductTable } from "./product-management/ProductTable"
 import { ProductForm } from "./product-management/ProductForm"
 import { ProductSummary } from "./product-management/ProductSummary"
+import { ProductStats } from "./product-management/ProductStats"
 
 import type { ProductTab } from "./product-management/types"
 
@@ -207,6 +208,13 @@ export function ProductManagement() {
           </Button>
         )}
       </div>
+
+      {/* Product Stats Cards */}
+      <ProductStats
+        totalProducts={baseFilteredProducts.length}
+        expiringCount={expiringCount}
+        expiredCount={expiredCount}
+      />
 
       <ProductTable
         filteredProducts={filteredProducts}
