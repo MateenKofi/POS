@@ -14,12 +14,13 @@ import {
 // Dashboard sub-components
 import { DashboardHeader } from "./dashboard/DashboardHeader"
 import { StatsCards } from "./dashboard/StatsCards"
-import { RecentTransactions } from "./dashboard/RecentTransactions"
 import { LowStockAlerts } from "./dashboard/LowStockAlerts"
 import { ExpiringProducts } from "./dashboard/ExpiringProducts"
-import { SalesSummary } from "./dashboard/SalesSummary"
 import { TopProducts } from "./dashboard/TopProducts"
 import { QuickActions } from "./dashboard/QuickActions"
+import { RevenueChart } from "./dashboard/RevenueChart"
+import { SalesByCategory } from "./dashboard/SalesByCategory"
+import { DailySalesChart } from "./dashboard/DailySalesChart"
 import type { DashboardStat, SaleData } from "./dashboard/types"
 
 interface DashboardProps {
@@ -162,6 +163,35 @@ export function Dashboard({ onNavigate }: DashboardProps) {
     );
   }
 
+  // Generate mock chart data (in real app, this would come from API)
+  const revenueData = [
+    { name: 'Mon', revenue: 1250, profit: 350 },
+    { name: 'Tue', revenue: 1580, profit: 420 },
+    { name: 'Wed', revenue: 1890, profit: 510 },
+    { name: 'Thu', revenue: 1420, profit: 380 },
+    { name: 'Fri', revenue: 2150, profit: 580 },
+    { name: 'Sat', revenue: 2890, profit: 780 },
+    { name: 'Sun', revenue: 1650, profit: 440 },
+  ]
+
+  const categoryData = [
+    { name: 'Animal Feed', value: 4500, color: '#10b981' },
+    { name: 'Seeds', value: 2100, color: '#3b82f6' },
+    { name: 'Fertilizers', value: 1850, color: '#f59e0b' },
+    { name: 'Tools', value: 1200, color: '#8b5cf6' },
+    { name: 'Other', value: 890, color: '#64748b' },
+  ]
+
+  const weeklySalesData = [
+    { name: 'Mon', sales: 12, revenue: 1250 },
+    { name: 'Tue', sales: 15, revenue: 1580 },
+    { name: 'Wed', sales: 18, revenue: 1890 },
+    { name: 'Thu', sales: 14, revenue: 1420 },
+    { name: 'Fri', sales: 22, revenue: 2150 },
+    { name: 'Sat', sales: 28, revenue: 2890 },
+    { name: 'Sun', sales: 16, revenue: 1650 },
+  ]
+
   return (
     <div className="p-3 sm:p-6">
       <div className="mb-6 sm:mb-8">
@@ -175,38 +205,33 @@ export function Dashboard({ onNavigate }: DashboardProps) {
 
       <StatsCards stats={dashboardStats} onQuickAction={handleQuickAction} />
 
-      {/* Charts and Tables */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <RecentTransactions
-          sales={sales}
-          formatCurrency={formatCurrency}
-          onQuickAction={handleQuickAction}
-        />
+      {/* Charts Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        <div className="lg:col-span-2">
+          <RevenueChart data={revenueData} formatCurrency={(v) => formatCurrency(v)} />
+        </div>
+        <SalesByCategory data={categoryData} formatCurrency={(v) => formatCurrency(v)} />
+      </div>
 
+      {/* Daily Sales Chart */}
+      <div className="grid grid-cols-1 gap-6 mb-6">
+        <DailySalesChart data={weeklySalesData} formatCurrency={(v) => formatCurrency(v)} />
+      </div>
+
+      {/* Alerts and Quick Actions */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <LowStockAlerts
           lowStockProducts={lowStockProducts}
           onQuickAction={handleQuickAction}
         />
-
         <ExpiringProducts
           expiringProducts={expiringProducts}
           expiredProducts={expiredProducts}
         />
       </div>
 
-      {/* Sales Summary Section */}
-      {sales.length > 0 && (
-        <div className="mt-6">
-          <SalesSummary
-            sales={sales}
-            formatCurrency={formatCurrency}
-            onQuickAction={handleQuickAction}
-          />
-        </div>
-      )}
-
       {/* Additional Dashboard Sections */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <TopProducts
           topProducts={dashboardStatistics?.topProducts || []}
           formatCurrency={formatCurrency}
