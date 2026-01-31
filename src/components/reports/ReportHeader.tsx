@@ -1,5 +1,5 @@
 import { Button, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/custom-components"
-import { Download, DollarSign, AlertTriangle, Users } from "lucide-react"
+import { Download, Banknote, AlertTriangle, Users } from "lucide-react"
 
 type ReportTab = "profit" | "expiry" | "staff"
 type PeriodType = "today" | "week" | "month"
@@ -50,7 +50,7 @@ export function ReportHeader({ activeTab, period, onTabChange, onPeriodChange }:
                 : 'border-transparent text-slate-600 hover:text-slate-800'
             }`}
           >
-            <DollarSign className="h-4 w-4" />
+            <Banknote className="h-4 w-4" />
             Profit & Revenue
           </button>
           <button

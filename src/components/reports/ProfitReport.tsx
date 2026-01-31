@@ -1,5 +1,5 @@
 import { Card, CardContent } from "@/components/custom-components"
-import { DollarSign, TrendingUp, Package } from "lucide-react"
+import { Banknote, TrendingUp, Package } from "lucide-react"
 
 interface ProductProfit {
   name: string
@@ -25,7 +25,7 @@ export function ProfitReport({ totalRevenue, grossProfit, profitMargin, topProdu
           <CardContent className="p-4">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm text-slate-600">Total Revenue</span>
-              <DollarSign className="h-4 w-4 text-green-600" />
+              <Banknote className="h-4 w-4 text-green-600" />
             </div>
             <p className="text-2xl font-bold text-slate-800">{formatCurrency(totalRevenue)}</p>
             <p className="text-xs text-slate-500 mt-1">{transactions} transactions</p>

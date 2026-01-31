@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Modal } from "@/components/modal"
-import { Calendar, DollarSign, Smartphone, Building2, CheckCircle2, AlertCircle, TrendingUp, TrendingDown, FileText, Loader2 } from "lucide-react"
+import { Calendar, Banknote, Smartphone, Building2, CheckCircle2, AlertCircle, TrendingUp, TrendingDown, FileText, Loader2 } from "lucide-react"
 import { useSales } from "@/hooks/useApi"
 import { PAYMENT_METHODS } from "@/hooks/useApi"
 import { type Sale } from "@/lib/api"
@@ -146,7 +146,7 @@ export function DailyClosure() {
                 <div className="p-4 bg-green-50 rounded-lg border border-green-200">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm text-slate-600">Total Sales</span>
-                    <DollarSign className="h-4 w-4 text-green-600" />
+                    <Banknote className="h-4 w-4 text-green-600" />
                   </div>
                   <p className="text-2xl font-bold text-green-600">{formatCurrency(todaySummary.totalSales)}</p>
                   <p className="text-xs text-slate-600 mt-1">{todaySummary.transactions} transactions</p>
@@ -155,7 +155,7 @@ export function DailyClosure() {
                 <div className="p-4 bg-green-50 rounded-lg border border-green-200">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm text-slate-600">Cash</span>
-                    <DollarSign className="h-4 w-4 text-green-600" />
+                    <Banknote className="h-4 w-4 text-green-600" />
                   </div>
                   <p className="text-2xl font-bold text-green-600">{formatCurrency(todaySummary.totalCash)}</p>
                   <p className="text-xs text-slate-600 mt-1">{PAYMENT_METHODS[1]}</p>

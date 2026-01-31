@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/custom-components"
 import { Button } from "@/components/ui/button"
-import { Calendar, DollarSign, Smartphone, Building2, FileText, Loader2 } from "lucide-react"
+import { Calendar, Banknote, Smartphone, Building2, FileText, Loader2 } from "lucide-react"
 
 interface TodaySummaryProps {
   todaySummary: {
@@ -42,7 +42,7 @@ export function TodaySummary({ todaySummary, isLoading, formatCurrency, onCloseD
               <div className="p-4 bg-green-50 rounded-lg border border-green-200">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-sm text-slate-600">Total Sales</span>
-                  <DollarSign className="h-4 w-4 text-green-600" />
+                  <Banknote className="h-4 w-4 text-green-600" />
                 </div>
                 <p className="text-2xl font-bold text-green-600">{formatCurrency(todaySummary.totalSales)}</p>
                 <p className="text-xs text-slate-600 mt-1">{todaySummary.transactions} transactions</p>
@@ -51,7 +51,7 @@ export function TodaySummary({ todaySummary, isLoading, formatCurrency, onCloseD
               <div className="p-4 bg-green-50 rounded-lg border border-green-200">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-sm text-slate-600">Cash</span>
-                  <DollarSign className="h-4 w-4 text-green-600" />
+                  <Banknote className="h-4 w-4 text-green-600" />
                 </div>
                 <p className="text-2xl font-bold text-green-600">{formatCurrency(todaySummary.totalCash)}</p>
                 <p className="text-xs text-slate-600 mt-1">Cash</p>
