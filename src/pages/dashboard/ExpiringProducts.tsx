@@ -8,7 +8,7 @@ interface ExpiringProductsProps {
   expiredProducts: Product[]
 }
 
-export function ExpiringProducts({ expiringProducts, expiredProducts }: ExpiringProductsProps) {
+export const ExpiringProducts = ({ expiringProducts, expiredProducts }: ExpiringProductsProps) => {
   return (
     <>
       {/* Expiring Soon Alert */}

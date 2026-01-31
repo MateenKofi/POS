@@ -7,7 +7,7 @@ interface ProductStatsProps {
   expiredCount: number
 }
 
-export function ProductStats({ totalProducts, expiringCount, expiredCount }: ProductStatsProps) {
+export const ProductStats = ({ totalProducts, expiringCount, expiredCount }: ProductStatsProps) => {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
       {/* Total Products */}

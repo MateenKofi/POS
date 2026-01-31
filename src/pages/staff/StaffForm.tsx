@@ -12,7 +12,7 @@ interface StaffFormProps {
   onCancel: () => void
 }
 
-export function StaffForm({ form, isEdit = false, isPending, onSubmit, onCancel }: StaffFormProps) {
+export const StaffForm = ({ form, isEdit = false, isPending, onSubmit, onCancel }: StaffFormProps) => {
   const { register, control, formState: { errors } } = form
 
   return (

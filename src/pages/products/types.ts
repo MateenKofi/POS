@@ -1,3 +1,1 @@
-
-
-export type ProductTab = 'all' | 'expiring' | 'expired'
+export type { ProductTab } from '@/lib/types'

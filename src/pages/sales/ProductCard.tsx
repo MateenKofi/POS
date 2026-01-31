@@ -8,7 +8,7 @@ interface ProductCardProps {
   onClick: (product: ApiProduct) => void
 }
 
-export function ProductCard({ product, onClick }: ProductCardProps) {
+export const ProductCard = ({ product, onClick }: ProductCardProps) => {
   const isExpired = product.expiry_date ? new Date(product.expiry_date) < new Date() : false
   const isLowStock = product.reorder_level && product.stock_quantity <= product.reorder_level
   const isOutOfStock = product.stock_quantity <= 0

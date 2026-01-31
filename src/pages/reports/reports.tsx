@@ -14,7 +14,7 @@ import { StaffReport } from "./StaffReport"
 type ReportTab = "profit" | "expiry" | "staff"
 type PeriodType = "today" | "week" | "month"
 
-export function Reports() {
+export const Reports = () => {
   const [activeTab, setActiveTab] = useState<ReportTab>("profit")
   const [period, setPeriod] = useState<PeriodType>("today")
 

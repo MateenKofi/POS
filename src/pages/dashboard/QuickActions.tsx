@@ -6,7 +6,7 @@ interface QuickActionsProps {
   onQuickAction: (action: string) => void
 }
 
-export function QuickActions({ onQuickAction }: QuickActionsProps) {
+export const QuickActions = ({ onQuickAction }: QuickActionsProps) => {
   return (
     <Card className="">
       <CardHeader>

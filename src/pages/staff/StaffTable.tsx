@@ -13,7 +13,7 @@ interface StaffTableProps {
   onChangePassword?: (staff: Staff) => void
 }
 
-export function StaffTable({ filteredStaff, isLoading, searchTerm, onSearchChange, onEdit, onDelete, onChangePassword }: StaffTableProps) {
+export const StaffTable = ({ filteredStaff, isLoading, searchTerm, onSearchChange, onEdit, onDelete, onChangePassword }: StaffTableProps) => {
   return (
     <>
       <div className="mb-6">

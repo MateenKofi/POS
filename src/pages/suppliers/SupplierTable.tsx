@@ -20,7 +20,7 @@ interface SupplierTableWithAddProps {
   addDialogContent: React.ReactNode
 }
 
-export function SupplierTable({ searchTerm, onSearchChange }: SupplierTableProps) {
+export const SupplierTable = ({ searchTerm, onSearchChange }: SupplierTableProps) => {
   return (
     <>
       <div className="mb-6">
@@ -38,7 +38,7 @@ export function SupplierTable({ searchTerm, onSearchChange }: SupplierTableProps
   )
 }
 
-export function SupplierTableWithAdd({
+export const SupplierTableWithAdd = ({
   filteredSuppliers,
   isLoading,
   searchTerm,
@@ -48,7 +48,7 @@ export function SupplierTableWithAdd({
   isAddDialogOpen,
   onAddDialogOpen,
   addDialogContent
-}: SupplierTableWithAddProps) {
+}: SupplierTableWithAddProps) => {
   return (
     <>
       <SupplierTable searchTerm={searchTerm} onSearchChange={onSearchChange} />

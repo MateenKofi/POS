@@ -20,7 +20,7 @@ interface ModernTabsProps {
     className?: string
 }
 
-export function ModernTabs({ tabs, activeTab, onChange, className }: ModernTabsProps) {
+export const ModernTabs = ({ tabs, activeTab, onChange, className }: ModernTabsProps) => {
     return (
         <div className={cn("inline-flex h-12 items-center justify-start rounded-xl bg-slate-100/80 p-1 text-slate-500 w-full sm:w-auto", className)}>
             {tabs.map((tab) => {

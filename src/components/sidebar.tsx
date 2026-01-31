@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   Package,
@@ -20,8 +21,6 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 interface SidebarProps {
-  activeTab: string;
-  onTabChange: (tab: string) => void;
   userRole: "cashier" | "manager" | "admin";
   username: string;
   onLogout: () => void;
@@ -30,6 +29,7 @@ interface SidebarProps {
 interface MenuItem {
   id: string;
   label: string;
+  path: string;
   icon: any;
   roles: string[];
 }
@@ -52,6 +52,7 @@ const menuGroups: MenuGroup[] = [
       {
         id: "dashboard",
         label: "Dashboard",
+        path: "/",
         icon: LayoutDashboard,
         roles: ["manager", "admin"],
       },
@@ -66,18 +67,21 @@ const menuGroups: MenuGroup[] = [
       {
         id: "sales",
         label: "Sales Terminal",
+        path: "/sales",
         icon: CreditCard,
         roles: ["cashier", "manager", "admin"],
       },
       {
         id: "transactions",
         label: "Transactions",
+        path: "/transactions",
         icon: History,
         roles: ["cashier", "manager", "admin"],
       },
       {
         id: "daily-closure",
         label: "Daily Closure",
+        path: "/daily-closure",
         icon: FileText,
         roles: ["manager", "admin"],
       },
@@ -92,12 +96,14 @@ const menuGroups: MenuGroup[] = [
       {
         id: "products",
         label: "Products",
+        path: "/products",
         icon: Package,
         roles: ["manager", "admin"],
       },
       {
         id: "stock-movements",
         label: "Stock Movements",
+        path: "/stock-movements",
         icon: RefreshCw,
         roles: ["manager", "admin"],
       },
@@ -112,38 +118,51 @@ const menuGroups: MenuGroup[] = [
       {
         id: "suppliers",
         label: "Suppliers",
+        path: "/suppliers",
         icon: Truck,
         roles: ["manager", "admin"],
       },
       {
         id: "supplier-products",
         label: "Supplier Products",
+        path: "/supplier-products",
         icon: Package,
         roles: ["manager", "admin"],
       },
       {
         id: "staff",
         label: "Staff",
+        path: "/staff",
         icon: Users,
+        roles: ["manager", "admin"],
+      },
+    ],
+  },
+  {
+    id: "reports",
+    label: "Reports",
+    icon: FileText,
+    roles: ["manager", "admin"],
+    items: [
+      {
+        id: "reports",
+        label: "Reports",
+        path: "/reports",
+        icon: FileText,
         roles: ["manager", "admin"],
       },
     ],
   },
 ];
 
-export function Sidebar({
-  activeTab,
-  onTabChange,
-  userRole,
-  username,
-  onLogout,
-}: SidebarProps) {
+export const Sidebar = ({ userRole, username, onLogout }: SidebarProps) => {
+  const navigate = useNavigate();
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(
-    new Set(menuGroups.map(g => g.id))
+    new Set(menuGroups.map((g) => g.id))
   );
 
   const toggleGroup = (groupId: string) => {
-    setExpandedGroups(prev => {
+    setExpandedGroups((prev) => {
       const next = new Set(prev);
       if (next.has(groupId)) {
         next.delete(groupId);
@@ -154,19 +173,25 @@ export function Sidebar({
     });
   };
 
+  // Close sidebar on mobile
+  const handleCloseSidebar = () => {
+    const event = new CustomEvent("closeSidebar");
+    window.dispatchEvent(event);
+  };
+
   // Filter groups and items based on user role
   const visibleGroups = menuGroups
-    .map(group => ({
+    .map((group) => ({
       ...group,
-      items: group.items.filter(item => item.roles.includes(userRole)),
+      items: group.items.filter((item) => item.roles.includes(userRole)),
     }))
-    .filter(group => group.items.length > 0);
+    .filter((group) => group.items.length > 0);
 
   // Get user initials for avatar
   const getInitials = (name: string) => {
     return name
       .split(" ")
-      .map(n => n[0])
+      .map((n) => n[0])
       .join("")
       .toUpperCase()
       .slice(0, 2);
@@ -192,6 +217,11 @@ export function Sidebar({
     return colorMap[role] || "bg-slate-100 text-slate-700";
   };
 
+  const handleLogout = () => {
+    onLogout();
+    navigate("/login");
+  };
+
   return (
     <div className="w-72 bg-gradient-to-b from-slate-50 to-white border-r border-slate-200 flex flex-col h-full">
       {/* Close button for mobile */}
@@ -200,10 +230,7 @@ export function Sidebar({
           variant="ghost"
           size="sm"
           className="p-2 h-8 w-8"
-          onClick={() => {
-            const event = new CustomEvent('closeSidebar');
-            window.dispatchEvent(event);
-          }}
+          onClick={handleCloseSidebar}
         >
           <X className="h-4 w-4" />
         </Button>
@@ -231,10 +258,12 @@ export function Sidebar({
             </div>
             <div className="flex-1 min-w-0">
               <p className="font-semibold text-slate-800 truncate">{username}</p>
-              <span className={cn(
-                "inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium",
-                getRoleColor(userRole)
-              )}>
+              <span
+                className={cn(
+                  "inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium",
+                  getRoleColor(userRole)
+                )}
+              >
                 {getRoleDisplay(userRole)}
               </span>
             </div>
@@ -247,7 +276,6 @@ export function Sidebar({
         {visibleGroups.map((group) => {
           const GroupIcon = group.icon;
           const isExpanded = expandedGroups.has(group.id);
-          const hasActiveItem = group.items.some(item => item.id === activeTab);
 
           return (
             <div key={group.id} className="space-y-1">
@@ -256,9 +284,7 @@ export function Sidebar({
                 variant="ghost"
                 className={cn(
                   "w-full justify-between gap-2 h-10 px-3 text-sm font-medium transition-all",
-                  hasActiveItem
-                    ? "bg-emerald-50 text-emerald-700"
-                    : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                  "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
                 )}
                 onClick={() => toggleGroup(group.id)}
               >
@@ -278,23 +304,24 @@ export function Sidebar({
                 <div className="ml-4 space-y-0.5">
                   {group.items.map((item) => {
                     const ItemIcon = item.icon;
-                    const isActive = activeTab === item.id;
 
                     return (
-                      <Button
+                      <NavLink
                         key={item.id}
-                        variant="ghost"
-                        className={cn(
-                          "w-full justify-start gap-3 h-9 px-3 text-sm transition-all",
-                          isActive
-                            ? "bg-gradient-to-r from-emerald-500 to-green-600 text-white shadow-md shadow-emerald-500/20"
-                            : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
-                        )}
-                        onClick={() => onTabChange(item.id)}
+                        to={item.path}
+                        className={({ isActive }) =>
+                          cn(
+                            "flex items-center justify-start gap-3 h-9 px-3 text-sm rounded-lg transition-all",
+                            isActive
+                              ? "bg-gradient-to-r from-emerald-500 to-green-600 text-white shadow-md shadow-emerald-500/20"
+                              : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                          )
+                        }
+                        onClick={handleCloseSidebar}
                       >
                         <ItemIcon className="h-4 w-4" />
                         <span className="truncate">{item.label}</span>
-                      </Button>
+                      </NavLink>
                     );
                   })}
                 </div>
@@ -309,7 +336,7 @@ export function Sidebar({
         <Button
           variant="ghost"
           className="w-full justify-start gap-3 h-10 px-3 text-sm text-slate-600 hover:text-red-600 hover:bg-red-50 transition-colors"
-          onClick={onLogout}
+          onClick={handleLogout}
         >
           <LogOut className="h-4 w-4" />
           <span>Logout</span>

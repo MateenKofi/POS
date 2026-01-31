@@ -11,7 +11,7 @@ interface ProductRowProps {
   isAdmin: boolean
 }
 
-export function ProductRow({ product, onEdit, onDelete, deleteProduct, isAdmin }: ProductRowProps) {
+export const ProductRow = ({ product, onEdit, onDelete, deleteProduct, isAdmin }: ProductRowProps) => {
   const getExpiryStatus = (expiryDate: string) => {
     const daysUntilExpiry = Math.ceil((new Date(expiryDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
     if (daysUntilExpiry < 0) return { status: 'expired', color: 'bg-red-100 text-red-800 border-red-300' }

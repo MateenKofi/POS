@@ -10,7 +10,7 @@ interface SupplierProductsModalProps {
   supplier: Supplier
 }
 
-export function SupplierProductsModal({ isOpen, onClose, supplier }: SupplierProductsModalProps) {
+export const SupplierProductsModal = ({ isOpen, onClose, supplier }: SupplierProductsModalProps) => {
   const { data: supplierProducts, isLoading: productsLoading } = useSupplierProductsBySupplier(supplier.supplier_id.toString())
 
   return (

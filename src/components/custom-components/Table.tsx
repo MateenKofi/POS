@@ -119,12 +119,12 @@ interface PaginationProps {
     className?: string
 }
 
-function Pagination({
+const Pagination = ({
     currentPage,
     totalPages,
     onPageChange,
     className,
-}: PaginationProps) {
+}: PaginationProps) => {
     return (
         <div className={cn("flex items-center justify-end space-x-2 py-4", className)}>
             <div className="flex-1 text-sm text-muted-foreground">

@@ -59,7 +59,7 @@ const TRANSACTION_TYPE_LABELS: Record<string, string> = {
 
 type SendMethod = 'select' | 'email' | 'sms' | null
 
-export function InvoiceModal({ isOpen, onClose, invoiceData, showDoneButton = false }: InvoiceModalProps) {
+export const InvoiceModal = ({ isOpen, onClose, invoiceData, showDoneButton = false }: InvoiceModalProps) => {
   const [isSending, setIsSending] = useState(false)
   const [sendMethod, setSendMethod] = useState<SendMethod>(null)
   const [customerEmail, setCustomerEmail] = useState('')

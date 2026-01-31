@@ -8,7 +8,7 @@ interface SalesSummaryProps {
   onQuickAction: (action: string) => void
 }
 
-export function SalesSummary({ sales, formatCurrency, onQuickAction }: SalesSummaryProps) {
+export const SalesSummary = ({ sales, formatCurrency, onQuickAction }: SalesSummaryProps) => {
   const totalRevenue = sales.reduce((sum, sale) => sum + parseFloat(sale.total_amount), 0)
   const totalSales = sales.length
   const averageSale = totalRevenue / totalSales

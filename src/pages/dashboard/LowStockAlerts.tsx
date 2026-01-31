@@ -7,7 +7,7 @@ interface LowStockAlertsProps {
   onQuickAction: (action: string) => void
 }
 
-export function LowStockAlerts({ lowStockProducts, onQuickAction }: LowStockAlertsProps) {
+export const LowStockAlerts = ({ lowStockProducts, onQuickAction }: LowStockAlertsProps) => {
   return (
     <Card className="">
       <CardHeader className="flex flex-row items-center justify-between">

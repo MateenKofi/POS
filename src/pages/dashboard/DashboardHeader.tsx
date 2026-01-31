@@ -7,7 +7,7 @@ interface DashboardHeaderProps {
   onRetry: () => void
 }
 
-export function DashboardHeader({ isLoading, error, onRetry }: DashboardHeaderProps) {
+export const DashboardHeader = ({ isLoading, error, onRetry }: DashboardHeaderProps) => {
   if (isLoading) {
     return (
       <div className="p-6">

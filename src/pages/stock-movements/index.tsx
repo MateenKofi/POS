@@ -20,7 +20,7 @@ const MOVEMENT_TYPES = {
   expiry: { icon: AlertTriangle, color: "text-purple-600", bgColor: "bg-purple-100", label: "Expired" },
 } as const
 
-export function StockMovements() {
+export const StockMovements = () => {
   const [searchTerm, setSearchTerm] = useState("")
   const [movementTypeFilter, setMovementTypeFilter] = useState<string>("all")
   const [productFilter, setProductFilter] = useState<string>("all")

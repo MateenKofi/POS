@@ -15,7 +15,7 @@ interface TopProductsProps {
   onQuickAction: (action: string) => void
 }
 
-export function TopProducts({ topProducts, formatCurrency, onQuickAction }: TopProductsProps) {
+export const TopProducts = ({ topProducts, formatCurrency, onQuickAction }: TopProductsProps) => {
   return (
     <Card className=" lg:col-span-2">
       <CardHeader className="flex flex-row items-center justify-between">

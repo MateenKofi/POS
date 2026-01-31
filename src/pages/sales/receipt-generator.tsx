@@ -38,7 +38,7 @@ interface ReceiptGeneratorProps {
 
 type ReceiptMethod = "print" | "sms" | "whatsapp"
 
-export function ReceiptGenerator({ receiptData, onClose }: ReceiptGeneratorProps) {
+export const ReceiptGenerator = ({ receiptData, onClose }: ReceiptGeneratorProps) => {
   const [selectedMethod, setSelectedMethod] = useState<ReceiptMethod>("print")
   const [phoneNumber, setPhoneNumber] = useState(receiptData.customerPhone || "")
   const [isSending, setIsSending] = useState(false)

@@ -16,7 +16,7 @@ interface TodaySummaryProps {
   onCloseDay: () => void
 }
 
-export function TodaySummary({ todaySummary, isLoading, formatCurrency, onCloseDay }: TodaySummaryProps) {
+export const TodaySummary = ({ todaySummary, isLoading, formatCurrency, onCloseDay }: TodaySummaryProps) => {
   return (
     <>
       <Card>

@@ -18,7 +18,7 @@ const defaultNewSupplier: CreateSupplierRequest = {
   contact_info: "",
 }
 
-export function SupplierManagement() {
+export const SupplierManagement = () => {
   const [searchTerm, setSearchTerm] = useState("")
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)

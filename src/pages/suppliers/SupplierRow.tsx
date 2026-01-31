@@ -10,7 +10,7 @@ interface SupplierRowProps {
   onDelete: (id: number) => void
 }
 
-export function SupplierRow({ supplier, onEdit, onDelete }: SupplierRowProps) {
+export const SupplierRow = ({ supplier, onEdit, onDelete }: SupplierRowProps) => {
   const [isViewProductsOpen, setIsViewProductsOpen] = useState(false)
 
   return (

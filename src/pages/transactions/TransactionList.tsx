@@ -10,12 +10,12 @@ interface TransactionListProps {
   onView: (transaction: Transaction) => void
 }
 
-export function TransactionList({
+export const TransactionList = ({
   transactions,
   transactionTypeLabels,
   transactionStatusColors,
   onView,
-}: TransactionListProps) {
+}: TransactionListProps) => {
   return (
     <div className="space-y-2">
       <Table>

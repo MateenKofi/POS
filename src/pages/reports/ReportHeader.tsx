@@ -11,7 +11,7 @@ interface ReportHeaderProps {
   onPeriodChange: (period: PeriodType) => void
 }
 
-export function ReportHeader({ activeTab, period, onTabChange, onPeriodChange }: ReportHeaderProps) {
+export const ReportHeader = ({ activeTab, period, onTabChange, onPeriodChange }: ReportHeaderProps) => {
   return (
     <>
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 sm:mb-8 gap-4">

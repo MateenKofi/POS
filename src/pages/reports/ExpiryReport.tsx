@@ -12,7 +12,7 @@ interface ExpiryReportProps {
   expiringProducts: ExpiringProduct[]
 }
 
-export function ExpiryReport({ expiringProducts }: ExpiryReportProps) {
+export const ExpiryReport = ({ expiringProducts }: ExpiryReportProps) => {
   const getStatusBadge = (status: 'expired' | 'expiring_soon' | 'ok') => {
     if (status === 'expired') {
       return <Badge className="bg-red-100 text-red-800 hover:bg-red-100">Expired</Badge>

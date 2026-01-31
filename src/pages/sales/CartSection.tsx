@@ -17,7 +17,7 @@ interface CartSectionProps {
   onCheckout: () => void
 }
 
-export function CartSection({
+export const CartSection = ({
   cart,
   subtotal,
   total,
@@ -27,7 +27,7 @@ export function CartSection({
   onUpdateQuantity,
   onRemove,
   onCheckout
-}: CartSectionProps) {
+}: CartSectionProps) => {
   return (
     <Card className="sticky top-4 overflow-x-hidden">
       <CardHeader className="-mx-6 px-6 border-b border-slate-100">

@@ -6,7 +6,7 @@ interface DailySalesChartProps {
   formatCurrency: (amount: number) => string
 }
 
-export function DailySalesChart({ data, formatCurrency }: DailySalesChartProps) {
+export const DailySalesChart = ({ data, formatCurrency }: DailySalesChartProps) => {
   return (
     <Card>
       <CardHeader className="pb-4">

@@ -45,7 +45,7 @@ const defaultPasswordData: PasswordData = {
   new_password: "",
 }
 
-export function StaffManagement() {
+export const StaffManagement = () => {
   const [searchTerm, setSearchTerm] = useState("")
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [editingStaff, setEditingStaff] = useState<Staff | null>(null)

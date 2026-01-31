@@ -6,7 +6,7 @@ interface StatsCardsProps {
   onQuickAction: (action: string) => void
 }
 
-export function StatsCards({ stats, onQuickAction }: StatsCardsProps) {
+export const StatsCards = ({ stats, onQuickAction }: StatsCardsProps) => {
   const quickActions: QuickAction[] = [
     { action: "sales", label: "View Sales" },
     { action: "products", label: "View Products" },

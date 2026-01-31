@@ -16,7 +16,7 @@ interface StaffReportProps {
   formatCurrency: (amount: number) => string
 }
 
-export function StaffReport({ staffPerformance, formatCurrency }: StaffReportProps) {
+export const StaffReport = ({ staffPerformance, formatCurrency }: StaffReportProps) => {
   return (
     <Card className="">
       <CardHeader>

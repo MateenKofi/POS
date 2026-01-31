@@ -12,7 +12,7 @@ interface SupplierProductTableProps {
   isDeletePending: boolean
 }
 
-export function SupplierProductTable({
+export const SupplierProductTable = ({
   filteredSupplierProducts,
   isLoading,
   searchTerm,
@@ -20,7 +20,7 @@ export function SupplierProductTable({
   onEdit,
   onDelete,
   isDeletePending
-}: SupplierProductTableProps) {
+}: SupplierProductTableProps) => {
   return (
     <>
       <div className="mb-6">

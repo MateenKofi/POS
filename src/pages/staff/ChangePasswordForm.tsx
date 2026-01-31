@@ -12,14 +12,14 @@ interface ChangePasswordFormProps {
   onCancel: () => void
 }
 
-export function ChangePasswordForm({
+export const ChangePasswordForm = ({
   form,
   showPassword,
   isPending,
   onTogglePassword,
   onSubmit,
   onCancel
-}: ChangePasswordFormProps) {
+}: ChangePasswordFormProps) => {
   const { register, formState: { errors }, handleSubmit } = form
 
   const onFormSubmit = () => {

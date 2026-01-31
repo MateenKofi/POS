@@ -21,7 +21,7 @@ interface TransactionFormProps {
   onSuccess: () => void
 }
 
-export function TransactionForm({ mode, transaction, onClose, onSuccess }: TransactionFormProps) {
+export const TransactionForm = ({ mode, transaction, onClose, onSuccess }: TransactionFormProps) => {
   const createMutation = useCreateTransaction()
   const updateMutation = useUpdateTransaction()
 

@@ -1,16 +1,9 @@
-import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react'
-import { api, endpoints, type User, type ApiResponse } from '@/lib/api'
+import React, { createContext, useContext, useState, useEffect } from 'react'
+import type { AuthContextType, AuthProviderProps, User, ApiResponse } from '@/lib/types'
+import { api, endpoints } from '@/lib/api'
 import { mockUser, authenticateMockUser } from '@/lib/mock-data'
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const USE_MOCKS = String((import.meta as any)?.env?.VITE_USE_MOCKS ?? 'true') === 'true'
-
-interface AuthContextType {
-  user: User | null
-  token: string | null
-  login: (username: string, password: string) => Promise<boolean>
-  logout: () => void
-  isLoading: boolean
-}
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
@@ -21,10 +14,6 @@ export const useAuth = () => {
     throw new Error('useAuth must be used within an AuthProvider')
   }
   return context
-}
-
-interface AuthProviderProps {
-  children: ReactNode
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {

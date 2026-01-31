@@ -13,14 +13,14 @@ interface SupplierProductEditFormProps {
   onSubmit: () => void
 }
 
-export function SupplierProductEditForm({
+export const SupplierProductEditForm = ({
   isOpen,
   onClose,
   data,
   form,
   isPending,
   onSubmit
-}: SupplierProductEditFormProps) {
+}: SupplierProductEditFormProps) => {
   const { register, formState: { errors }, handleSubmit } = form
 
   if (!data) return null

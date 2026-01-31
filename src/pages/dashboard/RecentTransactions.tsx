@@ -9,7 +9,7 @@ interface RecentTransactionsProps {
   onQuickAction: (action: string) => void
 }
 
-export function RecentTransactions({ sales, formatCurrency, onQuickAction }: RecentTransactionsProps) {
+export const RecentTransactions = ({ sales, formatCurrency, onQuickAction }: RecentTransactionsProps) => {
   return (
     <Card className="">
       <CardHeader className="flex flex-row items-center justify-between">

@@ -150,7 +150,7 @@ export interface SelectFieldProps {
     children: React.ReactNode
 }
 
-function SelectField({ label, error, id, children }: SelectFieldProps) {
+const SelectField = ({ label, error, id, children }: SelectFieldProps) => {
     const selectId = id || React.useId()
 
     return (

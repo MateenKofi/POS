@@ -10,7 +10,7 @@ interface CartItemListProps {
   onRemove: (id: number) => void
 }
 
-export function CartItemList({ cart, onUpdateQuantity, onRemove }: CartItemListProps) {
+export const CartItemList = ({ cart, onUpdateQuantity, onRemove }: CartItemListProps) => {
   return (
     <div className="space-y-2">
       {cart.map((item) => {
@@ -88,7 +88,7 @@ interface CartSummaryProps {
   userRole: string | undefined
 }
 
-export function CartSummary({ cart, subtotal, total, orderDiscount, userRole }: CartSummaryProps) {
+export const CartSummary = ({ cart, subtotal, total, orderDiscount, userRole }: CartSummaryProps) => {
   return (
     <>
       <Separator className="bg-slate-200" />
@@ -129,7 +129,7 @@ interface EmptyCartProps {
   icon: React.ComponentType<{ className?: string }>
 }
 
-export function EmptyCart({ icon: Icon }: EmptyCartProps) {
+export const EmptyCart = ({ icon: Icon }: EmptyCartProps) => {
   return (
     <div className="text-center py-12 px-4">
       <div className="relative inline-flex items-center justify-center w-24 h-24 mb-4">

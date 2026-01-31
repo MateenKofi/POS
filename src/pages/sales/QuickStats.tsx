@@ -6,7 +6,7 @@ interface QuickStatsProps {
   cartItemCount: number
 }
 
-export function QuickStats({ availableProducts, cartItemCount }: QuickStatsProps) {
+export const QuickStats = ({ availableProducts, cartItemCount }: QuickStatsProps) => {
   return (
     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
       <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-4 border border-green-100">

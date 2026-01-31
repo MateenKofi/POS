@@ -31,7 +31,7 @@ const defaultEditSupplierProduct: SupplierProductWithDetails = {
   stock_quantity: 0,
 }
 
-export function SupplierProductManagement() {
+export const SupplierProductManagement = () => {
   const [searchTerm, setSearchTerm] = useState("")
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)

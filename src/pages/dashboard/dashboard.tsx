@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import {
   Banknote,
   Package,
@@ -23,11 +24,8 @@ import { SalesByCategory } from "./SalesByCategory"
 import { DailySalesChart } from "./DailySalesChart"
 import type { DashboardStat, SaleData } from "./types"
 
-interface DashboardProps {
-  onNavigate?: (tab: string) => void;
-}
-
-export function Dashboard({ onNavigate }: DashboardProps) {
+export const Dashboard = () => {
+  const navigate = useNavigate();
   // API hooks for dashboard data
   const {
     data: dashboardStatistics,
@@ -143,13 +141,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
 
   // Quick action handlers
   const handleQuickAction = (action: string) => {
-    if (onNavigate) {
-      onNavigate(action);
-    } else {
-      // Fallback: try to dispatch a custom event
-      const event = new CustomEvent('navigateToTab', { detail: action });
-      window.dispatchEvent(event);
-    }
+    navigate(`/${action}`);
   };
 
   // Loading and error states

@@ -18,11 +18,11 @@ interface PaymentModalContentProps {
   userRole: string | undefined
 }
 
-export function PaymentModalContent({
+export const PaymentModalContent = ({
   form,
   total,
   userRole,
-}: PaymentModalContentProps) {
+}: PaymentModalContentProps) => {
   const { register, watch, setValue } = form
   const paymentMethod = watch('paymentMethod')
 
@@ -137,7 +137,7 @@ interface PaymentModalFooterProps {
   onConfirm: () => void
 }
 
-export function PaymentModalFooter({ form, isPending, onCancel, onConfirm }: PaymentModalFooterProps) {
+export const PaymentModalFooter = ({ form, isPending, onCancel, onConfirm }: PaymentModalFooterProps) => {
   const { watch } = form
   const paymentMethod = watch('paymentMethod')
 

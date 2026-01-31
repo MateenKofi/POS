@@ -15,7 +15,7 @@ interface SupplierProductFormProps {
   onSubmit: () => void
 }
 
-export function SupplierProductForm({
+export const SupplierProductForm = ({
   isOpen,
   onClose,
   form,
@@ -23,7 +23,7 @@ export function SupplierProductForm({
   products = [],
   isPending,
   onSubmit
-}: SupplierProductFormProps) {
+}: SupplierProductFormProps) => {
   const { register, control, formState: { errors }, handleSubmit } = form
 
   const onFormSubmit = () => {

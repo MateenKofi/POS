@@ -1,6 +1,6 @@
 import { CreditCard, Clock } from "lucide-react"
 
-export function SalesHeader() {
+export const SalesHeader = () => {
   return (
     <div className="mb-6 sm:mb-8">
       <div className="flex items-center justify-between mb-6">

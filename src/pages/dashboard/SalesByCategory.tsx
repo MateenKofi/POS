@@ -6,7 +6,7 @@ interface SalesByCategoryProps {
   formatCurrency: (amount: number) => string
 }
 
-export function SalesByCategory({ data, formatCurrency }: SalesByCategoryProps) {
+export const SalesByCategory = ({ data, formatCurrency }: SalesByCategoryProps) => {
   const total = data.reduce((sum, item) => sum + item.value, 0)
 
   return (

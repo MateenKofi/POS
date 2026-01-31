@@ -3,19 +3,9 @@
 import { useEffect } from "react"
 import { X } from "lucide-react"
 import { cn } from "@/lib/utils"
+import type { ModalProps } from "@/lib/types"
 
-interface ModalProps {
-  isOpen: boolean
-  onClose: () => void
-  title?: React.ReactNode
-  children: React.ReactNode
-  footer?: React.ReactNode
-  size?: "sm" | "md" | "lg" | "xl" | "full"
-  showCloseButton?: boolean
-  className?: string
-}
-
-export function Modal({
+export const Modal = ({
   isOpen,
   onClose,
   title,
@@ -24,7 +14,7 @@ export function Modal({
   size = "md",
   showCloseButton = true,
   className
-}: ModalProps) {
+}: ModalProps) => {
   // Handle ESC key press
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {

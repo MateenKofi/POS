@@ -443,312 +443,40 @@ export const endpoints = {
   },
 }
 
-// Types for API responses
-export interface ApiResponse<T> {
-  success: boolean
-  message?: string
-  data: T
-}
-
-export interface Product {
-  product_id: number
-  name: string
-  description: string
-  price: string  // Retail price per kg or per bag
-  cost_price: string  // Cost price for profit tracking
-  stock_quantity: number  // Total quantity in kg
-  unit_type: 'bag' | 'loose'  // Whether sold by bag or loose kg
-  weight_per_bag?: number  // Weight in kg per bag
-  category?: string
-  barcode?: string
-  supplier?: string
-  suppliers?: SupplierInfo[]
-  expiry_date?: string  // ISO date string for feed expiration
-  batch_number?: string  // Batch tracking for quality control
-  manufacturer?: string  // Feed manufacturer
-  reorder_level?: number  // Alert threshold for reordering
-}
-
-export interface SupplierInfo {
-  supplier_id: number
-  name: string
-  contact_info: string
-  supply_price: string
-}
-
-export interface CreateProductRequest {
-  name: string
-  description: string
-  price: string
-  cost_price: string
-  stock_quantity: number
-  unit_type: 'bag' | 'loose'
-  weight_per_bag?: number
-  category?: string
-  barcode?: string
-  supplier?: string
-  expiry_date?: string
-  batch_number?: string
-  manufacturer?: string
-  reorder_level?: number
-}
-
-export type UpdateProductRequest = Partial<CreateProductRequest>
-
-export interface SaleItem {
-  product_id: number
-  quantity: number
-  unit: 'bag' | 'kg'  // Whether sold as bags or kg
-  price_at_sale: number
-  cost_price_at_sale: number  // For profit calculation
-  discount_amount?: number  // Per-item discount
-  batch_number?: string  // Track which batch was sold
-  expiry_date?: string  // Expiry of sold items
-}
-
-export interface CreateSaleRequest {
-  payment_method_id: number
-  items: SaleItem[]
-}
-
-export interface Sale {
-  sale_id: number
-  sale_date: string
-  cashier_id: number  // Renamed from salesperson_id
-  payment_method_id: number
-  total_amount: string
-  subtotal: string  // Before discounts
-  total_discount: string  // Total discount applied
-  items: SaleItem[]
-  first_name?: string
-  last_name?: string
-  method_name?: string
-  customer_phone?: string  // For SMS receipts
-  profit_amount: string  // Total profit from this sale
-  receipt_generated: boolean  // Whether receipt was printed/sent
-}
-
-export interface PaymentMethod {
-  payment_method_id: number
-  name: string
-  description?: string
-}
-
-export interface User {
-  salesperson_id: number
-  first_name: string
-  last_name: string
-  email: string
-  username: string
-  role: 'cashier' | 'manager' | 'admin'
-  contact_info: string
-  status?: 'active' | 'inactive'
-  hire_date?: string
-  hourly_rate?: number
-  hours_worked?: number
-}
-
-export interface Supplier {
-  supplier_id: number
-  name: string
-  contact_info: string
-}
-
-export interface CreateSupplierRequest {
-  name: string
-  contact_info: string
-}
-
-export type UpdateSupplierRequest = Partial<CreateSupplierRequest>
-
-export interface SupplierProduct {
-  supplier_product_id: number
-  supplier_id: number
-  product_id: number
-  supply_price: string
-}
-
-export interface CreateSupplierProductRequest {
-  supplier_id: number
-  product_id: number
-  supply_price: string
-}
-
-export type UpdateSupplierProductRequest = Partial<CreateSupplierProductRequest>
-
-export interface SupplierProductWithDetails extends SupplierProduct {
-  supplier_name: string
-  product_name: string
-  product_description: string
-  retail_price: string
-  stock_quantity: number
-}
-
-export interface Staff {
-  salesperson_id: number
-  first_name: string
-  last_name: string
-  email: string
-  username: string
-  contact_info: string
-  role: 'cashier' | 'manager' | 'admin'
-  status?: 'active' | 'inactive'
-  hire_date?: string
-  hourly_rate?: number
-  hours_worked?: number
-}
-
-export interface CreateStaffRequest {
-  first_name: string
-  last_name: string
-  email: string
-  username: string
-  password: string
-  contact_info: string
-  role: 'cashier' | 'manager' | 'admin'
-  hourly_rate: number
-}
-
-export interface UpdateStaffRequest extends Partial<CreateStaffRequest> {
-  status?: 'active' | 'inactive'
-  hire_date?: string
-  hours_worked?: number
-}
-
-export interface UpdateStaffPasswordRequest {
-  current_password: string
-  new_password: string
-}
-
-export interface UpdateStaffRoleRequest {
-  role: 'cashier' | 'manager' | 'admin'
-}
-
-// Dashboard types
-export interface DashboardStats {
-  overview: {
-    todayRevenue: number
-    totalProducts: number
-    todaySales: number
-  }
-  topProducts: Array<{
-    product_id: number
-    name: string
-    total_sold: number
-    total_revenue: number
-  }>
-}
-
-export interface InventoryReport {
-  lowStockProducts: Product[]
-}
-
-// Stock Movement Tracking
-export interface StockMovement {
-  movement_id: number
-  product_id: number
-  movement_type: 'sale' | 'purchase' | 'adjustment' | 'return' | 'expiry'
-  quantity: number  // Positive for additions, negative for deductions
-  unit: 'bag' | 'kg'
-  reference_id?: number  // Sale ID or Purchase ID
-  reference_type?: 'sale' | 'purchase' | 'manual'
-  batch_number?: string
-  expiry_date?: string
-  notes?: string
-  created_by: number  // User ID
-  created_at: string
-}
-
-// Daily Closure Summary
-export interface DailyClosure {
-  closure_id: number
-  date: string
-  cashier_id: number
-  opening_balance: number
-  total_sales: number
-  total_cash: number
-  total_mobile_money: number
-  total_bank_transfer: number
-  expected_total: number
-  actual_total: number
-  variance: number
-  transactions_count: number
-  status: 'open' | 'closed'
-  closed_at?: string
-  notes?: string
-}
-
-// Report Types
-export interface ProfitReport {
-  period: string
-  total_revenue: number
-  total_cost: number
-  gross_profit: number
-  profit_margin: number
-  top_products: Array<{
-    product_id: number
-    name: string
-    profit: number
-    margin: number
-  }>
-}
-
-export interface ExpiryReport {
-  product_id: number
-  name: string
-  batch_number: string
-  expiry_date: string
-  quantity: number
-  days_until_expiry: number
-  status: 'expired' | 'expiring_soon' | 'ok'
-}
-
-export interface StaffPerformanceReport {
-  cashier_id: number
-  cashier_name: string
-  total_sales: number
-  total_transactions: number
-  average_transaction: number
-  total_profit: number
-  period: string
-}
-
-// Transaction - Independent financial transaction tracking
-// Transactions are NOT linked to invoices - they are separate money movement records
-export type TransactionType = 'sale_payment' | 'refund' | 'expense' | 'supplier_payment' | 'cash_deposit' | 'cash_withdrawal'
-
-export type TransactionStatus = 'pending' | 'completed' | 'failed' | 'cancelled'
-
-export interface Transaction {
-  transaction_id: number
-  transaction_date: string
-  transaction_type: TransactionType
-  status: TransactionStatus
-  amount: string  // Transaction amount
-  payment_method: 'cash' | 'mobile_money' | 'bank_transfer' | 'card'
-  reference_number?: string  // External reference (receipt number, check number, etc.)
-  description: string  // Description of the transaction
-  category?: string  // For expense categorization (e.g., 'utilities', 'rent', 'transport')
-  related_entity_id?: number  // Optional: sale_id, supplier_id, etc.
-  related_entity_type?: 'sale' | 'supplier' | 'expense' | null
-  cashier_id: number  // User who processed the transaction
-  cashier_name?: string  // Denormalized for display
-  notes?: string
-  created_at: string
-}
-
-export interface CreateTransactionRequest {
-  transaction_type: TransactionType
-  amount: string
-  payment_method: 'cash' | 'mobile_money' | 'bank_transfer' | 'card'
-  reference_number?: string
-  description: string
-  category?: string
-  related_entity_id?: number
-  related_entity_type?: 'sale' | 'supplier' | 'expense'
-  notes?: string
-}
-
-export interface UpdateTransactionRequest extends Partial<CreateTransactionRequest> {
-  status?: TransactionStatus
-}
+// Re-export types for backward compatibility
+export type {
+  ApiResponse,
+  Product,
+  CreateProductRequest,
+  UpdateProductRequest,
+  SupplierInfo,
+  SaleItem,
+  CreateSaleRequest,
+  Sale,
+  PaymentMethod,
+  User,
+  Staff,
+  CreateStaffRequest,
+  UpdateStaffRequest,
+  UpdateStaffPasswordRequest,
+  UpdateStaffRoleRequest,
+  Supplier,
+  CreateSupplierRequest,
+  UpdateSupplierRequest,
+  SupplierProduct,
+  CreateSupplierProductRequest,
+  UpdateSupplierProductRequest,
+  SupplierProductWithDetails,
+  DashboardStats,
+  InventoryReport,
+  StockMovement,
+  DailyClosure,
+  ProfitReport,
+  ExpiryReport,
+  StaffPerformanceReport,
+  TransactionType,
+  TransactionStatus,
+  Transaction,
+  CreateTransactionRequest,
+  UpdateTransactionRequest,
+} from './types'

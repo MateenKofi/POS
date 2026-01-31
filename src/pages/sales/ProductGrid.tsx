@@ -11,7 +11,7 @@ interface ProductGridProps {
   onProductClick: (product: ApiProduct) => void
 }
 
-export function ProductGrid({ filteredProducts, searchTerm, onSearchChange, onProductClick }: ProductGridProps) {
+export const ProductGrid = ({ filteredProducts, searchTerm, onSearchChange, onProductClick }: ProductGridProps) => {
   return (
     <Card>
       <CardHeader className="pb-4">

@@ -11,7 +11,7 @@ interface SupplierDetailsModalProps {
   product: Product | null
 }
 
-export function SupplierDetailsModal({ isOpen, onClose, product }: SupplierDetailsModalProps) {
+export const SupplierDetailsModal = ({ isOpen, onClose, product }: SupplierDetailsModalProps) => {
   const copyToClipboard = async (text: string) => {
     try {
       await navigator.clipboard.writeText(text)

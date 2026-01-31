@@ -21,7 +21,7 @@ interface ProductTableProps {
   isAdmin: boolean
 }
 
-export function ProductTable({
+export const ProductTable = ({
   filteredProducts,
   baseFilteredProducts,
   isLoading,
@@ -35,7 +35,7 @@ export function ProductTable({
   onDelete,
   deleteProduct,
   isAdmin
-}: ProductTableProps) {
+}: ProductTableProps) => {
   const getTabTitle = () => {
     switch (activeTab) {
       case 'expiring':

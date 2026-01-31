@@ -26,14 +26,14 @@ interface CloseDayModalProps {
   onSubmit: () => void
 }
 
-export function CloseDayModal({
+export const CloseDayModal = ({
   isOpen,
   onClose,
   form,
   todaySummary,
   isSubmitting,
   onSubmit,
-}: CloseDayModalProps) {
+}: CloseDayModalProps) => {
   const { register, watch } = form
   const formatCurrency = (amount: number) => `GH₵${amount.toFixed(2)}`
 

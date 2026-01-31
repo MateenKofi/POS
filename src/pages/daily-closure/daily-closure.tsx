@@ -20,7 +20,7 @@ interface DailySummary {
   transactions: number
 }
 
-export function DailyClosure() {
+export const DailyClosure = () => {
   const [showCloseDialog, setShowCloseDialog] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
 

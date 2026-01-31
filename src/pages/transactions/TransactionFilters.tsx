@@ -13,7 +13,7 @@ interface TransactionFiltersProps {
   onQueryChange: (value: string) => void
 }
 
-export function TransactionFilters({
+export const TransactionFilters = ({
   startDate,
   endDate,
   typeFilter,
@@ -23,7 +23,7 @@ export function TransactionFilters({
   onEndDateChange,
   onTypeFilterChange,
   onQueryChange,
-}: TransactionFiltersProps) {
+}: TransactionFiltersProps) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
       <div>

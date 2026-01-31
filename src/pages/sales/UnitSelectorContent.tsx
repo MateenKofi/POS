@@ -12,7 +12,7 @@ interface UnitSelectorContentProps {
   onCancel: () => void
 }
 
-export function UnitSelectorContent({ product, onConfirm, onCancel }: UnitSelectorContentProps) {
+export const UnitSelectorContent = ({ product, onConfirm, onCancel }: UnitSelectorContentProps) => {
   const [selectedUnit, setSelectedUnit] = useState<'bag' | 'kg'>(
     product.unit_type === 'bag' ? 'bag' : 'kg'
   )

@@ -16,7 +16,7 @@ interface InvoicePreviewProps {
   sale: Sale
 }
 
-function formatInvoiceId(sale: Sale): string {
+const formatInvoiceId = (sale: Sale): string => {
   const d = new Date(sale.sale_date)
   const y = d.getFullYear()
   const m = String(d.getMonth() + 1).padStart(2, "0")
@@ -24,7 +24,7 @@ function formatInvoiceId(sale: Sale): string {
   return `INV-${y}${m}${day}-${sale.sale_id}`
 }
 
-function InvoicePreview({ sale }: InvoicePreviewProps) {
+const InvoicePreview = ({ sale }: InvoicePreviewProps) => {
   const items = sale.items || []
   const subtotal = items.reduce((acc, it) => acc + it.price_at_sale * it.quantity, 0)
   const tax = subtotal * 0.08
@@ -57,7 +57,7 @@ function InvoicePreview({ sale }: InvoicePreviewProps) {
   )
 }
 
-export function Invoices() {
+export const Invoices = () => {
   const [query, setQuery] = useState<string>("")
   const [selected, setSelected] = useState<Sale | null>(null)
   const [email, setEmail] = useState<string>("")

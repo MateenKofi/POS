@@ -11,7 +11,7 @@ interface SupplierFormProps {
   onCancel: () => void
 }
 
-export function SupplierForm({ form, isEdit = false, isPending, onSubmit, onCancel }: SupplierFormProps) {
+export const SupplierForm = ({ form, isEdit = false, isPending, onSubmit, onCancel }: SupplierFormProps) => {
   const { register, formState: { errors } } = form
 
   return (

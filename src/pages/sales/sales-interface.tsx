@@ -20,7 +20,7 @@ import { UnitSelectorModal } from "./UnitSelectorModal"
 import { PaymentModalContent, PaymentModalFooter, type PaymentFormData } from "./PaymentModal"
 import type { CartItem, CompletedSale, UnitSelectorState } from "./types"
 
-export function SalesInterface() {
+export const SalesInterface = () => {
   const { user } = useAuth()
   const [cart, setCart] = useState<CartItem[]>([])
   const [searchTerm, setSearchTerm] = useState("")

@@ -10,7 +10,7 @@ interface StaffRowProps {
   onChangePassword?: (staff: Staff) => void
 }
 
-export function StaffRow({ staff, onEdit, onDelete, onChangePassword }: StaffRowProps) {
+export const StaffRow = ({ staff, onEdit, onDelete, onChangePassword }: StaffRowProps) => {
   return (
     <TableRow>
       <TableCell className="font-medium">

@@ -6,7 +6,7 @@ interface RevenueChartProps {
   formatCurrency: (amount: number) => string
 }
 
-export function RevenueChart({ data, formatCurrency }: RevenueChartProps) {
+export const RevenueChart = ({ data, formatCurrency }: RevenueChartProps) => {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">

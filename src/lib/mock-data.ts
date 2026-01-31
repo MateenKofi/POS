@@ -1,4 +1,17 @@
-import type { Product, Supplier, Staff, Sale, SupplierProduct, User, DashboardStats, InventoryReport, StockMovement, Transaction, CreateTransactionRequest, TransactionType } from './api'
+import type {
+  Product,
+  Supplier,
+  Staff,
+  Sale,
+  SupplierProduct,
+  User,
+  DashboardStats,
+  InventoryReport,
+  StockMovement,
+  Transaction,
+  CreateTransactionRequest,
+  TransactionType,
+} from './types'
 
 // Basic deterministic IDs for mock entities
 let nextProductId = 1001
@@ -71,7 +84,7 @@ export const mockUsers: { user: User; password: string }[] = [
 ]
 
 // Helper function to authenticate mock users
-export function authenticateMockUser(username: string, password: string): User | null {
+export const authenticateMockUser = (username: string, password: string): User | null => {
   const found = mockUsers.find(
     (u) => u.user.username === username && u.password === password
   )
@@ -264,7 +277,7 @@ export const mockSales: Sale[] = [
   },
 ]
 
-export function paginate<T>(items: T[], page: number, limit: number) {
+export const paginate = <T>(items: T[], page: number, limit: number) => {
   const total = items.length
   const pages = Math.max(1, Math.ceil(total / Math.max(1, limit)))
   const start = (Math.max(1, page) - 1) * Math.max(1, limit)
@@ -275,7 +288,7 @@ export function paginate<T>(items: T[], page: number, limit: number) {
   }
 }
 
-export function computeDashboardStats(): DashboardStats {
+export const computeDashboardStats = (): DashboardStats => {
   const todayStr = new Date().toDateString()
   const todaySales = mockSales.filter(s => new Date(s.sale_date).toDateString() === todayStr)
   const todayRevenue = todaySales.reduce((acc, s) => acc + parseFloat(s.total_amount), 0)
@@ -306,79 +319,79 @@ export function computeDashboardStats(): DashboardStats {
   }
 }
 
-export function computeInventoryReport(lowStockThreshold: number): InventoryReport {
+export const computeInventoryReport = (lowStockThreshold: number): InventoryReport => {
   const lowStockProducts = mockProducts.filter(p => p.stock_quantity <= lowStockThreshold)
   return { lowStockProducts }
 }
 
-export function createProduct(data: Omit<Product, 'product_id'>): Product {
+export const createProduct = (data: Omit<Product, 'product_id'>): Product => {
   const product: Product = { ...data, product_id: nextProductId++ }
   mockProducts.push(product)
   return product
 }
 
-export function updateProduct(id: number, data: Partial<Product>): Product | undefined {
+export const updateProduct = (id: number, data: Partial<Product>): Product | undefined => {
   const idx = mockProducts.findIndex(p => p.product_id === id)
   if (idx === -1) return undefined
   mockProducts[idx] = { ...mockProducts[idx], ...data, product_id: id }
   return mockProducts[idx]
 }
 
-export function deleteProduct(id: number): boolean {
+export const deleteProduct = (id: number): boolean => {
   const idx = mockProducts.findIndex(p => p.product_id === id)
   if (idx === -1) return false
   mockProducts.splice(idx, 1)
   return true
 }
 
-export function createSupplier(data: Omit<Supplier, 'supplier_id'>): Supplier {
+export const createSupplier = (data: Omit<Supplier, 'supplier_id'>): Supplier => {
   const supplier: Supplier = { ...data, supplier_id: nextSupplierId++ }
   mockSuppliers.push(supplier)
   return supplier
 }
 
-export function updateSupplier(id: number, data: Partial<Supplier>): Supplier | undefined {
+export const updateSupplier = (id: number, data: Partial<Supplier>): Supplier | undefined => {
   const idx = mockSuppliers.findIndex(s => s.supplier_id === id)
   if (idx === -1) return undefined
   mockSuppliers[idx] = { ...mockSuppliers[idx], ...data, supplier_id: id }
   return mockSuppliers[idx]
 }
 
-export function deleteSupplier(id: number): boolean {
+export const deleteSupplier = (id: number): boolean => {
   const idx = mockSuppliers.findIndex(s => s.supplier_id === id)
   if (idx === -1) return false
   mockSuppliers.splice(idx, 1)
   return true
 }
 
-export function createStaff(data: Omit<Staff, 'salesperson_id'> & { password?: string }): Staff {
+export const createStaff = (data: Omit<Staff, 'salesperson_id'> & { password?: string }): Staff => {
   const staff: Staff = { ...data, salesperson_id: nextStaffId++ }
   mockStaff.push(staff)
   return staff
 }
 
-export function updateStaff(id: number, data: Partial<Staff>): Staff | undefined {
+export const updateStaff = (id: number, data: Partial<Staff>): Staff | undefined => {
   const idx = mockStaff.findIndex(s => s.salesperson_id === id)
   if (idx === -1) return undefined
   mockStaff[idx] = { ...mockStaff[idx], ...data, salesperson_id: id }
   return mockStaff[idx]
 }
 
-export function deleteStaff(id: number): boolean {
+export const deleteStaff = (id: number): boolean => {
   const idx = mockStaff.findIndex(s => s.salesperson_id === id)
   if (idx === -1) return false
   mockStaff.splice(idx, 1)
   return true
 }
 
-export function toggleStaffStatus(id: number): Staff | undefined {
+export const toggleStaffStatus = (id: number): Staff | undefined => {
   const staff = mockStaff.find(s => s.salesperson_id === id)
   if (!staff) return undefined
   staff.status = staff.status === 'active' ? 'inactive' : 'active'
   return staff
 }
 
-export function createSale(data: Omit<Sale, 'sale_id' | 'sale_date' | 'first_name' | 'last_name' | 'method_name' | 'total_amount' | 'subtotal' | 'total_discount' | 'profit_amount' | 'receipt_generated'>): Sale {
+export const createSale = (data: Omit<Sale, 'sale_id' | 'sale_date' | 'first_name' | 'last_name' | 'method_name' | 'total_amount' | 'subtotal' | 'total_discount' | 'profit_amount' | 'receipt_generated'>): Sale => {
   const staff = mockStaff.find(s => s.salesperson_id === data.cashier_id) || mockStaff[0]
 
   // Calculate totals
@@ -434,7 +447,7 @@ export function createSale(data: Omit<Sale, 'sale_id' | 'sale_date' | 'first_nam
   return sale
 }
 
-export function upsertSupplierProduct(supplierId: number, productId: number, supplyPrice: string): SupplierProduct {
+export const upsertSupplierProduct = (supplierId: number, productId: number, supplyPrice: string): SupplierProduct => {
   const existing = mockSupplierProducts.find(sp => sp.supplier_id === supplierId && sp.product_id === productId)
   if (existing) {
     existing.supply_price = supplyPrice
@@ -445,7 +458,7 @@ export function upsertSupplierProduct(supplierId: number, productId: number, sup
   return supplierProduct
 }
 
-export function removeSupplierProduct(supplierId: number, productId: number): boolean {
+export const removeSupplierProduct = (supplierId: number, productId: number): boolean => {
   const idx = mockSupplierProducts.findIndex(sp => sp.supplier_id === supplierId && sp.product_id === productId)
   if (idx === -1) return false
   mockSupplierProducts.splice(idx, 1)
@@ -455,7 +468,7 @@ export function removeSupplierProduct(supplierId: number, productId: number): bo
 // Stock Movements
 export const mockStockMovements: StockMovement[] = []
 
-export function createStockMovement(movement: Omit<StockMovement, 'movement_id' | 'created_at'>): StockMovement {
+export const createStockMovement = (movement: Omit<StockMovement, 'movement_id' | 'created_at'>): StockMovement => {
   const newMovement: StockMovement = {
     movement_id: nextMovementId++,
     created_at: new Date().toISOString(),
@@ -561,12 +574,12 @@ export const mockTransactions: Transaction[] = [
   },
 ]
 
-export function getTransactions(page = 1, limit = 50) {
+export const getTransactions = (page = 1, limit = 50) => {
   const { data, pagination } = paginate(mockTransactions, page, limit)
   return { transactions: data, pagination }
 }
 
-export function getTransactionsByDateRange(startDate: string, endDate: string): Transaction[] {
+export const getTransactionsByDateRange = (startDate: string, endDate: string): Transaction[] => {
   const start = new Date(startDate)
   const end = new Date(endDate)
   return mockTransactions.filter(t => {
@@ -575,11 +588,11 @@ export function getTransactionsByDateRange(startDate: string, endDate: string): 
   })
 }
 
-export function getTransactionsByType(type: TransactionType): Transaction[] {
+export const getTransactionsByType = (type: TransactionType): Transaction[] => {
   return mockTransactions.filter(t => t.transaction_type === type)
 }
 
-export function createTransaction(data: Omit<Transaction, 'transaction_id' | 'transaction_date' | 'cashier_name' | 'created_at'> & { cashier_id?: number }): Transaction {
+export const createTransaction = (data: Omit<Transaction, 'transaction_id' | 'transaction_date' | 'cashier_name' | 'created_at'> & { cashier_id?: number }): Transaction => {
   const cashierId = data.cashier_id || 1 // Default to admin user
   const staff = mockStaff.find(s => s.salesperson_id === cashierId) || mockStaff[0]
 
@@ -596,14 +609,14 @@ export function createTransaction(data: Omit<Transaction, 'transaction_id' | 'tr
   return transaction
 }
 
-export function updateTransaction(id: number, data: Partial<CreateTransactionRequest & { status?: Transaction['status'] }>): Transaction | undefined {
+export const updateTransaction = (id: number, data: Partial<CreateTransactionRequest & { status?: Transaction['status'] }>): Transaction | undefined => {
   const idx = mockTransactions.findIndex(t => t.transaction_id === id)
   if (idx === -1) return undefined
   mockTransactions[idx] = { ...mockTransactions[idx], ...data }
   return mockTransactions[idx]
 }
 
-export function deleteTransaction(id: number): boolean {
+export const deleteTransaction = (id: number): boolean => {
   const idx = mockTransactions.findIndex(t => t.transaction_id === id)
   if (idx === -1) return false
   mockTransactions.splice(idx, 1)

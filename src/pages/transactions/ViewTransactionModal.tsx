@@ -10,7 +10,7 @@ const PAYMENT_METHOD_LABELS: Record<string, string> = {
   card: 'Card',
 }
 
-export function transactionToInvoiceData(transaction: Transaction): InvoiceData {
+export const transactionToInvoiceData = (transaction: Transaction): InvoiceData => {
   const amount = parseFloat(transaction.amount || '0')
 
   return {

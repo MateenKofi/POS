@@ -10,7 +10,7 @@ interface UnitSelectorModalProps {
   onConfirm: (product: ApiProduct, unit: 'bag' | 'kg', quantity: number) => void
 }
 
-export function UnitSelectorModal({ isOpen, product, onClose, onConfirm }: UnitSelectorModalProps) {
+export const UnitSelectorModal = ({ isOpen, product, onClose, onConfirm }: UnitSelectorModalProps) => {
   if (!product) return null
 
   return (

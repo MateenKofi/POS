@@ -11,7 +11,7 @@ interface ProductFormProps {
   onCancel: () => void
 }
 
-export function ProductForm({ form, isEdit = false, isPending, onSubmit, onCancel }: ProductFormProps) {
+export const ProductForm = ({ form, isEdit = false, isPending, onSubmit, onCancel }: ProductFormProps) => {
   const { register, watch, formState: { errors } } = form
   const unitType = watch('unit_type')
 

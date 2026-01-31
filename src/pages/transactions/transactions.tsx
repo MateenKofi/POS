@@ -25,7 +25,7 @@ const TRANSACTION_STATUS_COLORS: Record<string, string> = {
   cancelled: 'bg-gray-100 text-gray-800 hover:bg-gray-100',
 }
 
-export function Transactions() {
+export const Transactions = () => {
   const [page] = useState<number>(1)
   const [limit] = useState<number>(50)
   const [query, setQuery] = useState<string>("")

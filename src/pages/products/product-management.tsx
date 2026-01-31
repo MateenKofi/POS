@@ -35,7 +35,7 @@ const defaultNewProduct: CreateProductRequest = {
   reorder_level: 10,
 }
 
-export function ProductManagement() {
+export const ProductManagement = () => {
   const { user } = useAuth()
   const isAdmin = user?.role === 'admin'
 

@@ -5,7 +5,7 @@ interface ProductSummaryProps {
   products: Product[]
 }
 
-export function ProductSummary({ products }: ProductSummaryProps) {
+export const ProductSummary = ({ products }: ProductSummaryProps) => {
   const totalProducts = products.length
   const productsWithSuppliers = products.filter(p => p.suppliers && p.suppliers.length > 0).length
   const uniqueSuppliers = new Set<number>()
