@@ -1,38 +1,46 @@
-import { Button, TextInput } from "@/components/custom-components"
-import { Label } from "@/components/ui/label"
+import { Button } from "@/components/custom-components"
 import { Eye, EyeOff, Loader2 } from "lucide-react"
 import type { PasswordData } from "./types"
+import type { UseFormReturn } from "react-hook-form"
 
 interface ChangePasswordFormProps {
-  passwordData: PasswordData
+  form: UseFormReturn<PasswordData>
   showPassword: boolean
   isPending: boolean
-  onDataChange: (data: PasswordData) => void
   onTogglePassword: () => void
   onSubmit: () => void
   onCancel: () => void
 }
 
 export function ChangePasswordForm({
-  passwordData,
+  form,
   showPassword,
   isPending,
-  onDataChange,
   onTogglePassword,
   onSubmit,
   onCancel
 }: ChangePasswordFormProps) {
+  const { register, formState: { errors }, handleSubmit } = form
+
+  const onFormSubmit = () => {
+    handleSubmit(() => {
+      onSubmit()
+    })()
+  }
+
   return (
-    <div className="space-y-4">
-      <div>
-        <Label htmlFor="current-password">Current Password</Label>
+    <form onSubmit={(e) => { e.preventDefault(); onFormSubmit(); }} className="space-y-4">
+      <div className="space-y-2">
+        <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+          Current Password
+        </label>
         <div className="relative">
-          <TextInput
+          <input
             id="current-password"
             type={showPassword ? "text" : "password"}
-            value={passwordData.current_password}
-            onChange={(e) => onDataChange({ ...passwordData, current_password: e.target.value })}
             placeholder="Enter current password"
+            className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+            {...register('current_password')}
           />
           <Button
             type="button"
@@ -44,22 +52,28 @@ export function ChangePasswordForm({
             {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
           </Button>
         </div>
+        {errors.current_password && (
+          <p className="text-sm font-medium text-destructive">{errors.current_password.message}</p>
+        )}
       </div>
-      <div>
-        <Label htmlFor="new-password">New Password</Label>
-        <div className="relative">
-          <TextInput
-            id="new-password"
-            type={showPassword ? "text" : "password"}
-            value={passwordData.new_password}
-            onChange={(e) => onDataChange({ ...passwordData, new_password: e.target.value })}
-            placeholder="Enter new password"
-          />
-        </div>
+      <div className="space-y-2">
+        <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+          New Password
+        </label>
+        <input
+          id="new-password"
+          type={showPassword ? "text" : "password"}
+          placeholder="Enter new password"
+          className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+          {...register('new_password')}
+        />
+        {errors.new_password && (
+          <p className="text-sm font-medium text-destructive">{errors.new_password.message}</p>
+        )}
       </div>
       <div className="flex gap-2">
         <Button
-          onClick={onSubmit}
+          type="submit"
           className="flex-1 bg-green-600 hover:bg-green-700"
           disabled={isPending}
         >
@@ -73,6 +87,7 @@ export function ChangePasswordForm({
           )}
         </Button>
         <Button
+          type="button"
           variant="outline"
           onClick={onCancel}
           className="flex-1"
@@ -80,6 +95,6 @@ export function ChangePasswordForm({
           Cancel
         </Button>
       </div>
-    </div>
+    </form>
   )
 }

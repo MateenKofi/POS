@@ -3,44 +3,43 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/custom-components"
 import { Loader2 } from "lucide-react"
+import type { UseFormReturn } from "react-hook-form"
+
+export interface CloseDayFormData {
+  actualCash: string
+  actualMobileMoney: string
+  actualBankTransfer: string
+  notes: string
+}
 
 interface CloseDayModalProps {
   isOpen: boolean
   onClose: () => void
+  form: UseFormReturn<CloseDayFormData>
   todaySummary: {
     totalSales: number
     totalCash: number
     totalMobileMoney: number
     totalBankTransfer: number
   }
-  actualCash: string
-  actualMobileMoney: string
-  actualBankTransfer: string
-  notes: string
   isSubmitting: boolean
-  onActualCashChange: (value: string) => void
-  onActualMobileMoneyChange: (value: string) => void
-  onActualBankTransferChange: (value: string) => void
-  onNotesChange: (value: string) => void
   onSubmit: () => void
 }
 
 export function CloseDayModal({
   isOpen,
   onClose,
+  form,
   todaySummary,
-  actualCash,
-  actualMobileMoney,
-  actualBankTransfer,
-  notes,
   isSubmitting,
-  onActualCashChange,
-  onActualMobileMoneyChange,
-  onActualBankTransferChange,
-  onNotesChange,
   onSubmit,
 }: CloseDayModalProps) {
+  const { register, watch } = form
   const formatCurrency = (amount: number) => `GH₵${amount.toFixed(2)}`
+
+  const actualCash = watch('actualCash')
+  const actualMobileMoney = watch('actualMobileMoney')
+  const actualBankTransfer = watch('actualBankTransfer')
 
   const cashVariance = parseFloat(actualCash) || 0 - todaySummary.totalCash
   const mobileMoneyVariance = parseFloat(actualMobileMoney) || 0 - todaySummary.totalMobileMoney
@@ -53,7 +52,7 @@ export function CloseDayModal({
         <div className="bg-white rounded-lg max-w-md w-full p-6 max-h-[90vh] overflow-y-auto">
           <h2 className="text-xl font-bold text-slate-800 mb-4">Close Day</h2>
 
-          <div className="space-y-4">
+          <form onSubmit={(e) => { e.preventDefault(); onSubmit(); }} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="expected-cash">Expected Cash</Label>
@@ -65,10 +64,9 @@ export function CloseDayModal({
                   id="actual-cash"
                   type="number"
                   step="0.01"
-                  value={actualCash}
-                  onChange={(e) => onActualCashChange(e.target.value)}
                   placeholder="0.00"
                   className={`border ${cashVariance !== 0 ? 'border-red-300' : ''}`}
+                  {...register('actualCash')}
                 />
               </div>
             </div>
@@ -84,9 +82,8 @@ export function CloseDayModal({
                   id="actual-mm"
                   type="number"
                   step="0.01"
-                  value={actualMobileMoney}
-                  onChange={(e) => onActualMobileMoneyChange(e.target.value)}
                   placeholder="0.00"
+                  {...register('actualMobileMoney')}
                 />
               </div>
             </div>
@@ -102,23 +99,19 @@ export function CloseDayModal({
                   id="actual-bank"
                   type="number"
                   step="0.01"
-                  value={actualBankTransfer}
-                  onChange={(e) => onActualBankTransferChange(e.target.value)}
                   placeholder="0.00"
+                  {...register('actualBankTransfer')}
                 />
               </div>
             </div>
 
-            <div>
-              <Label htmlFor="notes">Notes</Label>
-              <Textarea
-                id="notes"
-                value={notes}
-                onChange={(e) => onNotesChange(e.target.value)}
-                placeholder="Add notes about today's closure..."
-                rows={3}
-              />
-            </div>
+            <Textarea
+              id="notes"
+              label="Notes"
+              placeholder="Add notes about today's closure..."
+              rows={3}
+              {...register('notes')}
+            />
 
             {/* Variance Summary */}
             <div className="border-t pt-4">
@@ -153,7 +146,7 @@ export function CloseDayModal({
 
             <div className="flex gap-2 pt-2">
               <Button
-                onClick={onSubmit}
+                type="submit"
                 className="flex-1 bg-green-600 hover:bg-green-700"
                 disabled={isSubmitting}
               >
@@ -167,6 +160,7 @@ export function CloseDayModal({
                 )}
               </Button>
               <Button
+                type="button"
                 variant="outline"
                 onClick={onClose}
                 className="flex-1"
@@ -174,7 +168,7 @@ export function CloseDayModal({
                 Cancel
               </Button>
             </div>
-          </div>
+          </form>
         </div>
       </div>
     )

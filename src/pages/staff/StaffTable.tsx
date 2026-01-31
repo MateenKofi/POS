@@ -10,9 +10,10 @@ interface StaffTableProps {
   onSearchChange: (value: string) => void
   onEdit: (staff: Staff) => void
   onDelete: (id: number) => void
+  onChangePassword?: (staff: Staff) => void
 }
 
-export function StaffTable({ filteredStaff, isLoading, searchTerm, onSearchChange, onEdit, onDelete }: StaffTableProps) {
+export function StaffTable({ filteredStaff, isLoading, searchTerm, onSearchChange, onEdit, onDelete, onChangePassword }: StaffTableProps) {
   return (
     <>
       <div className="mb-6">
@@ -64,6 +65,7 @@ export function StaffTable({ filteredStaff, isLoading, searchTerm, onSearchChang
                       staff={staff}
                       onEdit={onEdit}
                       onDelete={onDelete}
+                      onChangePassword={onChangePassword}
                     />
                   ))}
                   {filteredStaff?.length === 0 && (

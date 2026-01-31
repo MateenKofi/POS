@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useForm } from "react-hook-form"
 import { Card, CardContent, CardHeader, CardTitle, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Button, TextInput } from "@/components/custom-components"
 import { Plus, Loader2 } from "lucide-react"
 import { useSuppliers, useCreateSupplier, useUpdateSupplier, useDeleteSupplier } from "@/hooks/useApi"
@@ -22,7 +23,16 @@ export function SupplierManagement() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [editingSupplier, setEditingSupplier] = useState<Supplier | null>(null)
-  const [newSupplier, setNewSupplier] = useState<CreateSupplierRequest>(defaultNewSupplier)
+
+  // Form for adding new supplier
+  const newSupplierForm = useForm<CreateSupplierRequest>({
+    defaultValues: defaultNewSupplier,
+  })
+
+  // Form for editing supplier
+  const editSupplierForm = useForm<CreateSupplierRequest | Supplier>({
+    defaultValues: defaultNewSupplier,
+  })
 
   // API hooks
   const { data: suppliers, isLoading, error } = useSuppliers()
@@ -41,16 +51,16 @@ export function SupplierManagement() {
     )
   }) || []
 
-  const handleAddSupplier = async () => {
-    if (!newSupplier.name || !newSupplier.contact_info) {
+  const handleAddSupplier = async (data: CreateSupplierRequest) => {
+    if (!data.name || !data.contact_info) {
       toast.error("Please fill in all required fields")
       return
     }
 
     try {
-      await createSupplier.mutateAsync(newSupplier)
+      await createSupplier.mutateAsync(data)
       toast.success("Supplier created successfully!")
-      setNewSupplier(defaultNewSupplier)
+      newSupplierForm.reset(defaultNewSupplier)
       setIsAddDialogOpen(false)
     } catch (error) {
       toast.error("Failed to create supplier")
@@ -58,13 +68,13 @@ export function SupplierManagement() {
     }
   }
 
-  const handleEditSupplier = async () => {
+  const handleEditSupplier = async (data: CreateSupplierRequest | Supplier) => {
     if (!editingSupplier || !editingSupplier.supplier_id) return
 
     try {
       await updateSupplier.mutateAsync({
         id: editingSupplier.supplier_id.toString(),
-        data: editingSupplier
+        data: data as Supplier
       })
       toast.success("Supplier updated successfully!")
       setIsEditDialogOpen(false)
@@ -89,12 +99,12 @@ export function SupplierManagement() {
 
   const openEditDialog = (supplier: Supplier) => {
     setEditingSupplier({ ...supplier })
+    editSupplierForm.reset(supplier)
     setIsEditDialogOpen(true)
   }
 
-  const resetForm = () => {
-    setNewSupplier(defaultNewSupplier)
-    setEditingSupplier(null)
+  const resetNewForm = () => {
+    newSupplierForm.reset(defaultNewSupplier)
   }
 
   if (error) {
@@ -136,7 +146,7 @@ export function SupplierManagement() {
             placeholder="Search suppliers by name or contact info..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-md text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="w-full pl-10 pr-4 py-2"
           />
         </div>
       </div>
@@ -198,18 +208,20 @@ export function SupplierManagement() {
       {isAddDialogOpen && (
         <Modal
           isOpen={isAddDialogOpen}
-          onClose={() => setIsAddDialogOpen(false)}
+          onClose={() => {
+            setIsAddDialogOpen(false)
+            resetNewForm()
+          }}
           title="Add New Supplier"
           size="md"
         >
           <SupplierForm
-            data={newSupplier}
+            form={newSupplierForm}
             isPending={createSupplier.isPending}
-            onChange={(data) => setNewSupplier(data as CreateSupplierRequest)}
-            onSubmit={handleAddSupplier}
+            onSubmit={newSupplierForm.handleSubmit(handleAddSupplier)}
             onCancel={() => {
               setIsAddDialogOpen(false)
-              resetForm()
+              resetNewForm()
             }}
           />
         </Modal>
@@ -219,19 +231,21 @@ export function SupplierManagement() {
       {isEditDialogOpen && editingSupplier && (
         <Modal
           isOpen={isEditDialogOpen}
-          onClose={() => setIsEditDialogOpen(false)}
+          onClose={() => {
+            setIsEditDialogOpen(false)
+            setEditingSupplier(null)
+          }}
           title="Edit Supplier"
           size="md"
         >
           <SupplierForm
             isEdit
-            data={editingSupplier}
+            form={editSupplierForm}
             isPending={updateSupplier.isPending}
-            onChange={(data) => setEditingSupplier(data as Supplier)}
-            onSubmit={handleEditSupplier}
+            onSubmit={editSupplierForm.handleSubmit(handleEditSupplier)}
             onCancel={() => {
               setIsEditDialogOpen(false)
-              resetForm()
+              setEditingSupplier(null)
             }}
           />
         </Modal>

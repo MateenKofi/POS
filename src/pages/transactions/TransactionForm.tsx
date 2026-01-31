@@ -1,8 +1,9 @@
-import { useState } from "react"
+import { useForm } from "react-hook-form"
 import { Button, TextInput, Textarea, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/custom-components"
+import { Controller } from "react-hook-form"
 import { useCreateTransaction, useUpdateTransaction } from "@/hooks/useApi"
 import { toast } from "sonner"
-import type { Transaction, TransactionType, TransactionStatus } from "@/lib/api"
+import type { Transaction, TransactionType, TransactionStatus, CreateTransactionRequest } from "@/lib/api"
 
 const TRANSACTION_TYPE_LABELS: Record<TransactionType, string> = {
   sale_payment: 'Sale Payment',
@@ -24,28 +25,31 @@ export function TransactionForm({ mode, transaction, onClose, onSuccess }: Trans
   const createMutation = useCreateTransaction()
   const updateMutation = useUpdateTransaction()
 
-  const [formData, setFormData] = useState({
-    transaction_type: transaction?.transaction_type || 'sale_payment' as TransactionType,
-    amount: transaction?.amount || '',
-    payment_method: transaction?.payment_method || 'cash' as const,
-    description: transaction?.description || '',
-    category: transaction?.category || '',
-    reference_number: transaction?.reference_number || '',
-    notes: transaction?.notes || '',
-    status: transaction?.status || 'completed' as TransactionStatus,
+  const form = useForm<CreateTransactionRequest & { status?: TransactionStatus }>({
+    defaultValues: {
+      transaction_type: transaction?.transaction_type || 'sale_payment',
+      amount: transaction?.amount || '',
+      payment_method: transaction?.payment_method || 'cash',
+      description: transaction?.description || '',
+      category: transaction?.category || '',
+      reference_number: transaction?.reference_number || '',
+      notes: transaction?.notes || '',
+      status: transaction?.status || 'completed',
+    },
   })
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+  const { register, control, formState: { errors }, handleSubmit } = form
+
+  const onSubmit = (data: CreateTransactionRequest & { status?: TransactionStatus }) => {
     const payload = {
-      transaction_type: formData.transaction_type,
-      amount: formData.amount,
-      payment_method: formData.payment_method,
-      description: formData.description,
-      ...(formData.category && { category: formData.category }),
-      ...(formData.reference_number && { reference_number: formData.reference_number }),
-      ...(formData.notes && { notes: formData.notes }),
-      ...(mode === 'edit' && { status: formData.status }),
+      transaction_type: data.transaction_type,
+      amount: data.amount,
+      payment_method: data.payment_method,
+      description: data.description,
+      ...(data.category && { category: data.category }),
+      ...(data.reference_number && { reference_number: data.reference_number }),
+      ...(data.notes && { notes: data.notes }),
+      ...(mode === 'edit' && { status: data.status }),
     }
 
     if (mode === 'create') {
@@ -74,80 +78,126 @@ export function TransactionForm({ mode, transaction, onClose, onSuccess }: Trans
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="text-sm text-slate-600">Transaction Type</label>
-          <Select value={formData.transaction_type} onValueChange={(v) => setFormData({ ...formData, transaction_type: v as TransactionType })}>
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {Object.entries(TRANSACTION_TYPE_LABELS).map(([value, label]) => (
-                <SelectItem key={value} value={value}>{label}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block mb-2">
+            Transaction Type
+          </label>
+          <Controller
+            control={control}
+            name="transaction_type"
+            render={({ field }) => (
+              <Select value={field.value} onValueChange={field.onChange}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.entries(TRANSACTION_TYPE_LABELS).map(([value, label]) => (
+                    <SelectItem key={value} value={value}>{label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          />
+          {errors.transaction_type && (
+            <p className="text-sm font-medium text-destructive mt-1">{errors.transaction_type.message}</p>
+          )}
         </div>
-        <div>
-          <label className="text-sm text-slate-600">Amount (GH₵)</label>
-          <TextInput type="number" step="0.01" required value={formData.amount} onChange={(e) => setFormData({ ...formData, amount: e.target.value })} placeholder="0.00" />
-        </div>
+        <TextInput
+          type="number"
+          step="0.01"
+          label="Amount (GH₵)"
+          required
+          placeholder="0.00"
+          error={errors.amount?.message}
+          {...register('amount')}
+        />
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="text-sm text-slate-600">Payment Method</label>
-          <Select value={formData.payment_method} onValueChange={(v) => setFormData({ ...formData, payment_method: v as any })}>
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="cash">Cash</SelectItem>
-              <SelectItem value="mobile_money">Mobile Money</SelectItem>
-              <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
-              <SelectItem value="card">Card</SelectItem>
-            </SelectContent>
-          </Select>
+          <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block mb-2">
+            Payment Method
+          </label>
+          <Controller
+            control={control}
+            name="payment_method"
+            render={({ field }) => (
+              <Select value={field.value} onValueChange={field.onChange}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="cash">Cash</SelectItem>
+                  <SelectItem value="mobile_money">Mobile Money</SelectItem>
+                  <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
+                  <SelectItem value="card">Card</SelectItem>
+                </SelectContent>
+              </Select>
+            )}
+          />
+          {errors.payment_method && (
+            <p className="text-sm font-medium text-destructive mt-1">{errors.payment_method.message}</p>
+          )}
         </div>
         {mode === 'edit' && (
           <div>
-            <label className="text-sm text-slate-600">Status</label>
-            <Select value={formData.status} onValueChange={(v) => setFormData({ ...formData, status: v as TransactionStatus })}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="completed">Completed</SelectItem>
-                <SelectItem value="failed">Failed</SelectItem>
-                <SelectItem value="cancelled">Cancelled</SelectItem>
-              </SelectContent>
-            </Select>
+            <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block mb-2">
+              Status
+            </label>
+            <Controller
+              control={control}
+              name="status"
+              render={({ field }) => (
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="pending">Pending</SelectItem>
+                    <SelectItem value="completed">Completed</SelectItem>
+                    <SelectItem value="failed">Failed</SelectItem>
+                    <SelectItem value="cancelled">Cancelled</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
+            />
+            {errors.status && (
+              <p className="text-sm font-medium text-destructive mt-1">{errors.status.message}</p>
+            )}
           </div>
         )}
       </div>
 
-      <div>
-        <label className="text-sm text-slate-600">Description</label>
-        <Textarea required value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} placeholder="Transaction description" rows={3} />
-      </div>
+      <Textarea
+        label="Description"
+        required
+        placeholder="Transaction description"
+        rows={3}
+        error={errors.description?.message}
+        {...register('description')}
+      />
 
       <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="text-sm text-slate-600">Category (optional)</label>
-          <TextInput value={formData.category} onChange={(e) => setFormData({ ...formData, category: e.target.value })} placeholder="e.g., utilities, rent" />
-        </div>
-        <div>
-          <label className="text-sm text-slate-600">Reference Number (optional)</label>
-          <TextInput value={formData.reference_number} onChange={(e) => setFormData({ ...formData, reference_number: e.target.value })} placeholder="TXN-..." />
-        </div>
+        <TextInput
+          label="Category (optional)"
+          placeholder="e.g., utilities, rent"
+          {...register('category')}
+        />
+        <TextInput
+          label="Reference Number (optional)"
+          placeholder="TXN-..."
+          {...register('reference_number')}
+        />
       </div>
 
-      <div>
-        <label className="text-sm text-slate-600">Notes (optional)</label>
-        <Textarea value={formData.notes} onChange={(e) => setFormData({ ...formData, notes: e.target.value })} placeholder="Additional notes" rows={3} />
-      </div>
+      <Textarea
+        label="Notes (optional)"
+        placeholder="Additional notes"
+        rows={3}
+        {...register('notes')}
+      />
 
       <div className="flex justify-end gap-2 pt-2">
         <Button type="button" variant="outline" onClick={onClose}>Cancel</Button>

@@ -1,16 +1,14 @@
 "use client"
 
 import { useState, useMemo } from "react"
+import { useForm } from "react-hook-form"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/custom-components"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Modal } from "@/components/modal"
-import { Calendar, Banknote, Smartphone, Building2, CheckCircle2, AlertCircle, TrendingUp, TrendingDown, FileText, Loader2 } from "lucide-react"
+import { Calendar, Banknote, Smartphone, Building2, FileText, Loader2 } from "lucide-react"
 import { useSales } from "@/hooks/useApi"
 import { PAYMENT_METHODS } from "@/hooks/useApi"
+import { CloseDayModal, type CloseDayFormData } from "./CloseDayModal"
 import { type Sale } from "@/lib/api"
 
 interface DailySummary {
@@ -24,11 +22,17 @@ interface DailySummary {
 
 export function DailyClosure() {
   const [showCloseDialog, setShowCloseDialog] = useState(false)
-  const [actualCash, setActualCash] = useState("")
-  const [actualMobileMoney, setActualMobileMoney] = useState("")
-  const [actualBankTransfer, setActualBankTransfer] = useState("")
-  const [notes, setNotes] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  // Form for closing the day
+  const closeDayForm = useForm<CloseDayFormData>({
+    defaultValues: {
+      actualCash: "",
+      actualMobileMoney: "",
+      actualBankTransfer: "",
+      notes: "",
+    }
+  })
 
   // API hooks
   const { data: salesData, isLoading } = useSales(1, 1000)
@@ -74,12 +78,6 @@ export function DailyClosure() {
     return summary
   }, [sales, today])
 
-  // Calculate variance
-  const cashVariance = parseFloat(actualCash) || 0 - todaySummary.totalCash
-  const mobileMoneyVariance = parseFloat(actualMobileMoney) || 0 - todaySummary.totalMobileMoney
-  const bankTransferVariance = parseFloat(actualBankTransfer) || 0 - todaySummary.totalBankTransfer
-  const totalVariance = cashVariance + mobileMoneyVariance + bankTransferVariance
-
   // Get historical closures (mock data for now)
   const closureHistory = useMemo(() => {
     // In a real implementation, this would come from an API
@@ -100,10 +98,12 @@ export function DailyClosure() {
     await new Promise(resolve => setTimeout(resolve, 1500))
 
     // Reset form
-    setActualCash("")
-    setActualMobileMoney("")
-    setActualBankTransfer("")
-    setNotes("")
+    closeDayForm.reset({
+      actualCash: "",
+      actualMobileMoney: "",
+      actualBankTransfer: "",
+      notes: "",
+    })
     setShowCloseDialog(false)
     setIsSubmitting(false)
 
@@ -184,14 +184,14 @@ export function DailyClosure() {
 
           {/* Close Day Button */}
           <div className="flex justify-end">
-            <Button
+            <button
               onClick={() => setShowCloseDialog(true)}
-              className="bg-green-600 hover:bg-green-700 text-sm sm:text-base py-2 sm:py-3"
+              className="bg-green-600 hover:bg-green-700 text-white text-sm sm:text-base py-2 sm:py-3 px-4 rounded-md inline-flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={todaySummary.transactions === 0}
             >
-              <FileText className="h-4 w-4 mr-2" />
+              <FileText className="h-4 w-4" />
               Close Day
-            </Button>
+            </button>
           </div>
 
           {/* Recent Closures History */}
@@ -236,176 +236,19 @@ export function DailyClosure() {
       )}
 
       {/* Close Day Modal */}
-      {showCloseDialog && (
-        <Modal
-          isOpen={showCloseDialog}
-          onClose={() => setShowCloseDialog(false)}
-          title={`Close Day - ${new Date().toLocaleDateString()}`}
-          size="lg"
-        >
-          <div className="space-y-4">
-            {/* Expected Amounts */}
-            <div className="bg-slate-50 p-4 rounded-lg">
-              <h3 className="font-medium text-sm text-slate-700 mb-3">Expected Amounts</h3>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span>Cash:</span>
-                  <span className="font-medium">{formatCurrency(todaySummary.totalCash)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Mobile Money:</span>
-                  <span className="font-medium">{formatCurrency(todaySummary.totalMobileMoney)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Bank Transfer:</span>
-                  <span className="font-medium">{formatCurrency(todaySummary.totalBankTransfer)}</span>
-                </div>
-                <div className="flex justify-between font-bold border-t border-slate-300 pt-2">
-                  <span>Total Expected:</span>
-                  <span className="text-green-600">{formatCurrency(todaySummary.totalSales)}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Actual Amounts */}
-            <div>
-              <h3 className="font-medium text-sm text-slate-700 mb-3">Actual Amounts on Hand</h3>
-              <div className="space-y-3">
-                <div>
-                  <Label htmlFor="actual-cash">Actual Cash (GH₵)</Label>
-                  <Input
-                    id="actual-cash"
-                    type="number"
-                    step="0.01"
-                    placeholder="0.00"
-                    value={actualCash}
-                    onChange={(e) => setActualCash(e.target.value)}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="actual-mm">Actual Mobile Money (GH₵)</Label>
-                  <Input
-                    id="actual-mm"
-                    type="number"
-                    step="0.01"
-                    placeholder="0.00"
-                    value={actualMobileMoney}
-                    onChange={(e) => setActualMobileMoney(e.target.value)}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="actual-bt">Actual Bank Transfer (GH₵)</Label>
-                  <Input
-                    id="actual-bt"
-                    type="number"
-                    step="0.01"
-                    placeholder="0.00"
-                    value={actualBankTransfer}
-                    onChange={(e) => setActualBankTransfer(e.target.value)}
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Variance */}
-            {(actualCash || actualMobileMoney || actualBankTransfer) && (
-              <div className="bg-slate-50 p-4 rounded-lg">
-                <h3 className="font-medium text-sm text-slate-700 mb-3">Variance</h3>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between items-center">
-                    <span>Cash Variance:</span>
-                    <span className={`font-medium flex items-center gap-1 ${cashVariance === 0 ? 'text-green-600' : 'text-red-600'}`}>
-                      {cashVariance === 0 ? (
-                        <CheckCircle2 className="h-4 w-4" />
-                      ) : (
-                        <AlertCircle className="h-4 w-4" />
-                      )}
-                      {cashVariance > 0 ? '+' : ''}{formatCurrency(cashVariance)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span>Mobile Money Variance:</span>
-                    <span className={`font-medium flex items-center gap-1 ${mobileMoneyVariance === 0 ? 'text-green-600' : 'text-red-600'}`}>
-                      {mobileMoneyVariance === 0 ? (
-                        <CheckCircle2 className="h-4 w-4" />
-                      ) : (
-                        <AlertCircle className="h-4 w-4" />
-                      )}
-                      {mobileMoneyVariance > 0 ? '+' : ''}{formatCurrency(mobileMoneyVariance)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span>Bank Transfer Variance:</span>
-                    <span className={`font-medium flex items-center gap-1 ${bankTransferVariance === 0 ? 'text-green-600' : 'text-red-600'}`}>
-                      {bankTransferVariance === 0 ? (
-                        <CheckCircle2 className="h-4 w-4" />
-                      ) : (
-                        <AlertCircle className="h-4 w-4" />
-                      )}
-                      {bankTransferVariance > 0 ? '+' : ''}{formatCurrency(bankTransferVariance)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between font-bold border-t border-slate-300 pt-2">
-                    <span>Total Variance:</span>
-                    <span className={`flex items-center gap-1 ${totalVariance === 0 ? 'text-green-600' : 'text-red-600'}`}>
-                      {totalVariance === 0 ? (
-                        <CheckCircle2 className="h-4 w-4" />
-                      ) : (
-                        totalVariance > 0 ? (
-                          <TrendingUp className="h-4 w-4" />
-                        ) : (
-                          <TrendingDown className="h-4 w-4" />
-                        )
-                      )}
-                      {totalVariance > 0 ? '+' : ''}{formatCurrency(totalVariance)}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Notes */}
-            <div>
-              <Label htmlFor="notes">Notes (Optional)</Label>
-              <Input
-                id="notes"
-                placeholder="Add any notes about discrepancies..."
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-              />
-            </div>
-
-            {/* Actions */}
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                onClick={() => setShowCloseDialog(false)}
-                className="flex-1"
-                disabled={isSubmitting}
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={handleSubmitClosure}
-                className="flex-1 bg-green-600 hover:bg-green-700"
-                disabled={isSubmitting || (!actualCash && !actualMobileMoney && !actualBankTransfer)}
-              >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Submitting...
-                  </>
-                ) : (
-                  <>
-                    <CheckCircle2 className="h-4 w-4 mr-2" />
-                    Submit Closure
-                  </>
-                )}
-              </Button>
-            </div>
-          </div>
-        </Modal>
-      )}
+      <CloseDayModal
+        isOpen={showCloseDialog}
+        onClose={() => setShowCloseDialog(false)}
+        form={closeDayForm}
+        todaySummary={{
+          totalSales: todaySummary.totalSales,
+          totalCash: todaySummary.totalCash,
+          totalMobileMoney: todaySummary.totalMobileMoney,
+          totalBankTransfer: todaySummary.totalBankTransfer,
+        }}
+        isSubmitting={isSubmitting}
+        onSubmit={handleSubmitClosure}
+      />
     </div>
   )
 }

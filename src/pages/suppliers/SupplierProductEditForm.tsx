@@ -1,15 +1,15 @@
 import { Button, TextInput } from "@/components/custom-components"
-import { Label } from "@/components/ui/label"
 import { Loader2 } from "lucide-react"
 import { Modal } from "@/components/modal"
 import type { SupplierProductWithDetails } from "@/lib/api"
+import type { UseFormReturn } from "react-hook-form"
 
 interface SupplierProductEditFormProps {
   isOpen: boolean
   onClose: () => void
   data: SupplierProductWithDetails | null
+  form: UseFormReturn<SupplierProductWithDetails>
   isPending: boolean
-  onChange: (data: SupplierProductWithDetails) => void
   onSubmit: () => void
 }
 
@@ -17,11 +17,19 @@ export function SupplierProductEditForm({
   isOpen,
   onClose,
   data,
+  form,
   isPending,
-  onChange,
   onSubmit
 }: SupplierProductEditFormProps) {
+  const { register, formState: { errors }, handleSubmit } = form
+
   if (!data) return null
+
+  const onFormSubmit = () => {
+    handleSubmit(() => {
+      onSubmit()
+    })()
+  }
 
   return (
     <Modal
@@ -30,39 +38,33 @@ export function SupplierProductEditForm({
       title="Edit Supply Price"
       size="md"
     >
-      <div className="space-y-4">
-        <div>
-          <Label htmlFor="edit-supplier">Supplier</Label>
-          <TextInput
-            id="edit-supplier"
-            value={data.supplier_name}
-            disabled
-            className="bg-gray-50"
-          />
-        </div>
-        <div>
-          <Label htmlFor="edit-product">Product</Label>
-          <TextInput
-            id="edit-product"
-            value={data.product_name}
-            disabled
-            className="bg-gray-50"
-          />
-        </div>
-        <div>
-          <Label htmlFor="edit-supply-price">Supply Price ($) *</Label>
-          <TextInput
-            id="edit-supply-price"
-            type="number"
-            step="0.01"
-            value={data.supply_price}
-            onChange={(e) => onChange({ ...data, supply_price: e.target.value })}
-            placeholder="0.00"
-          />
-        </div>
+      <form onSubmit={(e) => { e.preventDefault(); onFormSubmit(); }} className="space-y-4">
+        <TextInput
+          id="edit-supplier"
+          label="Supplier"
+          value={data.supplier_name}
+          disabled
+          className="bg-gray-50"
+        />
+        <TextInput
+          id="edit-product"
+          label="Product"
+          value={data.product_name}
+          disabled
+          className="bg-gray-50"
+        />
+        <TextInput
+          id="edit-supply-price"
+          type="number"
+          step="0.01"
+          label="Supply Price ($) *"
+          placeholder="0.00"
+          error={errors.supply_price?.message}
+          {...register('supply_price')}
+        />
         <div className="flex gap-2">
           <Button
-            onClick={onSubmit}
+            type="submit"
             className="flex-1 bg-green-600 hover:bg-green-700"
             disabled={isPending}
           >
@@ -76,13 +78,14 @@ export function SupplierProductEditForm({
             )}
           </Button>
           <Button
+            type="button"
             variant="outline"
             onClick={onClose}
           >
             Cancel
           </Button>
         </div>
-      </div>
+      </form>
     </Modal>
   )
 }

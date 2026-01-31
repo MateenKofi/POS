@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useForm } from "react-hook-form"
 import { Button } from "@/components/custom-components"
 import { Plus } from "lucide-react"
 import { useCreateSupplierProduct, useUpdateSupplierProduct, useDeleteSupplierProduct, useSuppliers, useProducts, useAllSupplierProducts } from "@/hooks/useApi"
@@ -12,15 +13,37 @@ import { SupplierProductForm } from "./SupplierProductForm"
 import { SupplierProductEditForm } from "./SupplierProductEditForm"
 import { SupplierProductTable } from "./SupplierProductTable"
 
+const defaultNewSupplierProduct: CreateSupplierProductRequest = {
+  supplier_id: 0,
+  product_id: 0,
+  supply_price: "",
+}
+
+const defaultEditSupplierProduct: SupplierProductWithDetails = {
+  supplier_product_id: 0,
+  supplier_id: 0,
+  product_id: 0,
+  supply_price: "",
+  supplier_name: "",
+  product_name: "",
+  product_description: "",
+  retail_price: "",
+  stock_quantity: 0,
+}
+
 export function SupplierProductManagement() {
   const [searchTerm, setSearchTerm] = useState("")
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [editingSupplierProduct, setEditingSupplierProduct] = useState<SupplierProductWithDetails | null>(null)
-  const [newSupplierProduct, setNewSupplierProduct] = useState<CreateSupplierProductRequest>({
-    supplier_id: 0,
-    product_id: 0,
-    supply_price: "",
+
+  // Forms
+  const newSupplierProductForm = useForm<CreateSupplierProductRequest>({
+    defaultValues: defaultNewSupplierProduct,
+  })
+
+  const editSupplierProductForm = useForm<SupplierProductWithDetails>({
+    defaultValues: defaultEditSupplierProduct,
   })
 
   // API hooks
@@ -39,15 +62,15 @@ export function SupplierProductManagement() {
     sp.product_name?.toLowerCase().includes(searchTerm.toLowerCase())
   ) || []
 
-  const handleAddSupplierProduct = async () => {
-    if (!newSupplierProduct.supplier_id || !newSupplierProduct.product_id || !newSupplierProduct.supply_price) {
+  const handleAddSupplierProduct = (data: CreateSupplierProductRequest) => {
+    if (!data.supplier_id || !data.product_id || !data.supply_price) {
       toast.error("Please fill in all required fields")
       return
     }
 
     // Check if this supplier-product combination already exists
     const exists = supplierProducts?.some(
-      sp => sp.supplier_id === newSupplierProduct.supplier_id && sp.product_id === newSupplierProduct.product_id
+      sp => sp.supplier_id === data.supplier_id && sp.product_id === data.product_id
     )
 
     if (exists) {
@@ -55,35 +78,37 @@ export function SupplierProductManagement() {
       return
     }
 
-    try {
-      await createSupplierProduct.mutateAsync(newSupplierProduct)
-      toast.success("Supplier product relationship created successfully!")
-      setNewSupplierProduct({ supplier_id: 0, product_id: 0, supply_price: "" })
-      setIsAddDialogOpen(false)
-    } catch (error) {
-      toast.error("Failed to create supplier product relationship")
-      console.error(error)
-    }
+    createSupplierProduct.mutate(data, {
+      onSuccess: () => {
+        toast.success("Supplier product relationship created successfully!")
+        newSupplierProductForm.reset(defaultNewSupplierProduct)
+        setIsAddDialogOpen(false)
+      },
+      onError: () => {
+        toast.error("Failed to create supplier product relationship")
+      }
+    })
   }
 
-  const handleEditSupplierProduct = async () => {
+  const handleEditSupplierProduct = (data: SupplierProductWithDetails) => {
     if (!editingSupplierProduct) return
 
-    try {
-      await updateSupplierProduct.mutateAsync({
-        supplierId: editingSupplierProduct.supplier_id.toString(),
-        productId: editingSupplierProduct.product_id.toString(),
-        data: {
-          supply_price: editingSupplierProduct.supply_price,
-        }
-      })
-      toast.success("Supply price updated successfully!")
-      setIsEditDialogOpen(false)
-      setEditingSupplierProduct(null)
-    } catch (error) {
-      toast.error("Failed to update supply price")
-      console.error(error)
-    }
+    updateSupplierProduct.mutate({
+      supplierId: editingSupplierProduct.supplier_id.toString(),
+      productId: editingSupplierProduct.product_id.toString(),
+      data: {
+        supply_price: data.supply_price,
+      }
+    }, {
+      onSuccess: () => {
+        toast.success("Supply price updated successfully!")
+        setIsEditDialogOpen(false)
+        setEditingSupplierProduct(null)
+      },
+      onError: () => {
+        toast.error("Failed to update supply price")
+      }
+    })
   }
 
   const handleDeleteSupplierProduct = async (supplierId: number, productId: number) => {
@@ -103,12 +128,12 @@ export function SupplierProductManagement() {
 
   const openEditDialog = (supplierProduct: SupplierProductWithDetails) => {
     setEditingSupplierProduct({ ...supplierProduct })
+    editSupplierProductForm.reset(supplierProduct)
     setIsEditDialogOpen(true)
   }
 
-  const resetForm = () => {
-    setNewSupplierProduct({ supplier_id: 0, product_id: 0, supply_price: "" })
-    setEditingSupplierProduct(null)
+  const resetNewForm = () => {
+    newSupplierProductForm.reset(defaultNewSupplierProduct)
   }
 
   if (error) {
@@ -154,26 +179,25 @@ export function SupplierProductManagement() {
         isOpen={isAddDialogOpen}
         onClose={() => {
           setIsAddDialogOpen(false)
-          resetForm()
+          resetNewForm()
         }}
-        data={newSupplierProduct}
+        form={newSupplierProductForm}
         suppliers={suppliers}
         products={products}
         isPending={createSupplierProduct.isPending}
-        onChange={setNewSupplierProduct}
-        onSubmit={handleAddSupplierProduct}
+        onSubmit={newSupplierProductForm.handleSubmit(handleAddSupplierProduct)}
       />
 
       <SupplierProductEditForm
         isOpen={isEditDialogOpen}
         onClose={() => {
           setIsEditDialogOpen(false)
-          resetForm()
+          setEditingSupplierProduct(null)
         }}
         data={editingSupplierProduct}
+        form={editSupplierProductForm}
         isPending={updateSupplierProduct.isPending}
-        onChange={setEditingSupplierProduct}
-        onSubmit={handleEditSupplierProduct}
+        onSubmit={editSupplierProductForm.handleSubmit(handleEditSupplierProduct)}
       />
     </div>
   )

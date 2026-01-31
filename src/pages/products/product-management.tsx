@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useForm } from "react-hook-form"
 import { Button } from "@/components/custom-components"
 import { Modal } from "@/components/modal"
 import { Plus, AlertTriangle, Package } from "lucide-react"
@@ -17,6 +18,23 @@ import { ProductStats } from "./ProductStats"
 
 import type { ProductTab } from "./types"
 
+const defaultNewProduct: CreateProductRequest = {
+  name: "",
+  description: "",
+  price: "",
+  cost_price: "",
+  stock_quantity: 0,
+  unit_type: "loose",
+  weight_per_bag: undefined,
+  category: "",
+  barcode: "",
+  supplier: "",
+  expiry_date: "",
+  batch_number: "",
+  manufacturer: "",
+  reorder_level: 10,
+}
+
 export function ProductManagement() {
   const { user } = useAuth()
   const isAdmin = user?.role === 'admin'
@@ -24,25 +42,16 @@ export function ProductManagement() {
   // Dialog states
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
-
-  // Data states
-
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
-  const [newProduct, setNewProduct] = useState<CreateProductRequest>({
-    name: "",
-    description: "",
-    price: "",
-    cost_price: "",
-    stock_quantity: 0,
-    unit_type: "loose",
-    weight_per_bag: undefined,
-    category: "",
-    barcode: "",
-    supplier: "",
-    expiry_date: "",
-    batch_number: "",
-    manufacturer: "",
-    reorder_level: 10,
+
+  // Form for adding new product
+  const newProductForm = useForm<CreateProductRequest>({
+    defaultValues: defaultNewProduct,
+  })
+
+  // Form for editing product
+  const editProductForm = useForm<CreateProductRequest | Product>({
+    defaultValues: defaultNewProduct,
   })
 
   // Search and tab states
@@ -95,16 +104,16 @@ export function ProductManagement() {
   const expiredCount = baseFilteredProducts.filter((p: Product) => getExpiryStatus(p) === 'expired').length
   const expiringCount = baseFilteredProducts.filter((p: Product) => getExpiryStatus(p) === 'expiring').length
 
-  const handleAddProduct = async () => {
-    if (!newProduct.name || !newProduct.description || !newProduct.price || !newProduct.cost_price) {
+  const handleAddProduct = async (data: CreateProductRequest) => {
+    if (!data.name || !data.description || !data.price || !data.cost_price) {
       toast.error("Please fill in all required fields")
       return
     }
 
     try {
-      await createProduct.mutateAsync(newProduct)
+      await createProduct.mutateAsync(data)
       toast.success("Product created successfully!")
-      resetForm()
+      newProductForm.reset(defaultNewProduct)
       setIsAddDialogOpen(false)
     } catch (error) {
       toast.error("Failed to create product")
@@ -112,13 +121,13 @@ export function ProductManagement() {
     }
   }
 
-  const handleEditProduct = async () => {
+  const handleEditProduct = async (data: CreateProductRequest | Product) => {
     if (!editingProduct || !editingProduct.product_id) return
 
     try {
       await updateProduct.mutateAsync({
         id: editingProduct.product_id.toString(),
-        data: editingProduct
+        data: data as Product
       })
       toast.success("Product updated successfully!")
       setIsEditDialogOpen(false)
@@ -143,29 +152,12 @@ export function ProductManagement() {
 
   const openEditDialog = (product: Product) => {
     setEditingProduct({ ...product })
+    editProductForm.reset(product)
     setIsEditDialogOpen(true)
   }
 
-
-
-  const resetForm = () => {
-    setNewProduct({
-      name: "",
-      description: "",
-      price: "",
-      cost_price: "",
-      stock_quantity: 0,
-      unit_type: "loose",
-      weight_per_bag: undefined,
-      category: "",
-      barcode: "",
-      supplier: "",
-      expiry_date: "",
-      batch_number: "",
-      manufacturer: "",
-      reorder_level: 10,
-    })
-    setEditingProduct(null)
+  const resetNewForm = () => {
+    newProductForm.reset(defaultNewProduct)
   }
 
   if (error) {
@@ -238,18 +230,20 @@ export function ProductManagement() {
       {isAddDialogOpen && (
         <Modal
           isOpen={isAddDialogOpen}
-          onClose={() => setIsAddDialogOpen(false)}
+          onClose={() => {
+            setIsAddDialogOpen(false)
+            resetNewForm()
+          }}
           title="Add New Product"
           size="xl"
         >
           <ProductForm
-            product={newProduct}
+            form={newProductForm}
             isPending={createProduct.isPending}
-            onChange={setNewProduct}
-            onSubmit={handleAddProduct}
+            onSubmit={newProductForm.handleSubmit(handleAddProduct)}
             onCancel={() => {
               setIsAddDialogOpen(false)
-              resetForm()
+              resetNewForm()
             }}
           />
         </Modal>
@@ -259,26 +253,25 @@ export function ProductManagement() {
       {isEditDialogOpen && editingProduct && (
         <Modal
           isOpen={isEditDialogOpen}
-          onClose={() => setIsEditDialogOpen(false)}
+          onClose={() => {
+            setIsEditDialogOpen(false)
+            setEditingProduct(null)
+          }}
           title="Edit Product"
           size="xl"
         >
           <ProductForm
-            product={editingProduct}
+            form={editProductForm}
             isEdit
             isPending={updateProduct.isPending}
-            onChange={(p) => setEditingProduct(p as Product)}
-            onSubmit={handleEditProduct}
+            onSubmit={editProductForm.handleSubmit(handleEditProduct)}
             onCancel={() => {
               setIsEditDialogOpen(false)
-              resetForm()
+              setEditingProduct(null)
             }}
           />
         </Modal>
       )}
-
-      {/* Supplier Details Modal */}
-
     </div>
   )
 }

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useForm } from "react-hook-form"
 import { Button } from "@/components/custom-components"
 import { Modal } from "@/components/modal"
 import { Loader2, AlertTriangle, CreditCard } from "lucide-react"
@@ -16,8 +17,8 @@ import { QuickStats } from "./QuickStats"
 import { ProductGrid } from "./ProductGrid"
 import { CartSection } from "./CartSection"
 import { UnitSelectorModal } from "./UnitSelectorModal"
-import { PaymentModalContent, PaymentModalFooter } from "./PaymentModal"
-import type { CartItem, PaymentDetails, CompletedSale, UnitSelectorState } from "./types"
+import { PaymentModalContent, PaymentModalFooter, type PaymentFormData } from "./PaymentModal"
+import type { CartItem, CompletedSale, UnitSelectorState } from "./types"
 
 export function SalesInterface() {
   const { user } = useAuth()
@@ -30,14 +31,18 @@ export function SalesInterface() {
     product: null,
     isOpen: false
   })
-  const [paymentDetails, setPaymentDetails] = useState<PaymentDetails>({
-    method: 1,
-    amount: 0,
-    change: 0,
-    reference: ""
-  })
   const [showInvoice, setShowInvoice] = useState(false)
   const [invoiceData, setInvoiceData] = useState<CompletedSale | null>(null)
+
+  // Payment form
+  const paymentForm = useForm<PaymentFormData>({
+    defaultValues: {
+      paymentMethod: 1,
+      reference: "",
+      orderDiscount: 0,
+      customerPhone: "",
+    }
+  })
 
   // API hooks
   const { data: productsData, isLoading: isProductsLoading, error: productsError, refetch: refetchProducts } = useProducts(1, 100)
@@ -178,35 +183,18 @@ export function SalesInterface() {
   const total = Math.max(0, subtotal - orderDiscount)
 
   // Payment functions
-  const handlePaymentMethodChange = (method: string) => {
-    const methodId = parseInt(method) as PaymentDetails["method"]
-    setPaymentDetails(prev => ({
-      ...prev,
-      method: methodId,
-      amount: total,
-      change: 0
-    }))
-  }
-
-  const handleCashAmountChange = (amount: string) => {
-    const cashAmount = parseFloat(amount) || 0
-    const change = cashAmount - total
-    setPaymentDetails(prev => ({
-      ...prev,
-      amount: cashAmount,
-      change: change >= 0 ? change : 0
-    }))
-  }
-
   const processPayment = async () => {
-    if (!paymentDetails.method) {
+    const paymentFormData = paymentForm.getValues()
+    const paymentMethod = paymentFormData.paymentMethod
+
+    if (!paymentMethod) {
       alert("Please select a payment method")
       return
     }
 
     try {
       const saleData: CreateSaleRequest = {
-        payment_method_id: paymentDetails.method,
+        payment_method_id: paymentMethod,
         items: cart.map(item => ({
           product_id: item.product_id,
           quantity: item.quantity,
@@ -226,13 +214,13 @@ export function SalesInterface() {
         items: cart,
         subtotal,
         tax: 0,
-        total,
-        totalDiscount: orderDiscount,
-        paymentMethod: ["Cash", "Mobile Money", "Bank Transfer"][paymentDetails.method - 1],
-        amountPaid: paymentDetails.amount,
-        change: paymentDetails.change,
-        reference: paymentDetails.reference,
-        customerPhone,
+        total: total - paymentFormData.orderDiscount,
+        totalDiscount: paymentFormData.orderDiscount,
+        paymentMethod: ["Cash", "Mobile Money", "Bank Transfer"][paymentMethod - 1],
+        amountPaid: total,
+        change: 0,
+        reference: paymentFormData.reference,
+        customerPhone: paymentFormData.customerPhone,
         timestamp: new Date().toISOString(),
         status: "completed",
         apiResponse: result
@@ -241,6 +229,10 @@ export function SalesInterface() {
       setInvoiceData(sale)
       setShowPaymentDialog(false)
       setShowInvoice(true)
+      setCart([])
+      setOrderDiscount(0)
+      setCustomerPhone("")
+      paymentForm.reset()
     } catch (error) {
       console.error("Error creating sale:", error)
       alert("Failed to process payment. Please try again.")
@@ -251,12 +243,7 @@ export function SalesInterface() {
     setCart([])
     setOrderDiscount(0)
     setCustomerPhone("")
-    setPaymentDetails({
-      method: 1,
-      amount: 0,
-      change: 0,
-      reference: ""
-    })
+    paymentForm.reset()
     setShowInvoice(false)
     setInvoiceData(null)
   }
@@ -266,6 +253,13 @@ export function SalesInterface() {
       alert("Please add items to cart before proceeding to payment")
       return
     }
+    // Reset form and set default values
+    paymentForm.reset({
+      paymentMethod: 1,
+      reference: "",
+      orderDiscount: orderDiscount,
+      customerPhone: customerPhone,
+    })
     setShowPaymentDialog(true)
   }
 
@@ -346,33 +340,19 @@ export function SalesInterface() {
         title={<span className="flex items-center gap-2"><CreditCard className="h-5 w-5 text-green-500" />Payment Details</span>}
         size="md"
       >
-        <PaymentModalContent
-          paymentDetails={{
-            ...paymentDetails,
-            method: paymentDetails.method as 1 | 2 | 3
-          }}
-          total={total}
-          orderDiscount={orderDiscount}
-          customerPhone={customerPhone}
-          userRole={user?.role}
-          isPending={createSaleMutation.isPending}
-          onPaymentMethodChange={handlePaymentMethodChange}
-          onCashAmountChange={handleCashAmountChange}
-          onReferenceChange={(val) => setPaymentDetails(prev => ({ ...prev, reference: val }))}
-          onPhoneChange={setCustomerPhone}
-          onDiscountChange={setOrderDiscount}
-          onCancel={() => setShowPaymentDialog(false)}
-          onConfirm={() => { }}
-        />
-        <PaymentModalFooter
-          paymentDetails={{
-            method: paymentDetails.method as 1 | 2 | 3
-          }}
-          total={total}
-          isPending={createSaleMutation.isPending}
-          onCancel={() => setShowPaymentDialog(false)}
-          onConfirm={processPayment}
-        />
+        <form onSubmit={(e) => { e.preventDefault(); processPayment(); }}>
+          <PaymentModalContent
+            form={paymentForm}
+            total={total}
+            userRole={user?.role}
+          />
+          <PaymentModalFooter
+            form={paymentForm}
+            isPending={createSaleMutation.isPending}
+            onCancel={() => setShowPaymentDialog(false)}
+            onConfirm={processPayment}
+          />
+        </form>
       </Modal>
 
       {/* Invoice Modal */}

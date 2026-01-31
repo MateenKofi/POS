@@ -1,29 +1,37 @@
 import { Button, TextInput, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Label } from "@/components/custom-components"
+import { Controller } from "react-hook-form"
 import { Loader2 } from "lucide-react"
 import { Modal } from "@/components/modal"
 import type { Supplier, Product, CreateSupplierProductRequest } from "@/lib/api"
+import type { UseFormReturn } from "react-hook-form"
 
 interface SupplierProductFormProps {
   isOpen: boolean
   onClose: () => void
-  data: CreateSupplierProductRequest
+  form: UseFormReturn<CreateSupplierProductRequest>
   suppliers?: Supplier[]
   products?: Product[]
   isPending: boolean
-  onChange: (data: CreateSupplierProductRequest) => void
   onSubmit: () => void
 }
 
 export function SupplierProductForm({
   isOpen,
   onClose,
-  data,
+  form,
   suppliers = [],
   products = [],
   isPending,
-  onChange,
   onSubmit
 }: SupplierProductFormProps) {
+  const { register, control, formState: { errors }, handleSubmit } = form
+
+  const onFormSubmit = () => {
+    handleSubmit(() => {
+      onSubmit()
+    })()
+  }
+
   return (
     <Modal
       isOpen={isOpen}
@@ -31,57 +39,73 @@ export function SupplierProductForm({
       title="Add New Supplier Product Relationship"
       size="md"
     >
-      <div className="space-y-4">
+      <form onSubmit={(e) => { e.preventDefault(); onFormSubmit(); }} className="space-y-4">
         <div>
           <Label htmlFor="supplier">Supplier *</Label>
-          <Select
-            value={data.supplier_id.toString()}
-            onValueChange={(value) => onChange({ ...data, supplier_id: parseInt(value) })}
-          >
-            <SelectTrigger className="w-full text-gray-900">
-              <SelectValue placeholder="Select a supplier" />
-            </SelectTrigger>
-            <SelectContent>
-              {suppliers.map((supplier) => (
-                <SelectItem key={supplier.supplier_id} value={supplier.supplier_id.toString()}>
-                  {supplier.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <Controller
+            control={control}
+            name="supplier_id"
+            render={({ field }) => (
+              <Select
+                value={field.value?.toString()}
+                onValueChange={(value) => field.onChange(parseInt(value))}
+              >
+                <SelectTrigger className="w-full text-gray-900">
+                  <SelectValue placeholder="Select a supplier" />
+                </SelectTrigger>
+                <SelectContent>
+                  {suppliers.map((supplier) => (
+                    <SelectItem key={supplier.supplier_id} value={supplier.supplier_id.toString()}>
+                      {supplier.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          />
+          {errors.supplier_id && (
+            <p className="text-sm font-medium text-destructive mt-1">{errors.supplier_id.message}</p>
+          )}
         </div>
         <div>
           <Label htmlFor="product">Product *</Label>
-          <Select
-            value={data.product_id.toString()}
-            onValueChange={(value) => onChange({ ...data, product_id: parseInt(value) })}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select a product" />
-            </SelectTrigger>
-            <SelectContent>
-              {products.map((product) => (
-                <SelectItem key={product.product_id} value={product.product_id.toString()}>
-                  {product.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <div>
-          <Label htmlFor="supply-price">Supply Price ($) *</Label>
-          <TextInput
-            id="supply-price"
-            type="number"
-            step="0.01"
-            value={data.supply_price}
-            onChange={(e) => onChange({ ...data, supply_price: e.target.value })}
-            placeholder="0.00"
+          <Controller
+            control={control}
+            name="product_id"
+            render={({ field }) => (
+              <Select
+                value={field.value?.toString()}
+                onValueChange={(value) => field.onChange(parseInt(value))}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select a product" />
+                </SelectTrigger>
+                <SelectContent>
+                  {products.map((product) => (
+                    <SelectItem key={product.product_id} value={product.product_id.toString()}>
+                      {product.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
           />
+          {errors.product_id && (
+            <p className="text-sm font-medium text-destructive mt-1">{errors.product_id.message}</p>
+          )}
         </div>
+        <TextInput
+          id="supply-price"
+          type="number"
+          step="0.01"
+          label="Supply Price ($) *"
+          placeholder="0.00"
+          error={errors.supply_price?.message}
+          {...register('supply_price')}
+        />
         <div className="flex gap-2">
           <Button
-            onClick={onSubmit}
+            type="submit"
             className="flex-1 bg-green-600 hover:bg-green-700"
             disabled={isPending}
           >
@@ -95,13 +119,14 @@ export function SupplierProductForm({
             )}
           </Button>
           <Button
+            type="button"
             variant="outline"
             onClick={onClose}
           >
             Cancel
           </Button>
         </div>
-      </div>
+      </form>
     </Modal>
   )
 }

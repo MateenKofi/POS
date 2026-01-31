@@ -1,15 +1,16 @@
 import { Button, TableCell, TableRow } from "@/components/custom-components"
 import { Badge } from "@/components/ui/badge"
-import { Edit2, Trash2 } from "lucide-react"
+import { Edit2, Trash2, Key } from "lucide-react"
 import type { Staff } from "@/lib/api"
 
 interface StaffRowProps {
   staff: Staff
   onEdit: (staff: Staff) => void
   onDelete: (id: number) => void
+  onChangePassword?: (staff: Staff) => void
 }
 
-export function StaffRow({ staff, onEdit, onDelete }: StaffRowProps) {
+export function StaffRow({ staff, onEdit, onDelete, onChangePassword }: StaffRowProps) {
   return (
     <TableRow>
       <TableCell className="font-medium">
@@ -43,6 +44,17 @@ export function StaffRow({ staff, onEdit, onDelete }: StaffRowProps) {
           >
             <Edit2 className="h-4 w-4" />
           </Button>
+          {onChangePassword && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0 text-blue-600 hover:text-blue-700"
+              onClick={() => onChangePassword(staff)}
+              title="Change Password"
+            >
+              <Key className="h-4 w-4" />
+            </Button>
+          )}
           <Button
             variant="ghost"
             size="sm"

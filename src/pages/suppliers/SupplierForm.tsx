@@ -1,43 +1,40 @@
 import { Button, TextInput } from "@/components/custom-components"
-import { Label } from "@/components/ui/label"
 import { Loader2 } from "lucide-react"
 import type { CreateSupplierRequest, Supplier } from "@/lib/api"
+import type { UseFormReturn } from "react-hook-form"
 
 interface SupplierFormProps {
+  form: UseFormReturn<CreateSupplierRequest | Supplier>
   isEdit?: boolean
-  data: CreateSupplierRequest | Supplier
   isPending: boolean
-  onChange: (data: CreateSupplierRequest | Supplier) => void
   onSubmit: () => void
   onCancel: () => void
 }
 
-export function SupplierForm({ isEdit = false, data, isPending, onChange, onSubmit, onCancel }: SupplierFormProps) {
+export function SupplierForm({ form, isEdit = false, isPending, onSubmit, onCancel }: SupplierFormProps) {
+  const { register, formState: { errors } } = form
+
   return (
-    <div className="space-y-4">
-      <div>
-        <Label htmlFor="name">Supplier Name *</Label>
-        <TextInput
-          id="name"
-          value={data.name}
-          onChange={(e) => onChange({ ...data, name: e.target.value })}
-          placeholder="Enter supplier name"
-          className="text-sm sm:text-base"
-        />
-      </div>
-      <div>
-        <Label htmlFor="contact_info">Contact Information *</Label>
-        <TextInput
-          id="contact_info"
-          value={data.contact_info}
-          onChange={(e) => onChange({ ...data, contact_info: e.target.value })}
-          placeholder="Enter contact information"
-          className="text-sm sm:text-base"
-        />
-      </div>
+    <form onSubmit={onSubmit} className="space-y-4">
+      <TextInput
+        id="name"
+        label="Supplier Name *"
+        placeholder="Enter supplier name"
+        className="text-sm sm:text-base"
+        error={errors.name?.message}
+        {...register('name')}
+      />
+      <TextInput
+        id="contact_info"
+        label="Contact Information *"
+        placeholder="Enter contact information"
+        className="text-sm sm:text-base"
+        error={errors.contact_info?.message}
+        {...register('contact_info')}
+      />
       <div className="flex flex-col sm:flex-row gap-2">
         <Button
-          onClick={onSubmit}
+          type="submit"
           className="flex-1 bg-green-600 hover:bg-green-700 text-sm sm:text-base py-2 sm:py-3"
           disabled={isPending}
         >
@@ -51,6 +48,7 @@ export function SupplierForm({ isEdit = false, data, isPending, onChange, onSubm
           )}
         </Button>
         <Button
+          type="button"
           variant="outline"
           onClick={onCancel}
           className="text-sm sm:text-base py-2 sm:py-3"
@@ -58,6 +56,6 @@ export function SupplierForm({ isEdit = false, data, isPending, onChange, onSubm
           Cancel
         </Button>
       </div>
-    </div>
+    </form>
   )
 }

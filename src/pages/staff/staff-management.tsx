@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useMemo } from "react"
+import { useForm } from "react-hook-form"
 import {
   useStaff,
   useCreateStaff,
@@ -39,6 +40,11 @@ const defaultEditStaff: UpdateStaffRequest = {
   hourly_rate: 15.0,
 }
 
+const defaultPasswordData: PasswordData = {
+  current_password: "",
+  new_password: "",
+}
+
 export function StaffManagement() {
   const [searchTerm, setSearchTerm] = useState("")
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
@@ -47,12 +53,17 @@ export function StaffManagement() {
   const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
 
-  // Form states
-  const [newStaff, setNewStaff] = useState<CreateStaffRequest>(defaultNewStaff)
-  const [editStaff, setEditStaff] = useState<UpdateStaffRequest>(defaultEditStaff)
-  const [passwordData, setPasswordData] = useState<PasswordData>({
-    current_password: "",
-    new_password: "",
+  // Forms
+  const newStaffForm = useForm<CreateStaffRequest | UpdateStaffRequest>({
+    defaultValues: defaultNewStaff,
+  })
+
+  const editStaffForm = useForm<CreateStaffRequest | UpdateStaffRequest>({
+    defaultValues: defaultEditStaff,
+  })
+
+  const passwordForm = useForm<PasswordData>({
+    defaultValues: defaultPasswordData,
   })
 
   // API hooks
@@ -73,65 +84,65 @@ export function StaffManagement() {
     )
   }, [staffData, searchTerm])
 
-  const handleAddStaff = () => {
-    if (!newStaff.first_name.trim() || !newStaff.last_name.trim() || !newStaff.email.trim() || !newStaff.username.trim() || !newStaff.password.trim()) {
+  const handleAddStaff = (data: CreateStaffRequest | UpdateStaffRequest) => {
+    if (!data.first_name?.trim() || !data.last_name?.trim() || !data.email?.trim() || !data.username?.trim() || !data.password?.trim()) {
       alert("Please fill in all required fields")
       return
     }
 
-    if (newStaff.password.length < 6) {
+    if (data.password && data.password.length < 6) {
       alert("Password must be at least 6 characters long")
       return
     }
 
-    createStaffMutation.mutate(newStaff, {
+    createStaffMutation.mutate(data as CreateStaffRequest, {
       onSuccess: () => {
         setIsAddDialogOpen(false)
-        setNewStaff(defaultNewStaff)
+        newStaffForm.reset(defaultNewStaff)
       }
     })
   }
 
-  const handleEditStaff = () => {
+  const handleEditStaff = (data: UpdateStaffRequest) => {
     if (!editingStaff) return
 
-    if (!editStaff.first_name?.trim() || !editStaff.last_name?.trim() || !editStaff.email?.trim()) {
+    if (!data.first_name?.trim() || !data.last_name?.trim() || !data.email?.trim()) {
       alert("Please fill in all required fields")
       return
     }
 
     updateStaffMutation.mutate({
       id: editingStaff.salesperson_id.toString(),
-      data: editStaff
+      data: data
     }, {
       onSuccess: () => {
         setIsEditDialogOpen(false)
         setEditingStaff(null)
-        setEditStaff(defaultEditStaff)
+        editStaffForm.reset(defaultEditStaff)
       }
     })
   }
 
-  const handleUpdatePassword = () => {
+  const handleUpdatePassword = (data: PasswordData) => {
     if (!editingStaff) return
 
-    if (!passwordData.current_password.trim() || !passwordData.new_password.trim()) {
+    if (!data.current_password.trim() || !data.new_password.trim()) {
       alert("Please fill in all password fields")
       return
     }
 
-    if (passwordData.new_password.length < 6) {
+    if (data.new_password.length < 6) {
       alert("New password must be at least 6 characters long")
       return
     }
 
     updatePasswordMutation.mutate({
       id: editingStaff.salesperson_id.toString(),
-      data: passwordData
+      data: data
     }, {
       onSuccess: () => {
         setIsPasswordDialogOpen(false)
-        setPasswordData({ current_password: "", new_password: "" })
+        passwordForm.reset(defaultPasswordData)
         setEditingStaff(null)
       }
     })
@@ -145,7 +156,7 @@ export function StaffManagement() {
 
   const openEditDialog = (staff: Staff) => {
     setEditingStaff(staff)
-    setEditStaff({
+    editStaffForm.reset({
       first_name: staff.first_name,
       last_name: staff.last_name,
       email: staff.email,
@@ -156,8 +167,10 @@ export function StaffManagement() {
     setIsEditDialogOpen(true)
   }
 
-  const resetNewStaff = () => {
-    setNewStaff(defaultNewStaff)
+  const openPasswordDialog = (staff: Staff) => {
+    setEditingStaff(staff)
+    passwordForm.reset(defaultPasswordData)
+    setIsPasswordDialogOpen(true)
   }
 
   return (
@@ -184,24 +197,27 @@ export function StaffManagement() {
         onSearchChange={setSearchTerm}
         onEdit={openEditDialog}
         onDelete={handleDeleteStaff}
+        onChangePassword={openPasswordDialog}
       />
 
       {/* Add Staff Modal */}
       {isAddDialogOpen && (
         <Modal
           isOpen={isAddDialogOpen}
-          onClose={() => setIsAddDialogOpen(false)}
+          onClose={() => {
+            setIsAddDialogOpen(false)
+            newStaffForm.reset(defaultNewStaff)
+          }}
           title="Add New Staff Member"
           size="md"
         >
           <StaffForm
-            data={newStaff}
+            form={newStaffForm}
             isPending={createStaffMutation.isPending}
-            onChange={(data) => setNewStaff(data as CreateStaffRequest)}
-            onSubmit={handleAddStaff}
+            onSubmit={newStaffForm.handleSubmit(handleAddStaff)}
             onCancel={() => {
               setIsAddDialogOpen(false)
-              resetNewStaff()
+              newStaffForm.reset(defaultNewStaff)
             }}
           />
         </Modal>
@@ -211,17 +227,22 @@ export function StaffManagement() {
       {isEditDialogOpen && (
         <Modal
           isOpen={isEditDialogOpen}
-          onClose={() => setIsEditDialogOpen(false)}
+          onClose={() => {
+            setIsEditDialogOpen(false)
+            setEditingStaff(null)
+          }}
           title="Edit Staff Member"
           size="md"
         >
           <StaffForm
             isEdit
-            data={editStaff}
+            form={editStaffForm}
             isPending={updateStaffMutation.isPending}
-            onChange={setEditStaff}
-            onSubmit={handleEditStaff}
-            onCancel={() => setIsEditDialogOpen(false)}
+            onSubmit={editStaffForm.handleSubmit(handleEditStaff)}
+            onCancel={() => {
+              setIsEditDialogOpen(false)
+              setEditingStaff(null)
+            }}
           />
         </Modal>
       )}
@@ -230,18 +251,25 @@ export function StaffManagement() {
       {isPasswordDialogOpen && (
         <Modal
           isOpen={isPasswordDialogOpen}
-          onClose={() => setIsPasswordDialogOpen(false)}
+          onClose={() => {
+            setIsPasswordDialogOpen(false)
+            passwordForm.reset(defaultPasswordData)
+            setEditingStaff(null)
+          }}
           title="Change Password"
           size="md"
         >
           <ChangePasswordForm
-            passwordData={passwordData}
+            form={passwordForm}
             showPassword={showPassword}
             isPending={updatePasswordMutation.isPending}
-            onDataChange={setPasswordData}
             onTogglePassword={() => setShowPassword(!showPassword)}
-            onSubmit={handleUpdatePassword}
-            onCancel={() => setIsPasswordDialogOpen(false)}
+            onSubmit={passwordForm.handleSubmit(handleUpdatePassword)}
+            onCancel={() => {
+              setIsPasswordDialogOpen(false)
+              passwordForm.reset(defaultPasswordData)
+              setEditingStaff(null)
+            }}
           />
         </Modal>
       )}
