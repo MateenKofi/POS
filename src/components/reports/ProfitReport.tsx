@@ -1,4 +1,4 @@
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/custom-components"
 import { DollarSign, TrendingUp, Package } from "lucide-react"
 
 interface ProductProfit {
@@ -21,7 +21,7 @@ export function ProfitReport({ totalRevenue, grossProfit, profitMargin, topProdu
   return (
     <>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <Card className="border-slate-200">
+        <Card className="">
           <CardContent className="p-4">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm text-slate-600">Total Revenue</span>
@@ -32,7 +32,7 @@ export function ProfitReport({ totalRevenue, grossProfit, profitMargin, topProdu
           </CardContent>
         </Card>
 
-        <Card className="border-slate-200">
+        <Card className="">
           <CardContent className="p-4">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm text-slate-600">Gross Profit</span>
@@ -43,7 +43,7 @@ export function ProfitReport({ totalRevenue, grossProfit, profitMargin, topProdu
           </CardContent>
         </Card>
 
-        <Card className="border-slate-200 col-span-1 sm:col-span-2">
+        <Card className=" col-span-1 sm:col-span-2">
           <CardContent className="p-4">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm text-slate-600">Profit Margin</span>
@@ -55,7 +55,7 @@ export function ProfitReport({ totalRevenue, grossProfit, profitMargin, topProdu
         </Card>
       </div>
 
-      <Card className="border-slate-200">
+      <Card className="">
         <CardContent className="p-4">
           <h3 className="text-lg font-semibold text-slate-800 mb-4">Top Products by Profit</h3>
           {topProducts.length === 0 ? (

@@ -13,7 +13,7 @@ interface ProductGridProps {
 
 export function ProductGrid({ filteredProducts, searchTerm, onSearchChange, onProductClick }: ProductGridProps) {
   return (
-    <Card className="border-slate-200/60 shadow-sm shadow-slate-200/50">
+    <Card>
       <CardHeader className="pb-4">
         <div className="flex items-center justify-between mb-4">
           <CardTitle className="text-lg sm:text-xl text-slate-800 flex items-center gap-2">

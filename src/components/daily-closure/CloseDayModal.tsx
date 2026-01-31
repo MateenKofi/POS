@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/custom-components"
 import { Loader2 } from "lucide-react"
 
 interface CloseDayModalProps {
@@ -110,11 +111,12 @@ export function CloseDayModal({
 
             <div>
               <Label htmlFor="notes">Notes</Label>
-              <Input
+              <Textarea
                 id="notes"
                 value={notes}
                 onChange={(e) => onNotesChange(e.target.value)}
                 placeholder="Add notes about today's closure..."
+                rows={3}
               />
             </div>
 

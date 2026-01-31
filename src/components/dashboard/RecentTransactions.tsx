@@ -11,7 +11,7 @@ interface RecentTransactionsProps {
 
 export function RecentTransactions({ sales, formatCurrency, onQuickAction }: RecentTransactionsProps) {
   return (
-    <Card className="border-slate-200">
+    <Card className="">
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="text-slate-800">
           Recent Transactions

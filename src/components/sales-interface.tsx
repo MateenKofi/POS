@@ -5,9 +5,9 @@ import { Button } from "@/components/custom-components"
 import { Modal } from "@/components/modal"
 import { Loader2, AlertTriangle, CreditCard } from "lucide-react"
 import { useProducts, useCreateSale } from "@/hooks/useApi"
-import { ReceiptGenerator } from "@/components/receipt-generator"
 import { type CreateSaleRequest } from "@/lib/api"
 import { useAuth } from "@/contexts/AuthContext"
+import { InvoiceModal } from "./sales/InvoiceModal"
 
 
 // Sales sub-components
@@ -36,8 +36,8 @@ export function SalesInterface() {
     change: 0,
     reference: ""
   })
-  const [showReceipt, setShowReceipt] = useState(false)
-  const [completedSale, setCompletedSale] = useState<CompletedSale | null>(null)
+  const [showInvoice, setShowInvoice] = useState(false)
+  const [invoiceData, setInvoiceData] = useState<CompletedSale | null>(null)
 
   // API hooks
   const { data: productsData, isLoading: isProductsLoading, error: productsError, refetch: refetchProducts } = useProducts(1, 100)
@@ -67,13 +67,13 @@ export function SalesInterface() {
 
   // Refetch products after payment completion
   useEffect(() => {
-    if (completedSale && showReceipt) {
+    if (invoiceData && showInvoice) {
       const timer = setTimeout(() => {
         refetchProducts()
       }, 1000)
       return () => clearTimeout(timer)
     }
-  }, [completedSale, showReceipt, refetchProducts])
+  }, [invoiceData, showInvoice, refetchProducts])
 
   // Cart functions
   const addToCart = (product: typeof availableProducts[0]) => {
@@ -243,9 +243,9 @@ export function SalesInterface() {
         apiResponse: result
       }
 
-      setCompletedSale(sale)
+      setInvoiceData(sale)
       setShowPaymentDialog(false)
-      setShowReceipt(true)
+      setShowInvoice(true)
     } catch (error) {
       console.error("Error creating sale:", error)
       alert("Failed to process payment. Please try again.")
@@ -262,8 +262,8 @@ export function SalesInterface() {
       change: 0,
       reference: ""
     })
-    setShowReceipt(false)
-    setCompletedSale(null)
+    setShowInvoice(false)
+    setInvoiceData(null)
   }
 
   const openPaymentDialog = () => {
@@ -380,28 +380,30 @@ export function SalesInterface() {
         />
       </Modal>
 
-      {/* Receipt Generator */}
-      {completedSale && (
-        <ReceiptGenerator
-          receiptData={{
-            saleId: completedSale.id,
-            items: completedSale.items.map(item => ({
+      {/* Invoice Modal */}
+      {invoiceData && (
+        <InvoiceModal
+          isOpen={showInvoice}
+          onClose={finalizeSale}
+          invoiceData={{
+            saleId: invoiceData.id,
+            items: invoiceData.items.map(item => ({
               name: item.name,
               quantity: item.quantity,
               unit: item.unit,
               price: parseFloat(item.price),
               discount: item.discount
             })),
-            subtotal: completedSale.subtotal,
-            totalDiscount: completedSale.totalDiscount,
-            total: completedSale.total,
-            paymentMethod: completedSale.paymentMethod,
-            amountPaid: completedSale.amountPaid,
-            change: completedSale.change,
-            customerPhone: completedSale.customerPhone,
-            timestamp: completedSale.timestamp
+            subtotal: invoiceData.subtotal,
+            totalDiscount: invoiceData.totalDiscount,
+            total: invoiceData.total,
+            paymentMethod: invoiceData.paymentMethod,
+            amountPaid: invoiceData.amountPaid,
+            change: invoiceData.change,
+            customerPhone: invoiceData.customerPhone,
+            timestamp: invoiceData.timestamp,
+            cashierName: user?.first_name && user?.last_name ? `${user.first_name} ${user.last_name}` : undefined
           }}
-          onClose={finalizeSale}
         />
       )}
     </div>

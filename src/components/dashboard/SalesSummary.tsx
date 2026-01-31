@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/custom-components"
 import { Button } from "@/components/ui/button"
 import type { SaleData } from "./types"
 
@@ -27,7 +27,7 @@ export function SalesSummary({ sales, formatCurrency, onQuickAction }: SalesSumm
   }, {} as Record<string, number>)
 
   return (
-    <Card className="border-slate-200">
+    <Card className="">
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="text-slate-800">Sales Summary</CardTitle>
         <Button

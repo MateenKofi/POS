@@ -1,5 +1,4 @@
-import { TextInput } from "@/components/custom-components"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { TextInput, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/custom-components"
 import { Search } from "lucide-react"
 
 interface TransactionFiltersProps {

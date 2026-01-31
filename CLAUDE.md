@@ -59,11 +59,19 @@ The app is a **POS (Point of Sale) system** with role-based access control:
 
 ### Component Architecture
 
-#### UI Components (`src/components/ui/`)
-Radix UI + Tailwind components following shadcn/ui patterns:
-- `button.tsx`, `card.tsx`, `input.tsx`, `label.tsx`, `select.tsx`
-- `dialog.tsx`, `badge.tsx`, `alert.tsx`, `separator.tsx`
-- `table.tsx`
+#### UI Components (`src/components/ui/` vs `src/components/custom-components/`)
+
+**IMPORTANT: All new reusable UI components MUST be created in `src/components/custom-components/`**
+
+- **`src/components/custom-components/`** - Custom UI components (use this for new components)
+  - `Button.tsx`, `Card.tsx`, `Label.tsx`, `Select.tsx`, `Table.tsx`, `TextInput.tsx`, `Textarea.tsx`
+  - These components follow a consistent pattern with built-in label and error support
+  - Import from `@/components/custom-components` or individual files
+
+- **`src/components/ui/`** - Legacy shadcn/ui components (DO NOT add new files here)
+  - Existing: `badge.tsx`, `button.tsx`, `card.tsx`, `dialog.tsx`, `input.tsx`, `label.tsx`, `select.tsx`, `separator.tsx`, `table.tsx`
+  - Only use these if a custom-components equivalent doesn't exist yet
+  - Gradually migrating all components to `custom-components/`
 
 #### Feature Components
 Each is a self-contained page/component:

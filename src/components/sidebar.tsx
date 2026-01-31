@@ -42,7 +42,7 @@ export function Sidebar({
       id: "transactions",
       label: "Transactions",
       icon: History,
-      roles: ["manager", "admin"],
+      roles: ["cashier", "manager", "admin"],
     },
     {
       id: "sales",

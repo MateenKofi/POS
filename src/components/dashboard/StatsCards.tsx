@@ -19,7 +19,7 @@ export function StatsCards({ stats, onQuickAction }: StatsCardsProps) {
       {stats.map((stat, index) => {
         const Icon = stat.icon
         return (
-          <Card key={stat.title} className="border-slate-200 hover:shadow-md transition-shadow">
+          <Card key={stat.title} className="hover:shadow-lg transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 sm:px-6">
               <CardTitle className="text-xs sm:text-sm font-medium text-slate-600">
                 {stat.title}

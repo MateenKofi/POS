@@ -1,6 +1,4 @@
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Button, TextInput } from "@/components/custom-components"
-import { Label } from "@/components/ui/label"
+import { Button, TextInput, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Label } from "@/components/custom-components"
 import { Loader2 } from "lucide-react"
 import { Modal } from "@/components/modal"
 import type { Supplier, Product, CreateSupplierProductRequest } from "@/lib/api"

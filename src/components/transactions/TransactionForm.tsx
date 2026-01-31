@@ -1,6 +1,5 @@
 import { useState } from "react"
-import { Button, TextInput } from "@/components/custom-components"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Button, TextInput, Textarea, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/custom-components"
 import { useCreateTransaction, useUpdateTransaction } from "@/hooks/useApi"
 import { toast } from "sonner"
 import type { Transaction, TransactionType, TransactionStatus } from "@/lib/api"
@@ -131,7 +130,7 @@ export function TransactionForm({ mode, transaction, onClose, onSuccess }: Trans
 
       <div>
         <label className="text-sm text-slate-600">Description</label>
-        <TextInput required value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} placeholder="Transaction description" />
+        <Textarea required value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} placeholder="Transaction description" rows={3} />
       </div>
 
       <div className="grid grid-cols-2 gap-4">
@@ -147,7 +146,7 @@ export function TransactionForm({ mode, transaction, onClose, onSuccess }: Trans
 
       <div>
         <label className="text-sm text-slate-600">Notes (optional)</label>
-        <TextInput value={formData.notes} onChange={(e) => setFormData({ ...formData, notes: e.target.value })} placeholder="Additional notes" />
+        <Textarea value={formData.notes} onChange={(e) => setFormData({ ...formData, notes: e.target.value })} placeholder="Additional notes" rows={3} />
       </div>
 
       <div className="flex justify-end gap-2 pt-2">

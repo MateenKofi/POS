@@ -1,5 +1,5 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/custom-components"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/custom-components"
 
 interface StaffPerformanceData {
   id: number
@@ -18,7 +18,7 @@ interface StaffReportProps {
 
 export function StaffReport({ staffPerformance, formatCurrency }: StaffReportProps) {
   return (
-    <Card className="border-slate-200">
+    <Card className="">
       <CardHeader>
         <CardTitle className="text-lg font-semibold text-slate-800">Staff Performance</CardTitle>
       </CardHeader>

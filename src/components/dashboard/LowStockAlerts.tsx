@@ -9,7 +9,7 @@ interface LowStockAlertsProps {
 
 export function LowStockAlerts({ lowStockProducts, onQuickAction }: LowStockAlertsProps) {
   return (
-    <Card className="border-slate-200">
+    <Card className="">
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="text-slate-800">Low Stock Alerts</CardTitle>
         {lowStockProducts.length > 0 && (

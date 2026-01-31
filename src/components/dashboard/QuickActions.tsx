@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/custom-components"
 import { Button } from "@/components/ui/button"
 import { ShoppingCart, Package, Truck, Users } from "lucide-react"
 
@@ -8,7 +8,7 @@ interface QuickActionsProps {
 
 export function QuickActions({ onQuickAction }: QuickActionsProps) {
   return (
-    <Card className="border-slate-200">
+    <Card className="">
       <CardHeader>
         <CardTitle className="text-slate-800">Quick Actions</CardTitle>
       </CardHeader>

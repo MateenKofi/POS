@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/custom-components"
 import { Button } from "@/components/ui/button"
 import { TrendingUp } from "lucide-react"
 
@@ -17,7 +17,7 @@ interface TopProductsProps {
 
 export function TopProducts({ topProducts, formatCurrency, onQuickAction }: TopProductsProps) {
   return (
-    <Card className="border-slate-200 lg:col-span-2">
+    <Card className=" lg:col-span-2">
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="text-slate-800">Top Products</CardTitle>
         <Button

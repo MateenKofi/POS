@@ -29,7 +29,7 @@ export function CartSection({
   onCheckout
 }: CartSectionProps) {
   return (
-    <Card className="border-slate-200/60 shadow-sm shadow-slate-200/50 sticky top-4 overflow-x-hidden">
+    <Card className="sticky top-4 overflow-x-hidden">
       <CardHeader className="-mx-6 px-6 border-b border-slate-100">
         <CardTitle className="text-lg sm:text-xl text-slate-800 flex items-center gap-2 pl-4">
           <div className="p-2 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg">

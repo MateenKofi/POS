@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/custom-components"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/custom-components"
 import type { Product } from "@/lib/api"
 
 interface ExpiringProduct extends Product {
@@ -24,7 +24,7 @@ export function ExpiryReport({ expiringProducts }: ExpiryReportProps) {
   }
 
   return (
-    <Card className="border-slate-200">
+    <Card className="">
       <CardHeader>
         <CardTitle className="text-lg font-semibold text-slate-800">Expiring Stock Report</CardTitle>
       </CardHeader>

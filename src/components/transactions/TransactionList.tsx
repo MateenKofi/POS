@@ -1,22 +1,20 @@
 import { Badge } from "@/components/ui/badge"
 import { Button, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/custom-components"
-import { Edit, Trash2 } from "lucide-react"
+import { Eye } from "lucide-react"
 import type { Transaction } from "@/lib/api"
 
 interface TransactionListProps {
   transactions: Transaction[]
   transactionTypeLabels: Record<string, string>
   transactionStatusColors: Record<string, string>
-  onEdit: (transaction: Transaction) => void
-  onDelete: (id: number) => void
+  onView: (transaction: Transaction) => void
 }
 
 export function TransactionList({
   transactions,
   transactionTypeLabels,
   transactionStatusColors,
-  onEdit,
-  onDelete,
+  onView,
 }: TransactionListProps) {
   return (
     <div className="space-y-2">
@@ -27,6 +25,7 @@ export function TransactionList({
             <TableHead>Reference</TableHead>
             <TableHead>Description</TableHead>
             <TableHead>Type</TableHead>
+            <TableHead>Status</TableHead>
             <TableHead className="text-right">Amount</TableHead>
             <TableHead></TableHead>
           </TableRow>
@@ -45,8 +44,11 @@ export function TransactionList({
                 {t.cashier_name && <p className="text-xs text-slate-500">{t.cashier_name}</p>}
               </TableCell>
               <TableCell>
+                <span className="text-xs text-slate-600">{transactionTypeLabels[t.transaction_type]}</span>
+              </TableCell>
+              <TableCell>
                 <Badge variant="outline" className={transactionStatusColors[t.status]}>
-                  {transactionTypeLabels[t.transaction_type]}
+                  {t.status.charAt(0).toUpperCase() + t.status.slice(1)}
                 </Badge>
               </TableCell>
               <TableCell className="text-right">
@@ -55,14 +57,9 @@ export function TransactionList({
                 </span>
               </TableCell>
               <TableCell className="text-right">
-                <div className="flex justify-end gap-1">
-                  <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => onEdit(t)}>
-                    <Edit className="h-3 w-3" />
-                  </Button>
-                  <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-red-600" onClick={() => onDelete(t.transaction_id)}>
-                    <Trash2 className="h-3 w-3" />
-                  </Button>
-                </div>
+                <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => onView(t)}>
+                  <Eye className="h-3 w-3" />
+                </Button>
               </TableCell>
             </TableRow>
           ))}
