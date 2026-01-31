@@ -8,9 +8,9 @@ import type { SupplierProductWithDetails, CreateSupplierProductRequest } from "@
 import { toast } from "sonner"
 
 // Sub-components
-import { SupplierProductForm } from "./supplier-product-management/SupplierProductForm"
-import { SupplierProductEditForm } from "./supplier-product-management/SupplierProductEditForm"
-import { SupplierProductTable } from "./supplier-product-management/SupplierProductTable"
+import { SupplierProductForm } from "./SupplierProductForm"
+import { SupplierProductEditForm } from "./SupplierProductEditForm"
+import { SupplierProductTable } from "./SupplierProductTable"
 
 export function SupplierProductManagement() {
   const [searchTerm, setSearchTerm] = useState("")

@@ -7,17 +7,17 @@ import { Loader2, AlertTriangle, CreditCard } from "lucide-react"
 import { useProducts, useCreateSale } from "@/hooks/useApi"
 import { type CreateSaleRequest } from "@/lib/api"
 import { useAuth } from "@/contexts/AuthContext"
-import { InvoiceModal } from "./sales/InvoiceModal"
+import { InvoiceModal } from "./InvoiceModal"
 
 
 // Sales sub-components
-import { SalesHeader } from "./sales/SalesHeader"
-import { QuickStats } from "./sales/QuickStats"
-import { ProductGrid } from "./sales/ProductGrid"
-import { CartSection } from "./sales/CartSection"
-import { UnitSelectorModal } from "./sales/UnitSelectorModal"
-import { PaymentModalContent, PaymentModalFooter } from "./sales/PaymentModal"
-import type { CartItem, PaymentDetails, CompletedSale, UnitSelectorState } from "./sales/types"
+import { SalesHeader } from "./SalesHeader"
+import { QuickStats } from "./QuickStats"
+import { ProductGrid } from "./ProductGrid"
+import { CartSection } from "./CartSection"
+import { UnitSelectorModal } from "./UnitSelectorModal"
+import { PaymentModalContent, PaymentModalFooter } from "./PaymentModal"
+import type { CartItem, PaymentDetails, CompletedSale, UnitSelectorState } from "./types"
 
 export function SalesInterface() {
   const { user } = useAuth()

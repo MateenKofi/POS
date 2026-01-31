@@ -5,9 +5,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/custom-co
 import { Loader2, Receipt, Search } from "lucide-react"
 import { useTransactions } from "@/hooks/useApi"
 import type { Transaction } from "@/lib/api"
-import { InvoiceModal } from "@/components/sales/InvoiceModal"
-import { transactionToInvoiceData } from "./transactions/ViewTransactionModal"
-import { TransactionList } from "./transactions/TransactionList"
+import { InvoiceModal } from "@/pages/sales/InvoiceModal"
+import { transactionToInvoiceData } from "./ViewTransactionModal"
+import { TransactionList } from "./TransactionList"
 
 const TRANSACTION_TYPE_LABELS: Record<string, string> = {
   sale_payment: 'Sale Payment',

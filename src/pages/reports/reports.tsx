@@ -6,10 +6,10 @@ import { useSales, useProducts, useStaff } from "@/hooks/useApi"
 import type { Sale, Staff } from "@/lib/api"
 
 // Reports sub-components
-import { ReportHeader } from "./reports/ReportHeader"
-import { ProfitReport } from "./reports/ProfitReport"
-import { ExpiryReport } from "./reports/ExpiryReport"
-import { StaffReport } from "./reports/StaffReport"
+import { ReportHeader } from "./ReportHeader"
+import { ProfitReport } from "./ProfitReport"
+import { ExpiryReport } from "./ExpiryReport"
+import { StaffReport } from "./StaffReport"
 
 type ReportTab = "profit" | "expiry" | "staff"
 type PeriodType = "today" | "week" | "month"

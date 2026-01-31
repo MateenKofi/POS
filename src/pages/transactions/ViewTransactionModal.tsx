@@ -1,6 +1,6 @@
 // This component exports a helper to convert Transaction to InvoiceData
 // and re-exports InvoiceModal types for convenience
-import type { InvoiceData } from "@/components/sales/InvoiceModal"
+import type { InvoiceData } from "@/pages/sales/InvoiceModal"
 import type { Transaction } from "@/lib/api"
 
 const PAYMENT_METHOD_LABELS: Record<string, string> = {
@@ -38,5 +38,5 @@ export function transactionToInvoiceData(transaction: Transaction): InvoiceData 
 }
 
 // Re-export InvoiceModal
-export { InvoiceModal } from "@/components/sales/InvoiceModal"
-export type { InvoiceData, InvoiceItem } from "@/components/sales/InvoiceModal"
+export { InvoiceModal } from "@/pages/sales/InvoiceModal"
+export type { InvoiceData, InvoiceItem } from "@/pages/sales/InvoiceModal"

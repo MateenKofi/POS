@@ -9,8 +9,8 @@ import { toast } from "sonner"
 import { Modal } from "@/components/modal"
 
 // Supplier management sub-components
-import { SupplierForm } from "./supplier-management/SupplierForm"
-import { SupplierRow } from "./supplier-management/SupplierRow"
+import { SupplierForm } from "./SupplierForm"
+import { SupplierRow } from "./SupplierRow"
 
 const defaultNewSupplier: CreateSupplierRequest = {
   name: "",

@@ -14,10 +14,10 @@ import { Modal } from "@/components/modal"
 import { Plus } from "lucide-react"
 
 // Staff management sub-components
-import { StaffTable } from "./staff-management/StaffTable"
-import { StaffForm } from "./staff-management/StaffForm"
-import { ChangePasswordForm } from "./staff-management/ChangePasswordForm"
-import type { PasswordData } from "./staff-management/types"
+import { StaffTable } from "./StaffTable"
+import { StaffForm } from "./StaffForm"
+import { ChangePasswordForm } from "./ChangePasswordForm"
+import type { PasswordData } from "./types"
 
 const defaultNewStaff: CreateStaffRequest = {
   first_name: "",

@@ -10,12 +10,12 @@ import { toast } from "sonner"
 import { useAuth } from "@/contexts/AuthContext"
 
 // Product management sub-components
-import { ProductTable } from "./product-management/ProductTable"
-import { ProductForm } from "./product-management/ProductForm"
-import { ProductSummary } from "./product-management/ProductSummary"
-import { ProductStats } from "./product-management/ProductStats"
+import { ProductTable } from "./ProductTable"
+import { ProductForm } from "./ProductForm"
+import { ProductSummary } from "./ProductSummary"
+import { ProductStats } from "./ProductStats"
 
-import type { ProductTab } from "./product-management/types"
+import type { ProductTab } from "./types"
 
 export function ProductManagement() {
   const { user } = useAuth()

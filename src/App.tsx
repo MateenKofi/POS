@@ -1,22 +1,21 @@
 import { useState, useEffect } from "react"
 import { useAuth } from "@/contexts/AuthContext"
 import { Toaster } from "sonner"
-import Login from "@/components/login"
+import { Login } from "@/pages/authentication/login"
 import { Sidebar } from "@/components/sidebar"
-import { ProductManagement } from "@/components/product-management"
-import { SalesInterface } from "@/components/sales-interface"
-// import { SalesHistory } from "@/components/sales-history"
-import { SupplierManagement } from "@/components/supplier-management"
-import { SupplierProductManagement } from "@/components/supplier-product-management"
-import { StaffManagement } from "@/components/staff-management"
-import { Dashboard } from "@/components/dashboard"
-import { Reports } from "@/components/reports"
+import { ProductManagement } from "@/pages/products/product-management"
+import { SalesInterface } from "@/pages/sales/sales-interface"
+import { SupplierManagement } from "@/pages/suppliers/supplier-management"
+import { SupplierProductManagement } from "@/pages/suppliers/supplier-product-management"
+import { StaffManagement } from "@/pages/staff/staff-management"
+import { Dashboard } from "@/pages/dashboard/dashboard"
+import { Reports } from "@/pages/reports/reports"
 import { Loader2, Menu } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Invoices } from "@/components/invoices"
-import { Transactions } from "@/components/transactions"
-import { StockMovements } from "@/components/stock-movements"
-import { DailyClosure } from "@/components/daily-closure"
+import { Invoices } from "@/pages/invoices/invoices"
+import { Transactions } from "@/pages/transactions/transactions"
+import { StockMovements } from "@/pages/stock-movements"
+import { DailyClosure } from "@/pages/daily-closure/daily-closure"
 
 const App = () => {
   const [activeTab, setActiveTab] = useState("")
@@ -105,7 +104,7 @@ const App = () => {
     <div className="flex h-screen bg-slate-50">
       {/* Mobile Sidebar Overlay */}
       {isSidebarOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
           onClick={() => setIsSidebarOpen(false)}
         />

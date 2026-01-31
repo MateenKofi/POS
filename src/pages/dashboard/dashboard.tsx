@@ -12,16 +12,16 @@ import {
 } from "@/hooks/useApi";
 
 // Dashboard sub-components
-import { DashboardHeader } from "./dashboard/DashboardHeader"
-import { StatsCards } from "./dashboard/StatsCards"
-import { LowStockAlerts } from "./dashboard/LowStockAlerts"
-import { ExpiringProducts } from "./dashboard/ExpiringProducts"
-import { TopProducts } from "./dashboard/TopProducts"
-import { QuickActions } from "./dashboard/QuickActions"
-import { RevenueChart } from "./dashboard/RevenueChart"
-import { SalesByCategory } from "./dashboard/SalesByCategory"
-import { DailySalesChart } from "./dashboard/DailySalesChart"
-import type { DashboardStat, SaleData } from "./dashboard/types"
+import { DashboardHeader } from "./DashboardHeader"
+import { StatsCards } from "./StatsCards"
+import { LowStockAlerts } from "./LowStockAlerts"
+import { ExpiringProducts } from "./ExpiringProducts"
+import { TopProducts } from "./TopProducts"
+import { QuickActions } from "./QuickActions"
+import { RevenueChart } from "./RevenueChart"
+import { SalesByCategory } from "./SalesByCategory"
+import { DailySalesChart } from "./DailySalesChart"
+import type { DashboardStat, SaleData } from "./types"
 
 interface DashboardProps {
   onNavigate?: (tab: string) => void;
