@@ -5,7 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/custom-co
 import { Loader2, Receipt, Search } from "lucide-react"
 import { useTransactions } from "@/hooks/useApi"
 import type { Transaction } from "@/lib/api"
-import { ViewTransactionModal } from "./transactions/ViewTransactionModal"
+import { InvoiceModal } from "@/components/sales/InvoiceModal"
+import { transactionToInvoiceData } from "./transactions/ViewTransactionModal"
 import { TransactionList } from "./transactions/TransactionList"
 
 const TRANSACTION_TYPE_LABELS: Record<string, string> = {
@@ -148,11 +149,11 @@ export function Transactions() {
 
       <p className="text-xs text-slate-500 mt-4 text-center">Showing {list.length} transactions</p>
 
-      {/* View Transaction Modal */}
-      <ViewTransactionModal
+      {/* View Transaction Modal - Uses InvoiceModal */}
+      <InvoiceModal
         isOpen={isViewModalOpen}
         onClose={() => { setIsViewModalOpen(false); setSelectedTransaction(null); }}
-        transaction={selectedTransaction}
+        invoiceData={selectedTransaction ? transactionToInvoiceData(selectedTransaction) : null}
       />
     </div>
   )

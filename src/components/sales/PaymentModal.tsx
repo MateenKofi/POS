@@ -87,7 +87,7 @@ export function PaymentModalContent({
         <div>
           <label className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
             <DollarSign className="h-4 w-4 text-emerald-500" />
-            Cash Amount
+            Cash Amount <span className="text-slate-400 font-normal text-xs">(Auto-filled, editable if needed)</span>
           </label>
           <div className="relative">
             <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-500 font-medium">GH₵</span>
@@ -108,6 +108,17 @@ export function PaymentModalContent({
               <div>
                 <p className="text-xs text-emerald-600">Change due</p>
                 <p className="text-lg font-bold text-emerald-700">GH₵{paymentDetails.change.toFixed(2)}</p>
+              </div>
+            </div>
+          )}
+          {paymentDetails.amount > 0 && paymentDetails.change === 0 && (
+            <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-xl flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center">
+                <DollarSign className="h-4 w-4 text-white" />
+              </div>
+              <div>
+                <p className="text-xs text-green-600">Exact payment</p>
+                <p className="text-sm font-medium text-green-700">No change due</p>
               </div>
             </div>
           )}
@@ -187,7 +198,7 @@ export function PaymentModalContent({
             GH₵{total.toFixed(2)}
           </span>
         </div>
-        {paymentDetails.method === 1 && paymentDetails.amount > 0 && paymentDetails.amount >= total && (
+        {paymentDetails.method === 1 && paymentDetails.amount > 0 && (
           <div className="mt-3 pt-3 border-t border-slate-200 space-y-2">
             <div className="flex justify-between text-sm">
               <span className="text-slate-600">Cash Received:</span>
@@ -195,7 +206,9 @@ export function PaymentModalContent({
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-slate-600">Change:</span>
-              <span className="font-semibold text-emerald-600">GH₵{paymentDetails.change.toFixed(2)}</span>
+              <span className={paymentDetails.change > 0 ? "font-semibold text-emerald-600" : "font-medium text-slate-500"}>
+                {paymentDetails.change > 0 ? `GH₵${paymentDetails.change.toFixed(2)}` : "GH₵0.00 (Exact)"}
+              </span>
             </div>
           </div>
         )}

@@ -183,7 +183,7 @@ export function SalesInterface() {
     setPaymentDetails(prev => ({
       ...prev,
       method: methodId,
-      amount: methodId === 1 ? 0 : total,
+      amount: total,
       change: 0
     }))
   }
